@@ -10,7 +10,7 @@ const DEFAULT_TIME = 60 * 40;
 const SUBJECTS = ['Pensamiento Matemático', 'Comprensión Lectora', 'Redacción Indirecta', 'Pre-medicina', 'Ciencias de la Salud'];
 
 /* ── Timer bar ─────────────────────────────────────── */
-function TimerBar({ seconds, total }) {
+function TimerBar({ seconds, total, isMobile }) {
   const pct     = (seconds / total) * 100;
   const mins    = Math.floor(seconds / 60).toString().padStart(2, '0');
   const secs    = (seconds % 60).toString().padStart(2, '0');
@@ -28,13 +28,13 @@ function TimerBar({ seconds, total }) {
       <div style={{ height: 3, width: '100%', background: 'rgba(255,255,255,0.05)' }}>
         <motion.div style={{ height: '100%', background: barColor }} animate={{ width: `${pct}%` }} transition={{ duration: 0.8, ease: 'linear' }} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '10px 28px 0' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: isMobile ? '8px 14px 0' : '10px 28px 0' }}>
         <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 999,
+          display: 'inline-flex', alignItems: 'center', gap: 8, padding: isMobile ? '5px 11px' : '6px 14px', borderRadius: 999,
           background: urgent ? 'rgba(220,38,38,0.12)' : 'rgba(255,255,255,0.05)',
           border: `1px solid ${urgent ? 'rgba(248,113,113,0.3)' : 'rgba(255,255,255,0.1)'}`,
         }}>
-          <span style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700, color: urgent ? '#f87171' : warning ? '#f5c842' : 'white', letterSpacing: '0.05em' }}>
+          <span style={{ fontFamily: 'Syne, sans-serif', fontSize: isMobile ? 14 : 16, fontWeight: 700, color: urgent ? '#f87171' : warning ? '#f5c842' : 'white', letterSpacing: '0.05em' }}>
             {mins}:{secs}
           </span>
         </div>
@@ -44,9 +44,18 @@ function TimerBar({ seconds, total }) {
 }
 
 /* ── Question nav ──────────────────────────────────── */
-function QuestionNav({ questions, current, answers, setCurrent }) {
+function QuestionNav({ questions, current, answers, setCurrent, isMobile }) {
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
+    <div style={{
+      display: 'flex',
+      flexWrap: isMobile ? 'nowrap' : 'wrap',
+      gap: isMobile ? 5 : 6,
+      justifyContent: isMobile ? 'flex-start' : 'center',
+      overflowX: isMobile ? 'auto' : 'visible',
+      WebkitOverflowScrolling: 'touch',
+      paddingBottom: isMobile ? 4 : 0,
+      scrollbarWidth: 'none',
+    }}>
       {questions.map((q, i) => {
         const answered = answers[q.id] !== undefined;
         const active   = i === current;
@@ -56,7 +65,10 @@ function QuestionNav({ questions, current, answers, setCurrent }) {
             onClick={() => setCurrent(i)}
             whileHover={{ scale: 1.12 }} whileTap={{ scale: 0.94 }}
             style={{
-              width: 34, height: 34, borderRadius: 8, fontSize: 12, fontWeight: 600,
+              width: isMobile ? 30 : 34,
+              height: isMobile ? 30 : 34,
+              flexShrink: 0,
+              borderRadius: 8, fontSize: isMobile ? 11 : 12, fontWeight: 600,
               cursor: 'pointer', border: '1px solid', transition: 'color 0.12s ease, background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease',
               background: active ? '#f5c842' : answered ? 'rgba(52,211,153,0.12)' : 'rgba(255,255,255,0.04)',
               color:      active ? '#030a1a' : answered ? '#34d399' : 'rgba(255,255,255,0.4)',
@@ -575,6 +587,7 @@ function CenevalReport({ questions, answers, onRepeat, onHome }) {
 export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQuiz }) {
   const { user } = useAuth();
   const isStaff  = user.role === 'admin' || user.role === 'teacher';
+  const { isMobile } = useBreakpoint();
 
   const [mode,            setMode]           = useState('home');
   const [activeQuiz,      setActiveQuiz]     = useState(null);
@@ -621,7 +634,7 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
     const builtinQuiz = { id: 'builtin', title: 'Simulador EXANI-II Oficial', subject: 'Múltiples materias', timeLimit: 40, questions: mockExamQuestions };
 
     return (
-      <div style={{ maxHeight: 'calc(100vh - 4rem)', overflowY: 'auto', padding: '32px' }} className="scrollbar-hide">
+      <div style={{ maxHeight: 'calc(100vh - 4rem)', overflowY: 'auto', padding: isMobile ? '20px 14px' : '32px' }} className="scrollbar-hide">
         <div style={{ maxWidth: 640, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
             <div>
@@ -692,31 +705,36 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 4rem)' }}>
-      <TimerBar seconds={timeLeft} total={quizTimeLimit} />
+      <TimerBar seconds={timeLeft} total={quizTimeLimit} isMobile={isMobile} />
 
-      <div style={{ padding: '14px 28px', borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.01)' }}>
-        <QuestionNav questions={questions} current={currentQ} answers={answers} setCurrent={setCurrentQ} />
+      <div style={{
+        padding: isMobile ? '10px 12px' : '14px 28px',
+        borderBottom: '1px solid rgba(255,255,255,0.05)',
+        background: 'rgba(255,255,255,0.01)',
+        overflow: isMobile ? 'hidden' : 'visible',
+      }}>
+        <QuestionNav questions={questions} current={currentQ} answers={answers} setCurrent={setCurrentQ} isMobile={isMobile} />
       </div>
 
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px' }}>
+      <div style={{ flex: 1, display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', justifyContent: 'center', padding: isMobile ? '16px 14px' : '32px' }}>
         <div style={{ width: '100%', maxWidth: 600 }}>
           <AnimatePresence mode="wait">
             <motion.div key={currentQ} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.22 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-                <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 13 }}>{currentQ + 1} / {questions.length}</span>
-                <span style={{ fontSize: 11, fontWeight: 600, borderRadius: 999, padding: '2px 9px', background: 'rgba(96,165,250,0.1)', color: '#93c5fd', border: '1px solid rgba(96,165,250,0.2)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+                <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: isMobile ? 12 : 13, flexShrink: 0 }}>{currentQ + 1} / {questions.length}</span>
+                <span style={{ fontSize: 11, fontWeight: 600, borderRadius: 999, padding: '2px 9px', background: 'rgba(96,165,250,0.1)', color: '#93c5fd', border: '1px solid rgba(96,165,250,0.2)', maxWidth: isMobile ? '200px' : 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {q.subject}
                 </span>
               </div>
 
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl" style={{ padding: '22px 24px', marginBottom: 20 }}>
-                <p style={{ color: 'white', fontSize: 16, lineHeight: 1.7, marginBottom: q.image ? 16 : 0 }}>{q.question}</p>
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl" style={{ padding: isMobile ? '16px' : '22px 24px', marginBottom: 16 }}>
+                <p style={{ color: 'white', fontSize: isMobile ? 14.5 : 16, lineHeight: 1.7, marginBottom: q.image ? 16 : 0 }}>{q.question}</p>
                 {q.image && (
                   <img
                     src={q.image}
                     alt="Imagen del reactivo"
                     style={{
-                      maxWidth: '100%', maxHeight: 260, objectFit: 'contain',
+                      maxWidth: '100%', maxHeight: isMobile ? 180 : 260, objectFit: 'contain',
                       borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)',
                       display: 'block',
                     }}
@@ -724,7 +742,7 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
                 )}
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 8 : 10, marginBottom: 16 }}>
                 {q.options.map((opt, i) => (
                   <OptionButton key={i} letter={['A','B','C','D'][i]} text={opt} state={getOptionState(i)} onClick={() => handleAnswer(i)} disabled={isAnswered} />
                 ))}
@@ -734,25 +752,36 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
                 {isAnswered && showExplanation && q.explanation && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
-                    className="bg-yellow-500/[0.04] backdrop-blur-xl border border-yellow-500/20 rounded-2xl" style={{ padding: '16px 20px', marginBottom: 20, overflow: 'hidden' }}
+                    className="bg-yellow-500/[0.04] backdrop-blur-xl border border-yellow-500/20 rounded-2xl" style={{ padding: isMobile ? '14px 16px' : '16px 20px', marginBottom: 16, overflow: 'hidden' }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 8 }}>
                       <Lightbulb size={14} style={{ color: '#f5c842' }} />
                       <span style={{ color: '#f5c842', fontSize: 12, fontWeight: 600 }}>Explicación</span>
                     </div>
-                    <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 13.5, lineHeight: 1.65 }}>{q.explanation}</p>
+                    <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: isMobile ? 13 : 13.5, lineHeight: 1.65 }}>{q.explanation}</p>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <button onClick={() => { setShowExplanation(false); if (currentQ > 0) setCurrentQ(c => c - 1); }} disabled={currentQ === 0} className="btn-ghost" style={{ opacity: currentQ === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: isMobile ? 'wrap' : 'nowrap',
+                gap: isMobile ? 8 : 0,
+              }}>
+                <button
+                  onClick={() => { setShowExplanation(false); if (currentQ > 0) setCurrentQ(c => c - 1); }}
+                  disabled={currentQ === 0}
+                  className="btn-ghost"
+                  style={{ opacity: currentQ === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}
+                >
                   <ChevronLeft size={15} /> Anterior
                 </button>
 
-                <div style={{ display: 'flex', gap: 10 }}>
+                <div style={{ display: 'flex', gap: isMobile ? 8 : 10, flexWrap: isMobile ? 'wrap' : 'nowrap', justifyContent: isMobile ? 'flex-end' : 'flex-end', flex: isMobile ? '1 1 auto' : 'none' }}>
                   {isAnswered && q.explanation && (
-                    <button onClick={() => setShowExplanation(e => !e)} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <button onClick={() => setShowExplanation(e => !e)} className="btn-ghost" style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: isMobile ? 12 : undefined }}>
                       <Lightbulb size={14} /> {showExplanation ? 'Ocultar' : 'Explicación'}
                     </button>
                   )}

@@ -235,7 +235,7 @@ function VideoRow({ video, index }) {
 
 /* ── Session card ──────────────────────────────────────── */
 function SessionCard({ session, isMedical, isStaff, canDownload, onToggleVisibility, onUpload }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const accentColor = isMedical ? '#5eead4' : '#f5c842';
   const accentBg    = isMedical ? 'rgba(29,233,182,0.08)' : 'rgba(245,200,66,0.08)';
   const accentBorder= isMedical ? 'rgba(29,233,182,0.22)' : 'rgba(245,200,66,0.22)';

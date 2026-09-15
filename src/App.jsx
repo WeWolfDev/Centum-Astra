@@ -58,7 +58,8 @@ function AppContent() {
 
   function renderSection() {
     if (user.role === 'admin') {
-      if (activeSection === 'dashboard' || activeSection === 'students') return <AdminDashboard />;
+      if (activeSection === 'dashboard') return <AdminDashboard view="overview" onNavigate={handleNavigation} />;
+      if (activeSection === 'students')  return <AdminDashboard view="students" />;
       if (activeSection === 'stats') return <Statistics />;
     }
 
