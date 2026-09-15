@@ -115,7 +115,7 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}>
-            Welcome, {firstName}
+            Hola, {firstName}
           </span>
         </div>
       </div>
