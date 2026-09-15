@@ -4,14 +4,15 @@ import { mockModules } from '../../data/mockData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Flame, Target, BookOpen, ChevronRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useBreakpoint } from '../../hooks/useBreakpoint';
 
 /* ── Constellation progress ring ───────────────────────── */
-function ProgressHero({ value }) {
-  const SIZE   = 200;
+function ProgressHero({ value, isMobile }) {
+  const SIZE   = isMobile ? 160 : 200;
   const CX     = SIZE / 2;
   const CY     = SIZE / 2;
-  const R      = 82;
-  const STROKE = 8;
+  const R      = isMobile ? 64 : 82;
+  const STROKE = isMobile ? 6 : 8;
   const circ   = 2 * Math.PI * R;
   const filled = circ * (value / 100);
   const gap    = circ - filled;
@@ -28,12 +29,13 @@ function ProgressHero({ value }) {
   });
 
   // Module completion dots around the ring
+  const dotOffset = isMobile ? 18 : 22;
   const dots = mockModules.map((mod, i) => {
     const angle = (mod.progress / 100) * 360 * 0.5 + i * 72 - 90;
     const rad   = (angle * Math.PI) / 180;
     return {
-      x: CX + (R + 22) * Math.cos(rad),
-      y: CY + (R + 22) * Math.sin(rad),
+      x: CX + (R + dotOffset) * Math.cos(rad),
+      y: CY + (R + dotOffset) * Math.sin(rad),
       filled: mod.progress > 0,
     };
   });
@@ -111,7 +113,7 @@ function ProgressHero({ value }) {
           x={CX} y={CY - 10}
           textAnchor="middle"
           fill="white"
-          fontSize="36"
+          fontSize={isMobile ? "28" : "36"}
           fontWeight="700"
           fontFamily="Syne, sans-serif"
         >
@@ -267,6 +269,7 @@ const STATS = [
 
 export default function StudentDashboard({ setActiveSection }) {
   const { user } = useAuth();
+  const { isMobile } = useBreakpoint();
 
   return (
     <div className="scrollbar-hide resp-padding" style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 24, overflowY: 'auto', maxHeight: 'calc(100vh - 4rem)', position: 'relative' }}>
@@ -276,36 +279,46 @@ export default function StudentDashboard({ setActiveSection }) {
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="group relative overflow-hidden rounded-2xl p-5 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4 bg-white/5 backdrop-blur-xl border border-yellow-500/20 hover:border-yellow-500/35 transition-colors duration-300"
-        style={{ zIndex: 1 }}
+        className="group relative overflow-hidden rounded-2xl bg-white/5 backdrop-blur-xl border border-yellow-500/20 hover:border-yellow-500/35 transition-colors duration-300"
+        style={{
+          padding: isMobile ? 20 : 28,
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          justifyContent: isMobile ? 'flex-start' : 'space-between',
+          gap: 16,
+          zIndex: 1,
+        }}
       >
-        {/* Astronaut photo — hidden on mobile */}
-        <div className="resp-hide-mobile" style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 200, overflow: 'hidden', pointerEvents: 'none' }}>
-          <img
-            src={`${import.meta.env.BASE_URL}poldychromos-astronaut-6947813_1920.jpg`}
-            alt=""
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%', opacity: 0.32, display: 'block' }}
-          />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(20,18,5,1) 0%, rgba(20,18,5,0.4) 50%, transparent 100%)' }} />
-        </div>
+        {!isMobile && (
+          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 200, overflow: 'hidden', pointerEvents: 'none' }}>
+            <img
+              src={`${import.meta.env.BASE_URL}poldychromos-astronaut-6947813_1920.jpg`}
+              alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%', opacity: 0.32, display: 'block' }}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(20,18,5,1) 0%, rgba(20,18,5,0.4) 50%, transparent 100%)' }} />
+          </div>
+        )}
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="font-syne text-[22px] font-bold text-white mb-1.5 tracking-[-0.02em]"
+            style={{ fontFamily: 'Syne, sans-serif', fontSize: isMobile ? 20 : 22, fontWeight: 700, color: 'white', marginBottom: 6, letterSpacing: '-0.02em' }}
           >
-            Hola, <span className="bg-gradient-to-br from-yellow-200 via-[#f5c842] to-amber-500/80 bg-clip-text text-transparent">{user.name.split(' ')[0]}</span>
+            Hola, <span style={{ background: 'linear-gradient(135deg, #fde68a, #f5c842, rgba(245,180,66,0.8))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{user.name.split(' ')[0]}</span>
           </motion.h2>
           <p style={{ color: 'rgba(255,255,255,0.58)', fontSize: 13.5 }}>
             Estás a <span style={{ color: '#f5c842', fontWeight: 700 }}>{100 - user.progress} puntos</span> de completar tu preparación.
           </p>
         </div>
+
         <button
           onClick={() => setActiveSection('exam')}
-          className="btn-fill w-full sm:w-auto"
-          style={{ position: 'relative', zIndex: 1 }}
+          className="btn-fill"
+          style={{ position: 'relative', zIndex: 1, width: isMobile ? '100%' : 'auto' }}
         >
           <span>Iniciar simulacro</span>
         </button>
@@ -316,22 +329,26 @@ export default function StudentDashboard({ setActiveSection }) {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="grid grid-cols-3 gap-3"
-        style={{ zIndex: 1 }}
+        style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, zIndex: 1 }}
       >
         {STATS.map(({ Icon, label, val, desc }) => (
           <div
             key={label}
-            className="bg-white/5 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-4 flex flex-col"
+            style={{
+              background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16,
+              padding: isMobile ? '14px 12px' : '18px 20px',
+              display: 'flex', flexDirection: 'column',
+            }}
           >
-            <div className="flex items-center gap-1.5 mb-3">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10 }}>
               <Icon size={12} strokeWidth={1.6} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
-              <p className="text-[10px] font-semibold tracking-[0.07em] text-white/35 uppercase leading-none">{label}</p>
+              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.07em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' }}>{label}</p>
             </div>
-            <p className="font-syne text-[20px] sm:text-[28px] font-bold leading-none tracking-tight bg-gradient-to-br from-yellow-200 via-[#f5c842] to-amber-500/80 bg-clip-text text-transparent">
+            <p style={{ fontFamily: 'Syne, sans-serif', fontSize: isMobile ? 20 : 26, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em', background: 'linear-gradient(135deg, #fde68a, #f5c842, rgba(245,180,66,0.8))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               {val}
             </p>
-            <p className="text-[11px] text-white/28 mt-1.5">{desc}</p>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.28)', marginTop: 6 }}>{desc}</p>
           </div>
         ))}
       </motion.div>
@@ -349,7 +366,7 @@ export default function StudentDashboard({ setActiveSection }) {
           <div className="section-divider" style={{ width: '100%', marginBottom: 0 }}>
             <h3>Progreso</h3>
           </div>
-          <ProgressHero value={user.progress} />
+          <ProgressHero value={user.progress} isMobile={isMobile} />
         </motion.div>
 
         {/* Bar chart card */}
