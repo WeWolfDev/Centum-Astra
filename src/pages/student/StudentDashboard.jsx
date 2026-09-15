@@ -115,7 +115,7 @@ function ProgressHero({ value, isMobile }) {
           fill="white"
           fontSize={isMobile ? "28" : "36"}
           fontWeight="700"
-          fontFamily="Orbitron, sans-serif"
+          fontFamily="Syne, sans-serif"
         >
           {value}
         </text>
@@ -136,7 +136,7 @@ function ProgressHero({ value, isMobile }) {
 /* ── Module card — space vs clinical treatment ──────────── */
 const SPACE_COLORS = {
   blue:    { bar: 'linear-gradient(90deg,#1d4ed8,#60a5fa)' },
-  purple:  { bar: 'linear-gradient(90deg,#7e22ce,#c084fc)' },
+  slate:   { bar: 'linear-gradient(90deg,#1e3a6e,#3b82f6)' },
   emerald: { bar: 'linear-gradient(90deg,#065f46,#34d399)' },
 };
 const CLINICAL_STYLE = {
