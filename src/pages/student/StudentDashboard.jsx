@@ -113,7 +113,7 @@ function ProgressHero({ value }) {
           fill="white"
           fontSize="36"
           fontWeight="700"
-          fontFamily="Orbitron, sans-serif"
+          fontFamily="Syne, sans-serif"
         >
           {value}
         </text>
@@ -134,7 +134,7 @@ function ProgressHero({ value }) {
 /* ── Module card — space vs clinical treatment ──────────── */
 const SPACE_COLORS = {
   blue:    { bar: 'linear-gradient(90deg,#1d4ed8,#60a5fa)' },
-  purple:  { bar: 'linear-gradient(90deg,#7e22ce,#c084fc)' },
+  slate:   { bar: 'linear-gradient(90deg,#1e3a6e,#3b82f6)' },
   emerald: { bar: 'linear-gradient(90deg,#065f46,#34d399)' },
 };
 const CLINICAL_STYLE = {
@@ -296,7 +296,7 @@ export default function StudentDashboard({ setActiveSection }) {
             transition={{ delay: 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="font-syne text-[22px] font-bold text-white mb-1.5 tracking-[-0.02em]"
           >
-            Welcome, <span className="bg-gradient-to-br from-yellow-200 via-[#f5c842] to-amber-500/80 bg-clip-text text-transparent">{user.name.split(' ')[0]}</span>
+            Hola, <span className="bg-gradient-to-br from-yellow-200 via-[#f5c842] to-amber-500/80 bg-clip-text text-transparent">{user.name.split(' ')[0]}</span>
           </motion.h2>
           <p style={{ color: 'rgba(255,255,255,0.58)', fontSize: 13.5 }}>
             Estás a <span style={{ color: '#f5c842', fontWeight: 700 }}>{100 - user.progress} puntos</span> de completar tu preparación.
