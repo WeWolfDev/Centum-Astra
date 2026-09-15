@@ -260,9 +260,9 @@ const RECENT_SCORES = [
 ];
 
 const STATS = [
-  { Icon: Target,   label: 'Quizzes',   val: '12/20' },
-  { Icon: Flame,    label: 'Racha',      val: '5 días' },
-  { Icon: BookOpen, label: 'Promedio',   val: '82%' },
+  { Icon: Target,   label: 'Quizzes',  val: '12/20', desc: 'completados' },
+  { Icon: Flame,    label: 'Racha',    val: '5 días', desc: 'sin fallar' },
+  { Icon: BookOpen, label: 'Promedio', val: '82%',   desc: 'en simulacros' },
 ];
 
 export default function StudentDashboard({ setActiveSection }) {
@@ -276,7 +276,7 @@ export default function StudentDashboard({ setActiveSection }) {
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="group relative overflow-hidden rounded-2xl p-7 flex items-center justify-between flex-wrap gap-4 bg-white/5 backdrop-blur-xl border border-yellow-500/20 hover:border-yellow-500/35 transition-colors duration-300"
+        className="group relative overflow-hidden rounded-2xl p-5 sm:p-7 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4 bg-white/5 backdrop-blur-xl border border-yellow-500/20 hover:border-yellow-500/35 transition-colors duration-300"
         style={{ zIndex: 1 }}
       >
         {/* Astronaut photo — hidden on mobile */}
@@ -304,35 +304,34 @@ export default function StudentDashboard({ setActiveSection }) {
         </div>
         <button
           onClick={() => setActiveSection('exam')}
-          className="btn-fill"
+          className="btn-fill w-full sm:w-auto"
           style={{ position: 'relative', zIndex: 1 }}
         >
           <span>Iniciar simulacro</span>
         </button>
       </motion.div>
 
-      {/* Stats row */}
+      {/* Stats grid */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl px-7 py-5 flex items-stretch flex-wrap"
+        className="grid grid-cols-3 gap-3"
         style={{ zIndex: 1 }}
       >
-        {STATS.map(({ Icon, label, val }, i) => (
-          <div key={label} className="flex items-stretch">
-            {i > 0 && (
-              <div className="w-px bg-white/[0.06] self-stretch mx-7" />
-            )}
-            <div style={{ flex: 1 }}>
-              <p className="font-syne text-[32px] font-bold leading-none tracking-tight mb-1.5 bg-gradient-to-br from-yellow-200 via-[#f5c842] to-amber-500/80 bg-clip-text text-transparent">
-                {val}
-              </p>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 6 }}>
-                <Icon size={11} strokeWidth={1.6} style={{ color: 'rgba(255,255,255,0.35)' }} />
-                <p className="text-[11px] font-medium tracking-[0.04em] text-white/30 uppercase">{label}</p>
-              </div>
+        {STATS.map(({ Icon, label, val, desc }) => (
+          <div
+            key={label}
+            className="bg-white/5 backdrop-blur-xl border border-white/[0.08] rounded-2xl p-4 flex flex-col"
+          >
+            <div className="flex items-center gap-1.5 mb-3">
+              <Icon size={12} strokeWidth={1.6} style={{ color: 'rgba(255,255,255,0.35)', flexShrink: 0 }} />
+              <p className="text-[10px] font-semibold tracking-[0.07em] text-white/35 uppercase leading-none">{label}</p>
             </div>
+            <p className="font-syne text-[20px] sm:text-[28px] font-bold leading-none tracking-tight bg-gradient-to-br from-yellow-200 via-[#f5c842] to-amber-500/80 bg-clip-text text-transparent">
+              {val}
+            </p>
+            <p className="text-[11px] text-white/28 mt-1.5">{desc}</p>
           </div>
         ))}
       </motion.div>
