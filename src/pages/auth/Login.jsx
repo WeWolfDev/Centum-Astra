@@ -142,7 +142,7 @@ export default function Login() {
   };
 
   return (
-    <div className="relative flex flex-col overflow-hidden min-h-screen bg-[radial-gradient(ellipse_at_top,_#0d1533_0%,_#030a1a_45%,_#000_100%)]">
+    <div className="relative flex flex-col overflow-hidden min-h-screen bg-[radial-gradient(ellipse_at_top,_#0d1533_0%,_#030a1a_45%,_#060f28_100%)]">
       <PublicNav />
 
       {/* ── Layer 1: Static space photo — renders instantly, acts as poster ── */}
@@ -293,7 +293,7 @@ export default function Login() {
             {/* Form header */}
             <div className="mb-7">
               <h2 className="font-syne text-[22px] font-bold text-white mb-[5px] tracking-[-0.02em]">
-                Welcome
+                Bienvenido
               </h2>
               <p className="text-white/38 text-[13.5px] leading-[1.5]">
                 Selecciona tu perfil para continuar
