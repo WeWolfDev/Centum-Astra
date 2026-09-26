@@ -765,7 +765,7 @@ function CourseCard({ course, index, onSelect }) {
 }
 
 /* ── Public NavBar ──────────────────────────────────────── */
-export default function PublicNav() {
+export default function PublicNav({ onLoginClick }) {
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [scrolled,     setScrolled]     = useState(false);
 
@@ -812,32 +812,46 @@ export default function PublicNav() {
           </div>
         </div>
 
-        {/* Cursos — abre el selector directamente */}
-        <button
-          onClick={() => setSelectorOpen(true)}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '7px 16px', borderRadius: 8,
-            background: 'transparent',
-            border: '1px solid rgba(255,255,255,0.1)',
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 13.5, fontWeight: 500, cursor: 'pointer',
-            transition: 'color 0.15s ease, background 0.15s ease, border-color 0.15s ease',
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.color = 'white';
-            e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)';
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
-            e.currentTarget.style.background = 'transparent';
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-          }}
-        >
-          Cursos
-          <ChevronDown size={13} style={{ opacity: 0.6 }} />
-        </button>
+        {/* Right side nav actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Cursos — abre el selector directamente */}
+          <button
+            onClick={() => setSelectorOpen(true)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '7px 16px', borderRadius: 8,
+              background: 'transparent',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: 'rgba(255,255,255,0.7)',
+              fontSize: 13.5, fontWeight: 500, cursor: 'pointer',
+              transition: 'color 0.15s ease, background 0.15s ease, border-color 0.15s ease',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.color = 'white';
+              e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.color = 'rgba(255,255,255,0.7)';
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+            }}
+          >
+            Cursos
+            <ChevronDown size={13} style={{ opacity: 0.6 }} />
+          </button>
+
+          {/* Iniciar sesión — only shown when callback is provided */}
+          {onLoginClick && (
+            <button
+              onClick={onLoginClick}
+              className="btn-gold nav-cta-label"
+              style={{ padding: '7px 18px', fontSize: 13.5, borderRadius: 8 }}
+            >
+              Iniciar sesión
+            </button>
+          )}
+        </div>
       </motion.nav>
 
       {/* Course selector modal */}
