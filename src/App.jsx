@@ -6,6 +6,7 @@ import Stars from './components/ui/Stars';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 
+import LandingPage from './pages/landing/LandingPage';
 import Login from './pages/auth/Login';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Statistics from './pages/admin/Statistics';
@@ -52,8 +53,11 @@ function AppContent() {
     setCustomQuizzes(prev => prev.filter(q => q.id !== quizId));
   }
 
+  const [showLogin, setShowLogin] = useState(false);
+
   if (!user) {
-    return <Login />;
+    if (showLogin) return <Login onBack={() => setShowLogin(false)} />;
+    return <LandingPage onLoginClick={() => setShowLogin(true)} />;
   }
 
   function renderSection() {
