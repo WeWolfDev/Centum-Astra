@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Alumno · Módulos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Orbitron:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+a{color:rgba(255,255,255,0.6)}a:hover{color:rgba(255,255,255,0.92)}
+button{font:inherit}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 800px; background: #030a1a; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; line-height: 1.5">
+
+<nav aria-label="Principal" style="flex: 1 0 232px; box-sizing: border-box; padding: 20px; background: #04091f; border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 32px">
+<div style="font-family: 'Orbitron', sans-serif; line-height: 1.2; padding: 8px 12px">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #ffffff">CENTUM</div>
+<div style="font-size: 10px; font-weight: 500; letter-spacing: 0.14em; color: #f5c842">ASTRA</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 14px">
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 10px; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg><span>Inicio</span></a>
+<a href="#" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c842" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M12 7C10 5.5 7 5 4 5.5v12c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-12C17 5 14 5.5 12 7zM12 7v12"></path></svg><span>Módulos</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 10px; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M4 6h16v12H4zM10 9.5v5l4.5-2.5z"></path></svg><span>Videoteca</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 10px; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg><span>Simuladores y quizzes</span></a>
+</div>
+<div style="margin-top: auto; font-size: 13px; padding: 0 12px">
+<div style="color: #e2e8f0; font-weight: 500">Ana García</div>
+<a href="#" style="display: inline-block; padding: 12px 0; text-decoration: none">Cerrar sesión</a>
+</div>
+</nav>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 40px 48px; display: flex; flex-direction: column; gap: 28px; background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(12,29,69,0.85), rgba(12,29,69,0) 70%)">
+
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 36px; line-height: 1.1; letter-spacing: -0.03em; color: #ffffff">Módulos</h1>
+
+<div aria-label="Materias" style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="#" aria-current="true" style="flex: 1 1 150px; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 10px; border-radius: 14px; border: 1.5px solid #f5c842; background: rgba(245,200,66,0.1); color: #ffffff; font-size: 14px; font-weight: 600; line-height: 1.25; text-align: center; text-decoration: none"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f5c842" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6V4H6l6 8-6 8h12v-2"></path></svg><span>Pensamiento Matemático</span></a>
+<a href="#" style="flex: 1 1 150px; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 10px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.13); background: transparent; color: #cbd5e1; font-size: 14px; font-weight: 600; line-height: 1.25; text-align: center; text-decoration: none"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7C10 5.5 7 5 4 5.5v12c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-12C17 5 14 5.5 12 7zM12 7v12"></path></svg><span>Comprensión Lectora</span></a>
+<a href="#" style="flex: 1 1 150px; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 10px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.13); background: transparent; color: #cbd5e1; font-size: 14px; font-weight: 600; line-height: 1.25; text-align: center; text-decoration: none"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3"></path></svg><span>Redacción Indirecta</span></a>
+<a href="#" style="flex: 1 1 150px; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 10px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.13); background: transparent; color: #cbd5e1; font-size: 14px; font-weight: 600; line-height: 1.25; text-align: center; text-decoration: none"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h5l2-6 4 12 2-6h7"></path></svg><span>Pre-medicina</span></a>
+<a href="#" style="flex: 1 1 150px; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 10px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.13); background: transparent; color: #cbd5e1; font-size: 14px; font-weight: 600; line-height: 1.25; text-align: center; text-decoration: none"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"></path></svg><span>Ciencias de la Salud</span></a>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px">
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 26px; line-height: 1.15; letter-spacing: -0.02em; color: #ffffff">Pensamiento Matemático</h2>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; font-size: 14px">
+<span style="color: #e2e8f0">Material de Mtra. Sofía Ramírez</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: rgba(255,255,255,0.08); color: #e2e8f0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f5c842" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h12v9H6zM8.5 11V8a3.5 3.5 0 017 0v3"></path></svg>Solo lectura · sin descarga · exclusivo de Centum Astra</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px">
+<section style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; padding: 18px 20px; border-radius: 16px; border: 1.5px solid transparent; background: rgba(255,255,255,0.05)">
+<div style="flex: 1 1 240px; min-width: 0; display: flex; align-items: center; gap: 16px">
+<span style="flex: 0 0 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: rgba(52,211,153,0.16)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+<div style="min-width: 0">
+<h3 style="margin: 0; font-size: 18px; font-weight: 600; line-height: 1.3; color: #ffffff">Ecuaciones de primer grado</h3>
+<div style="font-size: 13px; font-weight: 600; color: #34d399">Vista</div>
+</div>
+</div>
+<div style="flex: 1.6 1 440px; min-width: 0; display: flex; flex-wrap: wrap; gap: 8px">
+<a href="#" aria-label="Ver Apuntes de la sesión, PDF de solo lectura" style="flex: 1 1 200px; box-sizing: border-box; min-width: 0; min-height: 72px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none"><span style="flex: 0 0 40px; height: 48px; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; border-radius: 6px; border: 1.5px solid #f5c842; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #f5c842">PDF</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.3">Apuntes de la sesión</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="2.8"></circle></svg></a>
+<a href="#" aria-label="Ver Ejercicios de práctica, PDF de solo lectura" style="flex: 1 1 200px; box-sizing: border-box; min-width: 0; min-height: 72px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none"><span style="flex: 0 0 40px; height: 48px; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; border-radius: 6px; border: 1.5px solid #f5c842; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #f5c842">PDF</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.3">Ejercicios de práctica</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="2.8"></circle></svg></a>
+<a href="#" style="flex: 0 1 132px; box-sizing: border-box; min-width: 112px; min-height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; border-radius: 12px; background: rgba(147,197,253,0.12); color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l2 2 3-4M4 16l2 2 3-4M13 7h7M13 16h7"></path></svg><span>Quiz 23/30</span></a>
+</div>
+</section>
+<section style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; padding: 18px 20px; border-radius: 16px; border: 1.5px solid rgba(245,200,66,0.55); background: rgba(255,255,255,0.05)">
+<div style="flex: 1 1 240px; min-width: 0; display: flex; align-items: center; gap: 16px">
+<span style="flex: 0 0 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: #f5c842; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 20px; color: #030a1a">2</span>
+<div style="min-width: 0">
+<h3 style="margin: 0; font-size: 18px; font-weight: 600; line-height: 1.3; color: #ffffff">Geometría analítica</h3>
+<div style="font-size: 13px; font-weight: 600; color: #f5c842">En curso</div>
+</div>
+</div>
+<div style="flex: 1.6 1 440px; min-width: 0; display: flex; flex-wrap: wrap; gap: 8px">
+<a href="#" aria-label="Ver Apuntes de la sesión, PDF de solo lectura" style="flex: 1 1 200px; box-sizing: border-box; min-width: 0; min-height: 72px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none"><span style="flex: 0 0 40px; height: 48px; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; border-radius: 6px; border: 1.5px solid #f5c842; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #f5c842">PDF</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.3">Apuntes de la sesión</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="2.8"></circle></svg></a>
+<a href="#" aria-label="Ver Ejercicios de práctica, PDF de solo lectura" style="flex: 1 1 200px; box-sizing: border-box; min-width: 0; min-height: 72px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none"><span style="flex: 0 0 40px; height: 48px; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; border-radius: 6px; border: 1.5px solid #f5c842; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #f5c842">PDF</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.3">Ejercicios de práctica</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="2.8"></circle></svg></a>
+<a href="#" style="flex: 0 1 132px; box-sizing: border-box; min-width: 112px; min-height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; border-radius: 12px; background: rgba(147,197,253,0.12); color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l2 2 3-4M4 16l2 2 3-4M13 7h7M13 16h7"></path></svg><span>Quiz 25/30</span></a>
+</div>
+</section>
+<section style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; padding: 18px 20px; border-radius: 16px; border: 1.5px solid transparent; background: rgba(255,255,255,0.05)">
+<div style="flex: 1 1 240px; min-width: 0; display: flex; align-items: center; gap: 16px">
+<span style="flex: 0 0 48px; height: 48px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.3); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #cbd5e1">3</span>
+<div style="min-width: 0">
+<h3 style="margin: 0; font-size: 18px; font-weight: 600; line-height: 1.3; color: #ffffff">Estadística y probabilidad</h3>
+<div style="font-size: 13px; font-weight: 600; color: #cbd5e1">Pendiente</div>
+</div>
+</div>
+<div style="flex: 1.6 1 440px; min-width: 0; display: flex; flex-wrap: wrap; gap: 8px">
+<a href="#" aria-label="Ver Apuntes de la sesión, PDF de solo lectura" style="flex: 1 1 200px; box-sizing: border-box; min-width: 0; min-height: 72px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none"><span style="flex: 0 0 40px; height: 48px; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; border-radius: 6px; border: 1.5px solid #f5c842; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; color: #f5c842">PDF</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.3">Apuntes de la sesión</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="2.8"></circle></svg></a>
+<a href="#" style="flex: 0 1 132px; box-sizing: border-box; min-width: 112px; min-height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 8px; border-radius: 12px; background: rgba(147,197,253,0.12); color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l2 2 3-4M4 16l2 2 3-4M13 7h7M13 16h7"></path></svg><span>Quiz</span></a>
+</div>
+</section>
+</div>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

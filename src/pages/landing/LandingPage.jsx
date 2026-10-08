@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft, ChevronRight, Play, Star,
@@ -97,26 +97,9 @@ const PLAN_FEATURES = [
 ];
 
 /* ══════════════════════════════════════════════════════════
-   SECTION A — Hero
+   SECTION A — Hero (minimalista)
 ══════════════════════════════════════════════════════════ */
 function Hero({ onRegisterClick }) {
-  const [videoReady, setVideoReady] = useState(false);
-  const videoRef = useRef(null);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    let cancelled = false;
-    const start = () => {
-      if (cancelled) return;
-      video.src = `${import.meta.env.BASE_URL}space.mp4`;
-      video.load();
-    };
-    if (document.readyState === 'complete') start();
-    else window.addEventListener('load', start, { once: true });
-    return () => { cancelled = true; };
-  }, []);
-
   const container = {
     hidden: {},
     show: { transition: { staggerChildren: 0.12, delayChildren: 0.2 } },
@@ -128,56 +111,42 @@ function Hero({ onRegisterClick }) {
 
   return (
     <section className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* Backgrounds */}
+      {/* Fondo: una sola capa (degradado radial del rediseño) + halo dorado sutil */}
       <div
+        className="absolute inset-0 pointer-events-none"
         style={{
-          position: 'absolute', inset: 0, zIndex: 0,
-          backgroundImage: `url(${import.meta.env.BASE_URL}timrael-space-4984262_1920.jpg)`,
-          backgroundSize: 'cover', backgroundPosition: 'center 20%',
+          zIndex: 0,
+          background:
+            'radial-gradient(ellipse 90% 60% at 50% 0%, #0c1d45 0%, transparent 70%), #030a1a',
         }}
       />
-      <video
-        ref={videoRef}
-        autoPlay muted loop playsInline preload="none"
-        onCanPlay={() => setVideoReady(true)}
+      <div
+        className="absolute pointer-events-none"
         style={{
-          position: 'absolute', inset: 0, zIndex: 1,
-          width: '100%', height: '100%',
-          objectFit: 'cover', objectPosition: 'center 30%',
-          opacity: videoReady ? 0.45 : 0,
-          transition: 'opacity 2.4s cubic-bezier(0.16, 1, 0.3, 1)',
-          pointerEvents: 'none',
+          zIndex: 1,
+          top: '12%', left: '50%', transform: 'translateX(-50%)',
+          width: 'min(640px, 90vw)', height: 'min(640px, 90vw)',
+          background:
+            'radial-gradient(circle at 50% 50%, rgba(245,200,66,0.08) 0%, transparent 60%)',
+          filter: 'blur(40px)',
         }}
       />
-      <div className="absolute inset-0 bg-[rgba(3,10,26,0.58)]" style={{ zIndex: 2 }} />
-      {/* Gold nebula */}
-      <div className="absolute pointer-events-none" style={{
-        zIndex: 3, top: '20%', left: '5%',
-        width: '50vw', height: '50vw',
-        background: 'radial-gradient(ellipse at 30% 50%,rgba(245,200,66,0.07) 0%,transparent 65%)',
-        filter: 'blur(40px)',
-      }} />
-      {/* Bottom fade to white testimonials section */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 pointer-events-none" style={{
-        zIndex: 4,
-        background: 'linear-gradient(to bottom, transparent 0%, rgba(248,250,252,1) 100%)',
-      }} />
 
-      {/* Content */}
+      {/* Contenido centrado */}
       <motion.div
-        className="relative flex flex-col flex-1 justify-center px-6 md:px-16 lg:px-24 pt-28 pb-52"
+        className="relative flex flex-col flex-1 items-center justify-center text-center px-6 pt-28 pb-24"
         style={{ zIndex: 5 }}
         variants={container}
         initial="hidden"
         animate="show"
       >
         {/* Badge */}
-        <motion.div variants={item} className="mb-6">
+        <motion.div variants={item} className="mb-7">
           <span style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '5px 14px', borderRadius: 999,
             background: 'rgba(245,200,66,0.1)',
-            border: '1px solid rgba(245,200,66,0.25)',
+            border: '1px solid rgba(245,200,66,0.22)',
             fontSize: 12, fontWeight: 600, color: '#f5c842',
             letterSpacing: '0.05em',
           }}>
@@ -189,74 +158,93 @@ function Hero({ onRegisterClick }) {
         {/* Headline */}
         <motion.h1
           variants={item}
-          className="resp-hero-h1 mb-6 max-w-3xl"
+          className="mb-7"
           style={{
-            fontFamily: 'Syne, sans-serif', fontWeight: 900,
-            fontSize: 72, lineHeight: 0.96, letterSpacing: '-0.04em',
+            fontFamily: '"Bricolage Grotesque", sans-serif',
+            fontWeight: 800,
+            fontSize: 'clamp(44px, 8vw, 80px)',
+            lineHeight: 1.02,
+            letterSpacing: '-0.03em',
+            maxWidth: 920,
           }}
         >
-          <span className="bg-gradient-to-b from-white to-white/55 bg-clip-text text-transparent">
-            Domina el EXANI-II,
-          </span>
+          <span style={{ color: 'white' }}>Domina el EXANI-II.</span>
           <br />
-          <span style={{
-            background: 'linear-gradient(90deg, #b8880f 0%, #f5c842 45%, #fde68a 100%)',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}>
-            vive tu vocación.
-          </span>
+          <span style={{ color: '#f5c842' }}>Vive tu vocación.</span>
         </motion.h1>
 
         {/* Sub */}
         <motion.p
           variants={item}
-          className="text-white/50 text-[16px] leading-[1.75] max-w-[520px] mb-10"
+          style={{
+            color: 'rgba(255,255,255,0.72)',
+            fontSize: 'clamp(15px, 1.6vw, 18px)',
+            lineHeight: 1.7,
+            maxWidth: 560,
+            marginBottom: 36,
+          }}
         >
-          La plataforma diseñada para aspirantes a carreras de salud. Simuladores reales,
-          metodología probada y seguimiento personalizado para que llegues donde quieres.
+          La plataforma diseñada para aspirantes a carreras de salud.
+          Simuladores reales, metodología probada y seguimiento personalizado
+          para que llegues donde quieres.
         </motion.p>
 
         {/* CTAs */}
-        <motion.div variants={item} className="flex flex-wrap gap-4 mb-14">
+        <motion.div variants={item} className="flex flex-wrap gap-3 justify-center mb-14">
           <button
-            className="btn-gold"
+            className="btn-gold-flat"
             onClick={onRegisterClick}
-            style={{ padding: '14px 32px', fontSize: 15, borderRadius: 12 }}
+            style={{ padding: '14px 28px', fontSize: 15 }}
           >
             Quiero acceder a la plataforma
           </button>
           <a
             href="#testimonios"
             className="btn-ghost"
-            style={{ padding: '14px 24px', fontSize: 15, borderRadius: 12 }}
+            style={{ padding: '14px 22px', fontSize: 15, borderRadius: 10 }}
           >
             Ver testimonios
           </a>
         </motion.div>
 
-        {/* Stats */}
-        <motion.div variants={item} className="flex flex-wrap items-stretch gap-0">
+        {/* Stats en línea separados por puntos — colapsa a grid 2x2 en móvil */}
+        <motion.div
+          variants={item}
+          className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3"
+          style={{ maxWidth: 720 }}
+        >
           {HERO_STATS.map((s, i) => (
-            <div key={s.label} className="flex items-stretch">
-              {i > 0 && <div className="w-px bg-white/[0.07] self-stretch mx-6 md:mx-8" />}
-              <div>
-                <p
-                  className="font-syne font-bold leading-none mb-1"
+            <div key={s.label} className="flex items-center gap-5">
+              {i > 0 && (
+                <span
+                  aria-hidden="true"
                   style={{
-                    fontSize: 22,
-                    background: i === 0
-                      ? 'linear-gradient(135deg,#f5c842,#fde68a)'
-                      : undefined,
-                    WebkitBackgroundClip: i === 0 ? 'text' : undefined,
-                    WebkitTextFillColor: i === 0 ? 'transparent' : undefined,
-                    backgroundClip: i === 0 ? 'text' : undefined,
-                    color: i === 0 ? undefined : 'white',
+                    width: 3, height: 3, borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.3)',
+                  }}
+                />
+              )}
+              <div className="flex items-baseline gap-2">
+                <span
+                  style={{
+                    fontFamily: '"Bricolage Grotesque", sans-serif',
+                    fontWeight: 700,
+                    fontSize: 20,
+                    color: i === 0 ? '#f5c842' : 'white',
+                    letterSpacing: '-0.01em',
                   }}
                 >
                   {s.val}
-                </p>
-                <p className="text-white/30 text-[11px] tracking-[0.04em]">{s.label}</p>
+                </span>
+                <span
+                  style={{
+                    color: 'rgba(255,255,255,0.65)',
+                    fontSize: 12,
+                    letterSpacing: '0.03em',
+                  }}
+                >
+                  {s.label}
+                </span>
               </div>
             </div>
           ))}
@@ -624,7 +612,7 @@ function RegistrationPayment({ sectionRef }) {
               >
                 <div className="mb-7">
                   <h3 className="font-syne font-bold text-white text-xl mb-1">Tus datos</h3>
-                  <p className="text-white/35 text-[13px]">Todos los campos son obligatorios.</p>
+                  <p className="text-white/60 text-[13px]">Todos los campos son obligatorios.</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -775,9 +763,9 @@ function RegistrationPayment({ sectionRef }) {
                 >
                   $1,499
                 </span>
-                <span className="text-white/35 text-[14px] mb-2">MXN</span>
+                <span className="text-white/60 text-[14px] mb-2">MXN</span>
               </div>
-              <p className="text-white/35 text-[12.5px]">Pago único · Sin mensualidades</p>
+              <p className="text-white/60 text-[12.5px]">Pago único · Sin mensualidades</p>
             </div>
 
             {/* Features */}

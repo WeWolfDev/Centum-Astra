@@ -57,7 +57,7 @@ export default function Statistics() {
             <p className="relative font-syne text-[28px] font-bold leading-none tracking-tight mb-1" style={{ color }}>
               {val}
             </p>
-            <p className="relative text-[11px] font-medium tracking-[0.04em] text-white/30 uppercase">{label}</p>
+            <p className="relative text-[11px] font-medium tracking-[0.04em] text-white/60 uppercase">{label}</p>
           </motion.div>
         ))}
       </div>

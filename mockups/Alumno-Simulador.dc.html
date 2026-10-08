@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Alumno · Simulador en curso</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Orbitron:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+a{color:rgba(255,255,255,0.6)}a:hover{color:rgba(255,255,255,0.92)}
+button{font:inherit}
+</style>
+</helmet>
+<div style="min-height: 860px; box-sizing: border-box; display: flex; flex-direction: column; background: #030a1a; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; line-height: 1.5">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding: 12px 40px; background: #04091f">
+<div style="display: flex; align-items: center; gap: 20px">
+<div style="font-family: 'Orbitron', sans-serif; line-height: 1.2">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #ffffff">CENTUM</div>
+<div style="font-size: 10px; font-weight: 500; letter-spacing: 0.14em; color: #f5c842">ASTRA</div>
+</div>
+<div style="font-size: 15px; font-weight: 600; color: #ffffff">Simulador EXANI-II</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px">
+<div style="display: flex; align-items: center; gap: 10px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2M9 2h6"></path></svg><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 26px; line-height: 1; color: #ffffff; font-variant-numeric: tabular-nums" aria-label="Tiempo restante">3:41:20</span></div>
+<div style="font-size: 15px; color: #e2e8f0"><strong style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #ffffff">{{done}}</strong> / 138 respondidas</div>
+<a href="#" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 14px">Pausar y salir</a>
+<button type="button" style="min-height: 44px; padding: 8px 20px; border: 1.5px solid #f5c842; border-radius: 10px; background: transparent; color: #f5c842; font-size: 14px; font-weight: 600; cursor: pointer">Terminar</button>
+</div>
+</header>
+<div role="progressbar" aria-valuemin="0" aria-valuemax="138" aria-valuenow="{{done}}" aria-label="Avance del simulador" style="height: 4px; background: rgba(255,255,255,0.08)"><div style="width: {{pctAll}}; height: 100%; background: #f5c842"></div></div>
+
+<main style="flex-grow: 1; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 40px 56px; box-sizing: border-box; width: 100%; max-width: 1240px; margin: 0 auto; padding: 44px 40px">
+
+<div style="flex: 2.2 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 26px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px">
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #ffffff">Pregunta {{qNum}}</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,0.08); font-size: 13px; font-weight: 600; color: #e2e8f0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f5c842" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{areaIcon}}"></path></svg>{{areaName}}</span>
+</div>
+<h1 style="margin: 0; font-size: 28px; font-weight: 500; line-height: 1.4; color: #ffffff">{{qText}}</h1>
+<div role="radiogroup" aria-label="Opciones de respuesta" style="display: flex; flex-direction: column; gap: 12px">
+<sc-for list="{{opts}}" as="o" hint-placeholder-count="4">
+<button type="button" role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="display: flex; align-items: center; gap: 16px; min-height: 62px; padding: 10px 18px; border: 1.5px solid {{o.bd}}; border-radius: 14px; background: {{o.bg}}; color: #ffffff; font-size: 19px; text-align: left; cursor: pointer"><span style="flex-shrink: 0; width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; background: {{o.kbg}}; color: {{o.kfg}}; font-size: 15px; font-weight: 700">{{o.k}}</span><span>{{o.t}}</span></button>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px">
+<button type="button" onClick="{{prev}}" style="min-height: 52px; padding: 10px 24px; border: 1.5px solid rgba(255,255,255,0.25); border-radius: 12px; background: transparent; color: #e2e8f0; font-size: 16px; font-weight: 600; cursor: pointer">Anterior</button>
+<button type="button" onClick="{{toggleFlag}}" aria-pressed="{{flagOn}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 52px; padding: 10px 18px; border: 0; border-radius: 12px; background: {{flagBg}}; color: #93c5fd; font-size: 15px; font-weight: 600; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"></path></svg>{{flagLabel}}</button>
+<button type="button" onClick="{{next}}" style="min-height: 52px; padding: 10px 36px; border: 0; border-radius: 12px; background: #f5c842; color: #030a1a; font-size: 16px; font-weight: 600; cursor: pointer">Siguiente</button>
+</div>
+</div>
+
+<aside aria-label="Navegación de preguntas" style="flex: 1 1 300px; min-width: 0; max-width: 360px; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{areas}}" as="a" hint-placeholder-count="5">
+<button type="button" onClick="{{a.pick}}" aria-pressed="{{a.on}}" style="display: block; width: 100%; box-sizing: border-box; min-height: 56px; padding: 9px 12px; border: 1.5px solid {{a.bd}}; border-radius: 12px; background: {{a.bg}}; color: #ffffff; text-align: left; cursor: pointer"><span style="display: flex; align-items: center; gap: 10px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{a.ic}}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="{{a.icon}}"></path></svg><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600">{{a.name}}</span><span style="font-size: 13px; color: #cbd5e1; white-space: nowrap">{{a.count}}</span></span><span style="display: block; margin-top: 8px; height: 4px; border-radius: 999px; background: rgba(255,255,255,0.12)"><span style="display: block; width: {{a.pct}}; height: 100%; border-radius: 999px; background: #f5c842"></span></span></button>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px">
+<sc-for list="{{cells}}" as="c" hint-placeholder-count="30">
+<button type="button" onClick="{{c.pick}}" aria-label="{{c.label}}" style="position: relative; min-height: 44px; padding: 0; border: 1.5px solid {{c.bd}}; border-radius: 10px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; font-weight: 600; cursor: pointer">{{c.n}}<span style="position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 999px; background: #93c5fd; opacity: {{c.flag}}"></span></button>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px">
+<span style="display: inline-flex; align-items: center; gap: 8px"><span style="width: 14px; height: 14px; border-radius: 4px; background: rgba(255,255,255,0.22)"></span>Respondida</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span style="width: 14px; height: 14px; box-sizing: border-box; border-radius: 4px; border: 1.5px solid rgba(255,255,255,0.3)"></span>Sin responder</span>
+<span style="display: inline-flex; align-items: center; gap: 8px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #93c5fd"></span>Marcada</span>
+</div>
+</aside>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1360,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var AREAS = [{"name": "Pensamiento Matemático", "icon": "M18 6V4H6l6 8-6 8h12v-2"}, {"name": "Comprensión Lectora", "icon": "M12 7C10 5.5 7 5 4 5.5v12c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-12C17 5 14 5.5 12 7zM12 7v12"}, {"name": "Redacción Indirecta", "icon": "M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3"}, {"name": "Pre-medicina", "icon": "M2 12h5l2-6 4 12 2-6h7"}, {"name": "Ciencias de la Salud", "icon": "M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"}];
+    var SIZE = [30, 30, 30, 24, 24];
+    var START = [0, 30, 60, 90, 114];
+    var q = st.q != null ? st.q : 22;
+    var ans = st.ans;
+    if (!ans) { ans = {}; for (var i = 0; i < 22; i++) { if (i !== 8 && i !== 16) ans[i] = (i * 7) % 4; } }
+    var flags = st.flags || { 16: true };
+    function areaOf(i) { for (var k = 4; k >= 0; k--) { if (i >= START[k]) return k; } return 0; }
+    function go(i) { self.setState({ q: Math.max(0, Math.min(137, i)), ans: ans, flags: flags }); }
+    var ar = areaOf(q);
+    var done = Object.keys(ans).length;
+    var real = q === 22;
+    var texts = real ? ['9', '11', '13', '15'] : ['[Opción A]', '[Opción B]', '[Opción C]', '[Opción D]'];
+    var sel = ans[q];
+    var opts = ['A', 'B', 'C', 'D'].map(function (k, i) {
+      var on = sel === i;
+      return {
+        k: k, t: texts[i], on: on,
+        pick: function () { var a = Object.assign({}, ans); a[q] = i; self.setState({ q: q, ans: a, flags: flags }); },
+        bd: on ? '#f5c842' : 'rgba(255,255,255,0.16)',
+        bg: on ? 'rgba(245,200,66,0.12)' : 'rgba(255,255,255,0.04)',
+        kbg: on ? '#f5c842' : 'rgba(255,255,255,0.1)',
+        kfg: on ? '#030a1a' : '#ffffff'
+      };
+    });
+    var areas = AREAS.map(function (a, k) {
+      var n = 0;
+      for (var i = START[k]; i < START[k] + SIZE[k]; i++) { if (ans[i] != null) n++; }
+      var on = k === ar;
+      return {
+        name: a.name, icon: a.icon, on: on,
+        count: n + ' / ' + SIZE[k],
+        pct: Math.round(n / SIZE[k] * 100) + '%',
+        bd: on ? '#f5c842' : 'transparent',
+        bg: on ? 'rgba(245,200,66,0.1)' : 'rgba(255,255,255,0.05)',
+        ic: on ? '#f5c842' : '#cbd5e1',
+        pick: function () {
+          var t = START[k];
+          for (var i = START[k]; i < START[k] + SIZE[k]; i++) { if (ans[i] == null) { t = i; break; } }
+          go(t);
+        }
+      };
+    });
+    var cells = [];
+    for (var j = START[ar]; j < START[ar] + SIZE[ar]; j++) {
+      (function (i) {
+        var cur = i === q, has = ans[i] != null;
+        cells.push({
+          n: i + 1,
+          label: 'Pregunta ' + (i + 1) + (has ? ', respondida' : ', sin responder') + (flags[i] ? ', marcada' : ''),
+          pick: function () { go(i); },
+          bd: cur ? '#f5c842' : has ? 'transparent' : 'rgba(255,255,255,0.22)',
+          bg: has ? 'rgba(255,255,255,0.16)' : 'transparent',
+          fg: cur ? '#f5c842' : has ? '#ffffff' : '#cbd5e1',
+          flag: flags[i] ? 1 : 0
+        });
+      })(j);
+    }
+    var fl = !!flags[q];
+    return {
+      done: done,
+      pctAll: Math.round(done / 138 * 1000) / 10 + '%',
+      qNum: (q + 1) + ' de 138',
+      areaName: AREAS[ar].name,
+      areaIcon: AREAS[ar].icon,
+      qText: real ? 'Si f(x) = 3x² − 2x + 1, ¿cuál es el valor de f(2)?' : '[Pregunta ' + (q + 1) + ' del banco de reactivos]',
+      opts: opts, areas: areas, cells: cells,
+      prev: function () { go(q - 1); },
+      next: function () { go(q + 1); },
+      flagOn: fl,
+      flagLabel: fl ? 'Marcada' : 'Marcar',
+      flagBg: fl ? 'rgba(147,197,253,0.18)' : 'transparent',
+      toggleFlag: function () { var f = Object.assign({}, flags); if (f[q]) delete f[q]; else f[q] = true; self.setState({ q: q, ans: ans, flags: f }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

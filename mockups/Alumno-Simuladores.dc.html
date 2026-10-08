@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Alumno · Simuladores y quizzes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Orbitron:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap">
+<style>
+body{margin:0}
+a{color:rgba(255,255,255,0.6)}a:hover{color:rgba(255,255,255,0.92)}
+button{font:inherit}
+</style>
+</helmet>
+<div style="display: flex; flex-wrap: wrap; min-height: 920px; background: #030a1a; color: #cbd5e1; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; line-height: 1.5">
+
+<nav aria-label="Principal" style="flex: 1 0 232px; box-sizing: border-box; padding: 20px; background: #04091f; border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 32px">
+<div style="font-family: 'Orbitron', sans-serif; line-height: 1.2; padding: 8px 12px">
+<div style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #ffffff">CENTUM</div>
+<div style="font-size: 10px; font-weight: 500; letter-spacing: 0.14em; color: #f5c842">ASTRA</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 14px">
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 10px; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"></path></svg><span>Inicio</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 10px; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M12 7C10 5.5 7 5 4 5.5v12c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-12C17 5 14 5.5 12 7zM12 7v12"></path></svg><span>Módulos</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 10px; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M4 6h16v12H4zM10 9.5v5l4.5-2.5z"></path></svg><span>Videoteca</span></a>
+<a href="#" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 12px; border-radius: 10px; background: rgba(255,255,255,0.06); color: #ffffff; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f5c842" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg><span>Simuladores y quizzes</span></a>
+</div>
+<div style="margin-top: auto; font-size: 13px; padding: 0 12px">
+<div style="color: #e2e8f0; font-weight: 500">Ana García</div>
+<a href="#" style="display: inline-block; padding: 12px 0; text-decoration: none">Cerrar sesión</a>
+</div>
+</nav>
+
+<main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 40px 48px; display: flex; flex-direction: column; gap: 32px; background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(12,29,69,0.85), rgba(12,29,69,0) 70%)">
+
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 36px; line-height: 1.1; letter-spacing: -0.03em; color: #ffffff">Simuladores y quizzes</h1>
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px">
+
+<section aria-label="Simulador EXANI-II" style="flex: 1.55 1 460px; min-width: 0; box-sizing: border-box; padding: 28px; border-radius: 18px; background: #0c1d45; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 14px">
+<span style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: rgba(245,200,66,0.14); flex-shrink: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f5c842" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle></svg></span>
+<div>
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -0.02em; color: #ffffff">Simulador EXANI-II</h2>
+<div style="font-size: 14px; color: #cbd5e1">138 preguntas · da puntaje Ceneval</div>
+</div>
+</div>
+<button type="button" style="min-height: 52px; padding: 12px 28px; border: 0; border-radius: 12px; background: #f5c842; color: #030a1a; font-size: 16px; font-weight: 600; cursor: pointer">Iniciar simulador</button>
+</div>
+
+<svg viewBox="0 0 560 196" role="img" aria-label="Puntaje de tus seis simuladores: 900, 935, 922, 970, 983 y 1,017" style="display: block; width: 100%; height: auto; font-family: 'Plus Jakarta Sans', sans-serif">
+<path d="{{areaD}}" fill="#f5c842" fill-opacity="0.12"></path>
+<g opacity="{{metaOp}}">
+<line x1="12" x2="548" y1="{{my}}" y2="{{my}}" stroke="#93c5fd" stroke-width="2" stroke-dasharray="6 5"></line>
+<text x="12" y="{{myLabel}}" font-size="13" font-weight="600" fill="#93c5fd">{{metaLabel}}</text>
+</g>
+<path d="{{lineD}}" fill="none" stroke="#f5c842" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>
+<circle cx="40" cy="{{y1}}" r="5" fill="#0c1d45" stroke="#f5c842" stroke-width="2.5"></circle>
+<text x="40" y="{{l1}}" text-anchor="middle" font-size="13" font-weight="600" fill="#e2e8f0">900</text>
+<text x="40" y="190" text-anchor="middle" font-size="13" fill="#cbd5e1">1</text>
+<circle cx="136" cy="{{y2}}" r="5" fill="#0c1d45" stroke="#f5c842" stroke-width="2.5"></circle>
+<text x="136" y="{{l2}}" text-anchor="middle" font-size="13" font-weight="600" fill="#e2e8f0">935</text>
+<text x="136" y="190" text-anchor="middle" font-size="13" fill="#cbd5e1">2</text>
+<circle cx="232" cy="{{y3}}" r="5" fill="#0c1d45" stroke="#f5c842" stroke-width="2.5"></circle>
+<text x="232" y="{{l3}}" text-anchor="middle" font-size="13" font-weight="600" fill="#e2e8f0">922</text>
+<text x="232" y="190" text-anchor="middle" font-size="13" fill="#cbd5e1">3</text>
+<circle cx="328" cy="{{y4}}" r="5" fill="#0c1d45" stroke="#f5c842" stroke-width="2.5"></circle>
+<text x="328" y="{{l4}}" text-anchor="middle" font-size="13" font-weight="600" fill="#e2e8f0">970</text>
+<text x="328" y="190" text-anchor="middle" font-size="13" fill="#cbd5e1">4</text>
+<circle cx="424" cy="{{y5}}" r="5" fill="#0c1d45" stroke="#f5c842" stroke-width="2.5"></circle>
+<text x="424" y="{{l5}}" text-anchor="middle" font-size="13" font-weight="600" fill="#e2e8f0">983</text>
+<text x="424" y="190" text-anchor="middle" font-size="13" fill="#cbd5e1">5</text>
+<circle cx="520" cy="{{y6}}" r="7" fill="#f5c842" stroke="#f5c842" stroke-width="2.5"></circle>
+<text x="520" y="{{l6}}" text-anchor="middle" font-size="15" font-weight="700" fill="#ffffff">1,017</text>
+<text x="520" y="190" text-anchor="middle" font-size="13" fill="#cbd5e1">6</text>
+</svg>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px">
+<div style="font-size: 16px; color: #e2e8f0">Has subido <strong style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 24px; letter-spacing: -0.02em; color: #34d399">117 puntos</strong> desde el primero</div>
+<button type="button" onClick="{{toggleMeta}}" aria-pressed="{{metaOn}}" style="display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 16px; border: 1px solid rgba(147,197,253,0.5); border-radius: 999px; background: {{metaBg}}; color: #93c5fd; font-size: 14px; font-weight: 600; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h12l-2.5 4L17 12H5"></path></svg>{{metaBtn}}</button>
+</div>
+
+<div>
+<h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 600; color: #e2e8f0">Tus simuladores</h3>
+<a href="#" style="display: flex; align-items: center; gap: 14px; min-height: 52px; border-top: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; text-decoration: none"><span style="flex: 0 0 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: rgba(245,200,66,0.14); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 15px; color: #f5c842">6</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; color: #cbd5e1">28 sep</span><span style="flex: 0 0 auto; font-size: 14px; white-space: nowrap">73 / 138</span><span style="flex: 0 0 64px; text-align: right; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #ffffff">1,017</span><span style="flex: 0 0 64px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 14px; font-weight: 600; color: #34d399"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V5M5 12l7-7 7 7"></path></svg>34</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 14px; min-height: 52px; border-top: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; text-decoration: none"><span style="flex: 0 0 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: rgba(245,200,66,0.14); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 15px; color: #f5c842">5</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; color: #cbd5e1">14 sep</span><span style="flex: 0 0 auto; font-size: 14px; white-space: nowrap">65 / 138</span><span style="flex: 0 0 64px; text-align: right; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #ffffff">983</span><span style="flex: 0 0 64px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 14px; font-weight: 600; color: #34d399"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V5M5 12l7-7 7 7"></path></svg>13</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 14px; min-height: 52px; border-top: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; text-decoration: none"><span style="flex: 0 0 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: rgba(245,200,66,0.14); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 15px; color: #f5c842">4</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; color: #cbd5e1">31 ago</span><span style="flex: 0 0 auto; font-size: 14px; white-space: nowrap">62 / 138</span><span style="flex: 0 0 64px; text-align: right; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #ffffff">970</span><span style="flex: 0 0 64px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 14px; font-weight: 600; color: #34d399"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V5M5 12l7-7 7 7"></path></svg>48</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 14px; min-height: 52px; border-top: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; text-decoration: none"><span style="flex: 0 0 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: rgba(245,200,66,0.14); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 15px; color: #f5c842">3</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; color: #cbd5e1">17 ago</span><span style="flex: 0 0 auto; font-size: 14px; white-space: nowrap">51 / 138</span><span style="flex: 0 0 64px; text-align: right; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #ffffff">922</span><span style="flex: 0 0 64px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 14px; font-weight: 600; color: #cbd5e1"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M5 12l7 7 7-7"></path></svg>13</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 14px; min-height: 52px; border-top: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; text-decoration: none"><span style="flex: 0 0 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: rgba(245,200,66,0.14); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 15px; color: #f5c842">2</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; color: #cbd5e1">3 ago</span><span style="flex: 0 0 auto; font-size: 14px; white-space: nowrap">54 / 138</span><span style="flex: 0 0 64px; text-align: right; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #ffffff">935</span><span style="flex: 0 0 64px; display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px; font-size: 14px; font-weight: 600; color: #34d399"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20V5M5 12l7-7 7 7"></path></svg>35</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 14px; min-height: 52px; border-top: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; text-decoration: none"><span style="flex: 0 0 34px; height: 34px; display: flex; align-items: center; justify-content: center; border-radius: 999px; background: rgba(245,200,66,0.14); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 15px; color: #f5c842">1</span><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; color: #cbd5e1">20 jul</span><span style="flex: 0 0 auto; font-size: 14px; white-space: nowrap">46 / 138</span><span style="flex: 0 0 64px; text-align: right; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 20px; color: #ffffff">900</span><span style="flex: 0 0 64px; text-align: right; font-size: 13px; color: #cbd5e1">Inicio</span></a>
+</div>
+</section>
+
+<section aria-label="Quizzes" style="flex: 1 1 320px; min-width: 0; box-sizing: border-box; padding: 28px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.13); display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; align-items: center; gap: 14px">
+<span style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 12px; background: rgba(147,197,253,0.14); flex-shrink: 0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l2 2 3-4M4 16l2 2 3-4M13 7h7M13 16h7"></path></svg></span>
+<div>
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -0.02em; color: #ffffff">Quizzes</h2>
+<div style="font-size: 14px; color: #cbd5e1">Por tema · solo cuentan aciertos</div>
+</div>
+</div>
+
+<div>
+<h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 600; color: #e2e8f0">Elige una materia</h3>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px; border-radius: 12px; background: rgba(255,255,255,0.05); color: #ffffff; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M18 6V4H6l6 8-6 8h12v-2"></path></svg><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.25">Pensamiento Matemático</span><span role="img" aria-label="3 de 4 quizzes hechos" style="display: inline-flex; gap: 4px; flex-shrink: 0"><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,0.3)"></span></span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px; border-radius: 12px; background: rgba(255,255,255,0.05); color: #ffffff; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M12 7C10 5.5 7 5 4 5.5v12c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-12C17 5 14 5.5 12 7zM12 7v12"></path></svg><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.25">Comprensión Lectora</span><span role="img" aria-label="3 de 4 quizzes hechos" style="display: inline-flex; gap: 4px; flex-shrink: 0"><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,0.3)"></span></span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px; border-radius: 12px; background: rgba(255,255,255,0.05); color: #ffffff; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3"></path></svg><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.25">Redacción Indirecta</span><span role="img" aria-label="2 de 4 quizzes hechos" style="display: inline-flex; gap: 4px; flex-shrink: 0"><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,0.3)"></span><span style="width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,0.3)"></span></span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px; border-radius: 12px; background: rgba(255,255,255,0.05); color: #ffffff; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M2 12h5l2-6 4 12 2-6h7"></path></svg><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.25">Pre-medicina</span><span role="img" aria-label="2 de 4 quizzes hechos" style="display: inline-flex; gap: 4px; flex-shrink: 0"><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,0.3)"></span><span style="width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,0.3)"></span></span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 12px; border-radius: 12px; background: rgba(255,255,255,0.05); color: #ffffff; text-decoration: none"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"></path></svg><span style="flex: 1 1 auto; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.25">Ciencias de la Salud</span><span role="img" aria-label="2 de 4 quizzes hechos" style="display: inline-flex; gap: 4px; flex-shrink: 0"><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; background: #93c5fd"></span><span style="width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,0.3)"></span><span style="width: 12px; height: 12px; border-radius: 4px; box-sizing: border-box; border: 1.5px solid rgba(255,255,255,0.3)"></span></span></a>
+</div>
+</div>
+
+<div>
+<h3 style="margin: 0 0 10px; font-size: 14px; font-weight: 600; color: #e2e8f0">Últimos resultados</h3>
+<a href="#" style="display: block; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); text-decoration: none; color: #e2e8f0"><span style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 14px">Coherencia y cohesión</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 18px; color: #ffffff; white-space: nowrap">27<span style="font-size: 13px; font-weight: 600; color: #cbd5e1"> / 30</span></span></span><span style="display: block; margin-top: 8px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.1)"><span style="display: block; width: 90%; height: 100%; border-radius: 999px; background: #93c5fd"></span></span></a>
+<a href="#" style="display: block; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); text-decoration: none; color: #e2e8f0"><span style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 14px">Biología celular</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 18px; color: #ffffff; white-space: nowrap">26<span style="font-size: 13px; font-weight: 600; color: #cbd5e1"> / 30</span></span></span><span style="display: block; margin-top: 8px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.1)"><span style="display: block; width: 87%; height: 100%; border-radius: 999px; background: #93c5fd"></span></span></a>
+<a href="#" style="display: block; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.1); text-decoration: none; color: #e2e8f0"><span style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px"><span style="font-size: 14px">Geometría analítica</span><span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 18px; color: #ffffff; white-space: nowrap">25<span style="font-size: 13px; font-weight: 600; color: #cbd5e1"> / 30</span></span></span><span style="display: block; margin-top: 8px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.1)"><span style="display: block; width: 83%; height: 100%; border-radius: 999px; background: #93c5fd"></span></span></a>
+</div>
+</section>
+
+</div>
+
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"meta":{"editor":"range","default":1240,"min":700,"max":1300,"step":10},"$preview":{"width":1360,"height":920}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var self = this;
+    var raw = Number(this.props.meta ?? 1240);
+    var c = Math.max(700, Math.min(1300, Math.round(isNaN(raw) ? 1240 : raw)));
+    var show = !!(this.state && this.state.meta);
+    function fmt(v) { return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+    function r1(v) { return Math.round(v * 10) / 10; }
+    var sc = [900, 935, 922, 970, 983, 1017];
+    var xs = [40, 136, 232, 328, 424, 520];
+    var ref = show ? sc.concat([c]) : sc;
+    var lo = Math.min.apply(null, ref) - 25;
+    var hi = Math.max.apply(null, ref) + 25;
+    function Y(v) { return r1(158 - (v - lo) / (hi - lo) * 118); }
+    var out = {};
+    var pts = sc.map(function (v, i) {
+      var y = Y(v);
+      out['y' + (i + 1)] = y;
+      out['l' + (i + 1)] = r1(y - 13);
+      return xs[i] + ' ' + y;
+    });
+    var lineD = 'M' + pts.join(' L');
+    var my = Y(c);
+    out.lineD = lineD;
+    out.areaD = lineD + ' L520 170 L40 170 Z';
+    out.my = my;
+    out.myLabel = my < 22 ? my + 16 : my - 7;
+    out.metaLabel = 'Meta · ' + fmt(c);
+    out.metaOp = show ? 1 : 0;
+    out.metaOn = show;
+    out.metaBtn = show ? 'Ocultar mi meta' : 'Ver mi meta';
+    out.metaBg = show ? 'rgba(147,197,253,0.14)' : 'transparent';
+    out.toggleMeta = function () { self.setState({ meta: !show }); };
+    return out;
+  }
+}
+</script>
+</body>
+</html>

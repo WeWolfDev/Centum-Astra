@@ -44,7 +44,7 @@ function StatCard({ Icon, label, value, change, changeUp, index }) {
       <p className="relative font-syne text-[28px] font-bold leading-none tracking-tight mb-1 bg-gradient-to-br from-yellow-200 via-gold-bright to-amber-500/80 bg-clip-text text-transparent">
         {value}
       </p>
-      <p className="relative text-[11px] font-medium tracking-[0.04em] text-white/30 uppercase">
+      <p className="relative text-[11px] font-medium tracking-[0.04em] text-white/60 uppercase">
         {label}
       </p>
     </motion.div>

@@ -2,19 +2,33 @@ import { motion } from 'framer-motion';
 import { Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const titles = {
-  dashboard:  'Dashboard',
-  students:   'Alumnos',
-  modules:    'Módulos',
-  videos:     'Videoteca',
-  stats:      'Estadísticas',
-  exam:       'Simulador EXANI-II',
-  whiteboard: 'Pizarra',
+const titlesByRole = {
+  student: {
+    dashboard: 'Inicio',
+    modules:   'Módulos',
+    videos:    'Videoteca',
+    exam:      'Simuladores y quizzes',
+  },
+  teacher: {
+    dashboard: 'Mis alumnos',
+    modules:   'Material',
+    exam:      'Simuladores y quizzes',
+  },
+  admin: {
+    dashboard: 'Mis alumnos',
+    modules:   'Material',
+    exam:      'Simuladores y quizzes',
+    payments:  'Pagos',
+    students:  'Alumnos',
+    videos:    'Videoteca',
+    stats:     'Estadísticas',
+  },
 };
 
 export default function Header({ activeSection, onMenuToggle, isMobile }) {
   const { user } = useAuth();
   const firstName = user?.name?.split(' ')[0] || '';
+  const titles = titlesByRole[user?.role] || titlesByRole.student;
 
   return (
     <motion.header
@@ -69,10 +83,10 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
         ) : (
           /* Desktop: section title */
           <span style={{
-            fontFamily: 'Syne, sans-serif',
-            fontSize: 13, fontWeight: 600,
-            color: 'rgba(255,255,255,0.72)',
-            letterSpacing: '0.01em',
+            fontFamily: '"Bricolage Grotesque", sans-serif',
+            fontSize: 15, fontWeight: 700,
+            color: 'rgba(255,255,255,0.88)',
+            letterSpacing: '-0.01em',
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {titles[activeSection] || 'Panel'}
@@ -83,7 +97,7 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
       {/* Right — date (desktop only) + welcome chip */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         {!isMobile && (
-          <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12, whiteSpace: 'nowrap' }}>
+          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, whiteSpace: 'nowrap' }}>
             {new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}
           </span>
         )}
@@ -108,7 +122,7 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
             {user?.avatar || firstName?.[0] || '?'}
           </div>
           <span style={{
-            color: 'rgba(255,255,255,0.5)',
+            color: 'rgba(255,255,255,0.72)',
             fontSize: isMobile ? 11.5 : 12,
             fontWeight: 500,
             overflow: 'hidden',

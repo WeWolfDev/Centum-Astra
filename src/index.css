@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Syne:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Orbitron:wght@400;500;600;700;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Syne:wght@400;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -16,7 +16,10 @@
   }
 
   body {
-    background: #030a1a;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, #0c1d45 0%, transparent 60%),
+      #030a1a;
+    background-attachment: fixed;
     color: #cbd5e1;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 16px;
@@ -103,6 +106,51 @@
     border-color: rgba(29,233,182,0.22);
   }
   }
+
+  /* ── Rediseño: semantic surfaces ────────────────── */
+  .bg-page    { background-color: #030a1a; }
+  .bg-raised  { background-color: #0c1d45; }
+  .bg-subtle  { background-color: rgba(255,255,255,0.05); }
+
+  /* ── Rediseño: contenedor de página ───────────────
+     Padding uniforme para las pantallas rediseñadas.
+     Se encoge en móvil para que el contenido no se ahogue. */
+  .rediseno-page {
+    padding: 40px 48px;
+  }
+  @media (max-width: 767px) {
+    .rediseno-page { padding: 20px 16px; }
+  }
+  @media (max-width: 479px) {
+    .rediseno-page { padding: 16px 12px; }
+  }
+
+  /* ── Rediseño: botón dorado plano (sin degradado) ── */
+  .btn-gold-flat {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 12px 22px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #030a1a;
+    background: #f5c842;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  @media (hover: hover) {
+    .btn-gold-flat:hover:not(:disabled) {
+      background: #fde68a;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    }
+  }
+  .btn-gold-flat:disabled { opacity: 0.5; cursor: not-allowed; }
 
   /* ── Buttons ────────────────────────────────────── */
   .btn-gold {
@@ -345,12 +393,6 @@
 }
 
 /* ── Keyframes ───────────────────────────────────────── */
-@keyframes twinkle {
-  0%, 100% { opacity: var(--star-opacity, 0.6); transform: scale(1); }
-  50% { opacity: calc(var(--star-opacity, 0.6) * 0.35); transform: scale(0.85); }
-}
-
-
 @keyframes fill-slide {
   from { transform: translateX(-100%); }
   to   { transform: translateX(0); }
@@ -451,17 +493,6 @@
   color: rgba(255, 255, 255, 0.38);
   text-transform: uppercase;
   margin-top: 4px;
-}
-
-/* ── Star field ───────────────────────────────────────── */
-.star-field {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 0%, #0c1d45 0%, transparent 60%),
-    #030a1a;
 }
 
 /* ── Reduced motion ──────────────────────────────────── */

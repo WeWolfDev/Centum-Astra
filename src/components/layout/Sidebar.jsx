@@ -1,50 +1,41 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  LayoutDashboard, Users, FolderOpen, Video,
-  BarChart2, FileText, LogOut, X,
+  Home, FolderOpen, Video, GraduationCap,
+  Users, CreditCard, LogOut, X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
+// Admin queda sin rediseñar hasta tener mockup; conservamos su nav previo.
+// TODO(rediseno): Pagos (sin mockup — admin pendiente).
 const adminNav = [
-  { id: 'dashboard', label: 'Dashboard',      Icon: LayoutDashboard },
-  { id: 'students',  label: 'Alumnos',         Icon: Users },
-  { id: 'modules',   label: 'Módulos',          Icon: FolderOpen },
-  { id: 'videos',    label: 'Videoteca',        Icon: Video },
-  { id: 'exam',      label: 'Simulador EXANI',  Icon: FileText },
-  { id: 'stats',     label: 'Estadísticas',     Icon: BarChart2 },
+  { id: 'dashboard', label: 'Mis alumnos',             Icon: Users },
+  { id: 'modules',   label: 'Material',                Icon: FolderOpen },
+  { id: 'exam',      label: 'Simuladores y quizzes',   Icon: GraduationCap },
+  { id: 'payments',  label: 'Pagos',                   Icon: CreditCard },
 ];
 
 const teacherNav = [
-  { id: 'dashboard', label: 'Mi Panel',         Icon: LayoutDashboard },
-  { id: 'modules',   label: 'Módulos',          Icon: FolderOpen },
-  { id: 'videos',    label: 'Videoteca',        Icon: Video },
-  { id: 'exam',      label: 'Simulador EXANI',  Icon: FileText },
-  { id: 'stats',     label: 'Estadísticas',     Icon: BarChart2 },
+  { id: 'dashboard', label: 'Mis alumnos',             Icon: Users },
+  { id: 'modules',   label: 'Material',                Icon: FolderOpen },
+  { id: 'exam',      label: 'Simuladores y quizzes',   Icon: GraduationCap },
 ];
 
 const studentNav = [
-  { id: 'dashboard',  label: 'Mi progreso',     Icon: LayoutDashboard },
-  { id: 'modules',    label: 'Módulos',          Icon: FolderOpen },
-  { id: 'videos',     label: 'Videoteca',        Icon: Video },
-  { id: 'exam',       label: 'Simulador EXANI',  Icon: FileText },
+  { id: 'dashboard', label: 'Inicio',                  Icon: Home },
+  { id: 'modules',   label: 'Módulos',                 Icon: FolderOpen },
+  { id: 'videos',    label: 'Videoteca',               Icon: Video },
+  { id: 'exam',      label: 'Simuladores y quizzes',   Icon: GraduationCap },
 ];
 
 const navByRole = { admin: adminNav, teacher: teacherNav, student: studentNav };
 
 const roleLabel = { admin: 'Administrador', teacher: 'Profesor', student: 'Alumno' };
 
-const roleBadge = {
-  admin:   { bg: 'rgba(245,200,66,0.12)',  color: '#f5c842',  border: 'rgba(245,200,66,0.25)' },
-  teacher: { bg: 'rgba(96,165,250,0.12)',  color: '#93c5fd',  border: 'rgba(96,165,250,0.25)' },
-  student: { bg: 'rgba(45,212,191,0.12)',  color: '#5eead4',  border: 'rgba(45,212,191,0.25)' },
-};
-
 export default function Sidebar({ activeSection, setActiveSection, isOpen, onClose, isMobile }) {
   const { user, logout } = useAuth();
   const [logoutHover, setLogoutHover] = useState(false);
   const nav = navByRole[user.role] || studentNav;
-  const badge = roleBadge[user.role];
 
   return (
     <motion.aside
@@ -125,7 +116,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
             <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 12.5, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {user.name.split(' ').slice(0, 2).join(' ')}
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.28)', fontSize: 11, marginTop: 1 }}>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, marginTop: 1 }}>
               {roleLabel[user.role]}
             </p>
           </div>
@@ -159,7 +150,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
           style={{
             display: 'flex', alignItems: 'center', gap: 10,
             width: '100%', padding: '9px 14px', borderRadius: 10,
-            color: logoutHover ? '#f87171' : 'rgba(255,255,255,0.3)',
+            color: logoutHover ? '#f87171' : 'rgba(255,255,255,0.6)',
             fontSize: 13, fontWeight: 500,
             background: logoutHover ? 'rgba(248,113,113,0.07)' : 'none',
             border: 'none', cursor: 'pointer',

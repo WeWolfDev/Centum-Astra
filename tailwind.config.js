@@ -28,9 +28,9 @@ export default {
         },
       },
       fontFamily: {
-        display: ['Orbitron', 'sans-serif'],
-        body:    ['Inter', 'sans-serif'],
-        syne:    ['Syne', 'sans-serif'],
+        display:  ['"Bricolage Grotesque"', 'sans-serif'],
+        body:     ['"Plus Jakarta Sans"', 'sans-serif'],
+        wordmark: ['Orbitron', 'sans-serif'],
       },
       backgroundImage: {
         'nebula':          'radial-gradient(ellipse 80% 60% at 50% 0%, #0c1d45 0%, #030a1a 70%)',
@@ -63,16 +63,11 @@ export default {
         'card-teal':     '0 0 0 1px rgba(29,233,182,0.28), 0 12px 48px rgba(0,0,0,0.65), 0 0 36px rgba(29,233,182,0.07)',
       },
       animation: {
-        'twinkle':       'twinkle 3s ease-in-out infinite',
         'ring-glow':     'ring-glow 3s ease-in-out infinite',
         'slide-in-left': 'slide-in-left 0.4s cubic-bezier(0.16,1,0.3,1)',
         'shimmer':       'shimmer 2.4s ease-in-out infinite',
       },
       keyframes: {
-        twinkle: {
-          '0%, 100%': { opacity: '0.9' },
-          '50%':      { opacity: '0.15' },
-        },
         'ring-glow': {
           '0%, 100%': { filter: 'drop-shadow(0 0 6px rgba(245,200,66,0.4))' },
           '50%':      { filter: 'drop-shadow(0 0 14px rgba(245,200,66,0.7))' },

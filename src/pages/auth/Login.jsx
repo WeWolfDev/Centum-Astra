@@ -105,8 +105,8 @@ export default function Login() {
 
     const startVideo = () => {
       if (cancelled) return;
-      video.src = `${import.meta.env.BASE_URL}space.mp4`;
-      video.load();
+      // TODO(rediseno): video de fondo eliminado (space.mp4 borrado del repo).
+      // Login seguirá con el poster estático hasta que haya nuevo mockup.
     };
 
     if (document.readyState === 'complete') {
@@ -265,7 +265,7 @@ export default function Login() {
                   )}>
                     {s.val}
                   </p>
-                  <p className="text-[11px] text-white/30 font-normal tracking-[0.045em] relative">
+                  <p className="text-[11px] text-white/60 font-normal tracking-[0.045em] relative">
                     {s.label}
                   </p>
                 </div>

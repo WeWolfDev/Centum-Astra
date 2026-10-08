@@ -1,39 +1,29 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Upload, X, Search } from 'lucide-react';
 import { mockVideos } from '../../data/mockData';
+import { useMaterial } from '../../context/MaterialContext';
 import { useAuth } from '../../context/AuthContext';
-import { cn } from '../../lib/utils';
+import Pastilla from '../../components/rediseno/Pastilla';
+import IconSubject from '../../components/rediseno/IconSubject';
 
-const SUBJECTS = ['Pensamiento Matemático', 'Comprensión Lectora', 'Redacción Indirecta', 'Pre-medicina', 'Ciencias de la Salud'];
+// Catálogo de materias en el orden del mockup Alumno-Videoteca.dc.html
+const SUBJECTS = [
+  { id: 'Pensamiento Matemático', icon: 'math',    tono: 'materia-math',    color: '#93c5fd' },
+  { id: 'Comprensión Lectora',    icon: 'reading', tono: 'materia-reading', color: '#d8b4fe' },
+  { id: 'Redacción Indirecta',    icon: 'writing', tono: 'materia-writing', color: '#6ee7b7' },
+  { id: 'Pre-medicina',           icon: 'premed',  tono: 'materia-premed',  color: '#5eead4' },
+  { id: 'Ciencias de la Salud',   icon: 'health',  tono: 'materia-health',  color: '#67e8f9' },
+];
 
-const subjectColors = {
-  'Pensamiento Matemático': 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  'Comprensión Lectora': 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  'Redacción Indirecta': 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-  'Pre-medicina': 'bg-teal-500/20 text-teal-300 border-teal-500/30',
-  'Ciencias de la Salud': 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-};
+const SUBJECT_BY_ID = Object.fromEntries(SUBJECTS.map(s => [s.id, s]));
 
-const thumbColors = {
-  'PM': 'from-blue-600 to-blue-800',
-  'CL': 'from-purple-600 to-purple-800',
-  'RI': 'from-emerald-600 to-emerald-800',
-  'CS': 'from-cyan-600 to-cyan-800',
-};
-
-const subjectThumb = {
-  'Pensamiento Matemático': 'PM',
-  'Comprensión Lectora': 'CL',
-  'Redacción Indirecta': 'RI',
-  'Pre-medicina': 'CS',
-  'Ciencias de la Salud': 'CS',
-};
+// Icono de rejilla ("Todas") del mockup.
+const ALL_ICON = 'M4 5h7v7H4zM13 5h7v7h-7zM4 14h7v5H4zM13 14h7v5h-7z';
 
 function UploadVideoModal({ onClose, onUpload }) {
   const { user } = useAuth();
   const [title, setTitle]       = useState('');
-  const [subject, setSubject]   = useState(SUBJECTS[0]);
+  const [subject, setSubject]   = useState(SUBJECTS[0].id);
   const [duration, setDuration] = useState('');
   const [fileName, setFileName] = useState('');
 
@@ -50,295 +40,486 @@ function UploadVideoModal({ onClose, onUpload }) {
       id: Date.now(),
       title: title.trim(),
       subject,
-      instructor: user.name,
+      instructor: user?.name || '—',
       duration: duration || '—',
       views: '0',
-      thumbnail: subjectThumb[subject] || 'PM',
+      thumbnail: 'PM',
+      date: new Date().toISOString().slice(0, 10),
     });
     onClose();
   }
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 100,
-      background: 'rgba(3,10,26,0.82)', backdropFilter: 'blur(8px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
-    }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.94, y: 16 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl"
-        style={{ width: '100%', maxWidth: 420, padding: '28px 24px' }}
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Subir sesión"
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 100,
+        background: 'rgba(3,10,26,0.85)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: 440,
+          background: '#0c1d45',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: 16,
+          padding: '28px 24px',
+          color: '#cbd5e1',
+        }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
           <div>
-            <h3 style={{ color: 'white', fontSize: 17, fontWeight: 700, marginBottom: 2 }}>Subir sesión</h3>
-            <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>Agrega una nueva sesión grabada</p>
+            <h3 style={{
+              margin: 0,
+              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontWeight: 700,
+              fontSize: 20,
+              color: '#ffffff',
+              lineHeight: 1.2,
+            }}>Subir sesión</h3>
+            <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>
+              Agrega una nueva sesión grabada
+            </p>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex' }}>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Cerrar"
+            style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+              width: 44, height: 44, borderRadius: 10,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              color: '#cbd5e1', cursor: 'pointer',
+            }}
+          >
             <X size={18} />
           </button>
         </div>
 
-        {/* File picker */}
         <label style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           gap: 8, padding: '22px 16px', borderRadius: 12, cursor: 'pointer', marginBottom: 16,
-          border: '2px dashed rgba(245,200,66,0.2)', background: 'rgba(245,200,66,0.02)',
+          border: '1.5px dashed rgba(245,200,66,0.35)',
+          background: 'rgba(255,255,255,0.03)',
+          minHeight: 110,
         }}>
-          <input type="file" style={{ display: 'none' }} onChange={handleFileChange} accept="video/*,.mp4,.mov,.avi" />
-          <Upload size={22} style={{ color: '#f5c842', opacity: 0.7 }} />
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, textAlign: 'center' }}>
-            {fileName ? `🎬 ${fileName}` : 'Selecciona el archivo de video'}
+          <input
+            type="file"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+            accept="video/*,.mp4,.mov,.avi"
+            aria-label="Archivo de video"
+          />
+          <Upload size={22} aria-hidden="true" style={{ color: '#f5c842' }} />
+          <p style={{ margin: 0, color: '#e2e8f0', fontSize: 13, textAlign: 'center' }}>
+            {fileName || 'Selecciona el archivo de video'}
           </p>
-          <p style={{ color: 'rgba(255,255,255,0.22)', fontSize: 11 }}>MP4 · MOV · AVI</p>
+          <p style={{ margin: 0, color: 'rgba(255,255,255,0.6)', fontSize: 11 }}>MP4 · MOV · AVI</p>
         </label>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
-          <div>
-            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11.5, marginBottom: 5 }}>Título de la sesión *</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 22 }}>
+          <label style={{ display: 'block' }}>
+            <span style={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: 12, marginBottom: 6 }}>Título de la sesión *</span>
             <input
               type="text" value={title} onChange={e => setTitle(e.target.value)}
               placeholder="Ej. Clase 5 — Álgebra lineal"
-              style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: 'white', fontSize: 13, outline: 'none' }}
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.13)',
+                borderRadius: 10, padding: '12px 14px',
+                color: '#ffffff', fontSize: 14, outline: 'none',
+                minHeight: 44,
+              }}
             />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
-            <div>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11.5, marginBottom: 5 }}>Materia</p>
-              <select value={subject} onChange={e => setSubject(e.target.value)}
-                style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: 'white', fontSize: 13, outline: 'none' }}
+          </label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: 12 }}>
+            <label>
+              <span style={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: 12, marginBottom: 6 }}>Materia</span>
+              <select
+                value={subject}
+                onChange={e => setSubject(e.target.value)}
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.13)',
+                  borderRadius: 10, padding: '12px 14px',
+                  color: '#ffffff', fontSize: 14, outline: 'none',
+                  minHeight: 44,
+                }}
               >
-                {SUBJECTS.map(s => <option key={s} value={s} style={{ background: '#0c1d45' }}>{s}</option>)}
+                {SUBJECTS.map(s => (
+                  <option key={s.id} value={s.id} style={{ background: '#0c1d45' }}>{s.id}</option>
+                ))}
               </select>
-            </div>
-            <div>
-              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11.5, marginBottom: 5 }}>Duración</p>
+            </label>
+            <label>
+              <span style={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: 12, marginBottom: 6 }}>Duración</span>
               <input
                 type="text" value={duration} onChange={e => setDuration(e.target.value)}
                 placeholder="45:00"
-                style={{ width: 80, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: '10px 14px', color: 'white', fontSize: 13, outline: 'none' }}
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.13)',
+                  borderRadius: 10, padding: '12px 14px',
+                  color: '#ffffff', fontSize: 14, outline: 'none',
+                  minHeight: 44,
+                }}
               />
-            </div>
+            </label>
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: 10 }}>
-          <motion.button
-            whileTap={{ scale: 0.97 }} onClick={handleSubmit} disabled={!title.trim()}
-            className="btn-gold" style={{ flex: 1, opacity: title.trim() ? 1 : 0.4 }}
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!title.trim()}
+            className="btn-gold"
+            style={{ flex: 1, minHeight: 44, opacity: title.trim() ? 1 : 0.5 }}
           >
             Publicar sesión
-          </motion.button>
-          <button onClick={onClose} className="btn-ghost">Cancelar</button>
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-ghost"
+            style={{ minHeight: 44 }}
+          >
+            Cancelar
+          </button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
 
-function VideoCard({ video, onClick, isActive }) {
+function VideoCard({ video, onClick }) {
+  const meta = SUBJECT_BY_ID[video.subject];
   return (
-    <motion.div
-      whileHover={{ y: -5, transition: { duration: 0.2, ease: [0.16, 1, 0.3, 1] } }}
+    <button
+      type="button"
       onClick={() => onClick(video)}
-      className={cn(
-        'group relative overflow-hidden cursor-pointer rounded-2xl',
-        'bg-white/5 backdrop-blur-xl border transition-colors duration-300',
-        isActive ? 'border-yellow-500/50' : 'border-white/10 hover:border-yellow-500/30',
-      )}
+      aria-label={`Reproducir ${video.title}`}
+      style={{
+        display: 'block',
+        width: '100%',
+        textAlign: 'left',
+        background: 'transparent',
+        border: 'none',
+        padding: 0,
+        color: '#cbd5e1',
+        cursor: 'pointer',
+        minWidth: 0,
+      }}
     >
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-[radial-gradient(ellipse_at_top,rgba(245,200,66,0.07)_0%,transparent_65%)] z-10" />
-      <div className="absolute top-0 left-4 right-4 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-r from-transparent via-yellow-500/35 to-transparent z-10" />
-      {/* Thumbnail */}
-      <div className={`relative z-[1] h-40 bg-gradient-to-br ${thumbColors[video.thumbnail] || 'from-slate-600 to-slate-800'} flex items-center justify-center`}>
-        <div className="absolute inset-0 bg-black/20" />
-        <motion.div
-          whileHover={{ scale: 1.1 }}
-          className="relative w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30"
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '16 / 9',
+          borderRadius: 16,
+          background: '#0c1d45',
+          overflow: 'hidden',
+        }}
+      >
+        {meta && (
+          <IconSubject
+            name={meta.icon}
+            size={undefined}
+            strokeWidth={0.7}
+            color="rgba(255,255,255,0.16)"
+            style={{
+              position: 'absolute',
+              right: '4%',
+              top: '8%',
+              height: '84%',
+              width: 'auto',
+            }}
+          />
+        )}
+        <span
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: '50%', top: '50%',
+            width: 60, height: 60,
+            marginLeft: -30, marginTop: -30,
+            borderRadius: 999,
+            background: '#f5c842',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
         >
-          <span className="text-2xl ml-1">▶</span>
-        </motion.div>
-        <span className="absolute bottom-2 right-2 text-xs bg-black/60 text-white px-2 py-0.5 rounded-md">
+          <svg width="22" height="22" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M5 2.5v11l9-5.5z" fill="#030a1a" />
+          </svg>
+        </span>
+        <span
+          style={{
+            position: 'absolute',
+            right: 12, bottom: 12,
+            padding: '3px 9px',
+            borderRadius: 6,
+            background: 'rgba(3,10,26,0.85)',
+            color: '#ffffff',
+            fontSize: 13, fontWeight: 600,
+          }}
+        >
           {video.duration}
         </span>
       </div>
 
-      <div className="relative z-[1]" style={{ padding: '16px 18px' }}>
-        <span className={`badge border ${subjectColors[video.subject] || 'bg-white/10 text-white/50'} text-[10px]`} style={{ marginBottom: 8, display: 'inline-block' }}>
-          {video.subject}
-        </span>
-        <h3 style={{ color: 'rgba(255,255,255,0.9)', fontSize: 13.5, fontWeight: 700, lineHeight: 1.45, marginBottom: 10, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{video.title}</h3>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 11.5, color: 'rgba(255,255,255,0.38)' }}>
-          <span>{video.instructor}</span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            {video.views}
-          </span>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function VideoModal({ video, onClose }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-      onClick={onClose}
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        onClick={e => e.stopPropagation()}
-        className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl w-full max-w-2xl p-6"
+      <div
+        style={{
+          marginTop: 12,
+          fontFamily: '"Bricolage Grotesque", sans-serif',
+          fontSize: 17, fontWeight: 600, lineHeight: 1.3,
+          color: '#ffffff',
+        }}
       >
-        <div className={`h-72 rounded-xl bg-gradient-to-br ${thumbColors[video.thumbnail] || 'from-slate-600 to-slate-800'} flex items-center justify-center mb-5`}>
-          <div className="text-center">
-            <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-2 border-white/40 mx-auto mb-3">
-              <span className="text-4xl ml-1">▶</span>
-            </div>
-            <p className="text-white/70 text-sm">[Vista previa · Conectar a Zoom/Drive]</p>
-          </div>
-        </div>
+        {video.title}
+      </div>
 
-        <h2 className="text-xl font-bold text-white mb-2">{video.title}</h2>
-        <div className="flex items-center gap-3 flex-wrap mb-4">
-          <span className={`badge border ${subjectColors[video.subject] || ''}`}>{video.subject}</span>
-          <span className="text-white/40 text-sm">{video.instructor}</span>
-          <span className="text-white/40 text-sm">⏱ {video.duration}</span>
-          <span className="text-white/40 text-sm">👁 {video.views} vistas</span>
-        </div>
-
-        <div className="flex gap-3">
-          <button className="btn-gold text-sm flex-1">Reproducir</button>
-          <button onClick={onClose} className="btn-ghost text-sm">Cerrar</button>
-        </div>
-      </motion.div>
-    </motion.div>
+      <div
+        style={{
+          marginTop: 8,
+          display: 'flex', flexWrap: 'wrap',
+          alignItems: 'center', gap: '6px 10px',
+          fontSize: 13,
+          color: 'rgba(255,255,255,0.6)',
+        }}
+      >
+        {meta ? (
+          <Pastilla tono={meta.tono}>{video.subject}</Pastilla>
+        ) : (
+          <Pastilla tono="neutral">{video.subject}</Pastilla>
+        )}
+        <span>{video.instructor}</span>
+      </div>
+    </button>
   );
 }
 
 export default function VideoLibrary() {
   const { user } = useAuth();
-  const isStaff = user.role === 'admin' || user.role === 'teacher';
+  const isStaff = user?.role === 'admin' || user?.role === 'teacher';
+  const { videosDeVideoteca } = useMaterial();
 
-  const [videos, setVideos]         = useState(mockVideos);
-  const [activeVideo, setActiveVideo] = useState(null);
+  const [videosLocales, setVideosLocales] = useState(mockVideos);
   const [filter, setFilter]         = useState('all');
   const [search, setSearch]         = useState('');
   const [showUpload, setShowUpload] = useState(false);
 
-  const subjects = ['all', ...new Set(videos.map(v => v.subject))];
+  // Combina los videos del mock base + los subidos por el maestro + los locales (modal legacy).
+  const videos = useMemo(
+    () => [...videosDeVideoteca, ...videosLocales],
+    [videosDeVideoteca, videosLocales],
+  );
 
-  const filtered = videos.filter(v => {
-    const matchFilter = filter === 'all' || v.subject === filter;
-    const matchSearch = v.title.toLowerCase().includes(search.toLowerCase()) ||
-      v.instructor.toLowerCase().includes(search.toLowerCase());
-    return matchFilter && matchSearch;
-  });
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return videos.filter(v => {
+      const matchFilter = filter === 'all' || v.subject === filter;
+      if (!matchFilter) return false;
+      if (!q) return true;
+      return (
+        v.title.toLowerCase().includes(q) ||
+        (v.instructor || '').toLowerCase().includes(q)
+      );
+    });
+  }, [videos, filter, search]);
 
   function handleUpload(video) {
-    setVideos(prev => [video, ...prev]);
+    setVideosLocales(prev => [video, ...prev]);
   }
 
+  function handleOpenVideo(/* video */) {
+    // TODO(rediseno): player real. Por ahora no abrimos modal/placeholder visible.
+  }
+
+  const conteo = `${filtered.length} ${filtered.length === 1 ? 'sesión grabada' : 'sesiones grabadas'}`;
+
   return (
-    <div className="p-4 sm:p-8 space-y-6 overflow-y-auto scrollbar-hide max-h-[calc(100vh-4rem)]">
+    <div
+      className="scrollbar-hide"
+      style={{
+        maxHeight: 'calc(100vh - 4rem)',
+        overflowY: 'auto',
+        padding: 'clamp(20px, 4vw, 40px) clamp(16px, 4vw, 48px)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 28,
+        background: 'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(12,29,69,0.85), rgba(12,29,69,0) 70%)',
+      }}
+    >
       {showUpload && (
         <UploadVideoModal onClose={() => setShowUpload(false)} onUpload={handleUpload} />
       )}
 
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5">
-        <div className="flex items-center justify-between flex-wrap gap-4">
-          <div>
-            <div className="section-divider" style={{ marginBottom: 6 }}>
-              <h3>Videoteca de Sesiones</h3>
-            </div>
-            <p style={{ color: 'rgba(255,255,255,0.38)', fontSize: 12.5 }}>
-              <span className="font-syne text-[18px] font-bold leading-none tracking-tight bg-gradient-to-br from-yellow-200 via-[#f5c842] to-amber-500/80 bg-clip-text text-transparent">{videos.length}</span>
-              <span style={{ marginLeft: 6 }}>sesiones grabadas · {new Set(videos.map(v => v.subject)).size} materias</span>
-            </p>
-          </div>
-          <div className="flex items-center gap-3 flex-wrap">
+      <header
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px 24px',
+        }}
+      >
+        <h1
+          style={{
+            margin: 0,
+            fontFamily: '"Bricolage Grotesque", sans-serif',
+            fontWeight: 700,
+            fontSize: 36,
+            lineHeight: 1.1,
+            letterSpacing: '-0.03em',
+            color: '#ffffff',
+          }}
+        >
+          Videoteca
+        </h1>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              flex: '0 1 320px',
+              minWidth: 220,
+              boxSizing: 'border-box',
+              minHeight: 48,
+              padding: '0 16px',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: 999,
+              background: 'rgba(12,29,69,0.5)',
+            }}
+          >
+            <Search size={20} strokeWidth={1.8} aria-hidden="true" style={{ color: '#cbd5e1', flexShrink: 0 }} />
             <input
-              type="text"
-              placeholder="Buscar sesión..."
+              type="search"
+              aria-label="Buscar sesión"
+              placeholder="Buscar tema o profesor"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white placeholder-white/30 text-sm focus:outline-none focus:border-amber-400/40 w-48 sm:w-56"
+              style={{
+                flex: '1 1 auto',
+                minWidth: 0,
+                height: 44,
+                border: 0,
+                background: 'transparent',
+                color: '#e2e8f0',
+                font: 'inherit',
+                fontSize: 15,
+                outline: 'none',
+              }}
             />
-            {isStaff && (
-              <motion.button
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setShowUpload(true)}
-                className="btn-gold flex items-center gap-[7px]"
-              >
-                <Upload size={14} strokeWidth={2} />
-                Subir sesión
-              </motion.button>
-            )}
-          </div>
-        </div>
+          </label>
 
-        {/* Subject filters */}
-        <div className="flex gap-2 mt-4 flex-wrap">
-          {subjects.map(s => (
+          {isStaff && (
             <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all border
-                ${filter === s
-                  ? 'bg-amber-400/15 text-amber-300 border-amber-400/30'
-                  : 'bg-white/5 text-white/50 border-white/10 hover:text-white'
-                }`}
+              type="button"
+              onClick={() => setShowUpload(true)}
+              className="btn-gold"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, minHeight: 44 }}
             >
-              {s === 'all' ? 'Todas las materias' : s}
+              <Upload size={16} strokeWidth={2} aria-hidden="true" />
+              Subir sesión
             </button>
-          ))}
+          )}
         </div>
-      </motion.div>
+      </header>
+
+      {/* Chips de materia */}
+      <div
+        role="group"
+        aria-label="Filtrar por materia"
+        style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}
+      >
+        {[{ id: 'all', label: 'Todas', iconPath: ALL_ICON }, ...SUBJECTS.map(s => ({
+          id: s.id, label: s.id, iconPath: null, icon: s.icon,
+        }))].map(c => {
+          const on = filter === c.id;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setFilter(c.id)}
+              aria-pressed={on}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                minHeight: 48,
+                padding: '8px 16px',
+                borderRadius: 999,
+                border: `1.5px solid ${on ? '#f5c842' : 'rgba(255,255,255,0.13)'}`,
+                background: on ? 'rgba(245,200,66,0.1)' : 'rgba(255,255,255,0.04)',
+                color: on ? '#ffffff' : '#cbd5e1',
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {c.iconPath ? (
+                <svg
+                  width="20" height="20" viewBox="0 0 24 24"
+                  fill="none" stroke={on ? '#f5c842' : '#cbd5e1'}
+                  strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d={c.iconPath} />
+                </svg>
+              ) : (
+                <IconSubject
+                  name={c.icon}
+                  size={20}
+                  color={on ? '#f5c842' : '#cbd5e1'}
+                />
+              )}
+              {c.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Conteo */}
+      <div style={{ fontSize: 14, color: '#cbd5e1' }}>{conteo}</div>
 
       {/* Grid */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={filter + search}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
-          {filtered.map((video, i) => (
-            <motion.div
-              key={video.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.07 }}
-            >
-              <VideoCard
-                video={video}
-                onClick={setActiveVideo}
-                isActive={activeVideo?.id === video.id}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
-      </AnimatePresence>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+          gap: '28px 24px',
+        }}
+      >
+        {filtered.map(video => (
+          <VideoCard key={video.id} video={video} onClick={handleOpenVideo} />
+        ))}
+      </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-16 text-white/30">
-          <p className="text-5xl mb-3">🎬</p>
-          <p>No se encontraron videos</p>
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '48px 16px',
+            color: 'rgba(255,255,255,0.6)',
+            fontSize: 15,
+          }}
+        >
+          No se encontraron sesiones con esos filtros.
         </div>
       )}
-
-      <AnimatePresence>
-        {activeVideo && <VideoModal video={activeVideo} onClose={() => setActiveVideo(null)} />}
-      </AnimatePresence>
     </div>
   );
 }
