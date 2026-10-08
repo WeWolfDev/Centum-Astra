@@ -73,7 +73,10 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
         {isMobile ? (
           /* Mobile: show logo only (sidebar is hidden, brand identity here) */
           <img
-            src={`${import.meta.env.BASE_URL}logo-astra.jpeg`}
+            src={`${import.meta.env.BASE_URL}logo-astra-sm.png`}
+            srcSet={`${import.meta.env.BASE_URL}logo-astra-sm.png 1x, ${import.meta.env.BASE_URL}logo-astra-sm@2x.png 2x`}
+            width={26}
+            height={26}
             alt="Centum Astra"
             style={{
               width: 26, height: 26, borderRadius: 6, objectFit: 'cover', flexShrink: 0,

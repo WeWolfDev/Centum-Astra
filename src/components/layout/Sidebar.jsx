@@ -67,7 +67,10 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
       <div style={{ padding: '20px 20px 18px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <img
-            src={`${import.meta.env.BASE_URL}logo-astra.jpeg`}
+            src={`${import.meta.env.BASE_URL}logo-astra-sm.png`}
+            srcSet={`${import.meta.env.BASE_URL}logo-astra-sm.png 1x, ${import.meta.env.BASE_URL}logo-astra-sm@2x.png 2x`}
+            width={34}
+            height={34}
             alt="Centum Astra"
             style={{
               width: 34, height: 34, borderRadius: 9,
