@@ -21,6 +21,7 @@
 | 6 | Refactor: un solo camino | `grep -n aciertosACeneval src/pages/exam/ExamSimulator.jsx` → vacío. `ResultadoSimulador` recibe `puntaje` como prop; nadie en el archivo llama `aciertosACeneval`. |
 | 7 | Cobertura final | `npm run test:coverage` → 100% statements/branches/functions/lines en los dos archivos del scope. |
 | 8 | Build no se rompe | `npm run build` → `✓ built in 488ms`, sin errores. |
+| 9 | Bug encontrado durante el ciclo y corregido | Guard clause `if (total <= 0) return min;` añadida en `src/config/rediseno.js`. Los tests que anclaban el bug se reemplazaron por aserciones del comportamiento correcto. |
 
 ## Especificación de tests
 
@@ -32,7 +33,8 @@
 | 4 | Redondeo al entero más cercano con fracciones no exactas | `aciertosACeneval(1, 7) === 786` | unit | PASS |
 | 5 | Clamp a MAX cuando `aciertos > total` | `aciertosACeneval(200, 138) === 1300` | unit | PASS |
 | 6 | Clamp a MIN cuando `aciertos < 0` | `aciertosACeneval(-5, 138) === 700` | unit | PASS |
-| 7 | **BUG documentado**: `total=0` devuelve NaN en vez de un valor finito del rango | `it.fails("devuelve un valor finito...")` + `it("comportamiento actual produce NaN...")` | unit | expected fail + PASS |
+| 7 | `aciertosACeneval(0, 0)` devuelve MIN (guard clause) | `rediseno.test.js` → "devuelve MIN cuando total es 0" | unit | PASS |
+| 7b | `aciertosACeneval(x, total < 0)` devuelve MIN (guard clause) | `rediseno.test.js` → "devuelve MIN cuando total es negativo" | unit | PASS |
 | 8 | `puedeDescargarPdf` permite teacher/admin, niega el resto | 5 casos | unit | PASS |
 | 9 | `contarAciertos` con answers vacío → 0 | `examScoring.test.js` | unit | PASS |
 | 10 | `contarAciertos` todos incorrectos → 0 | unit | PASS |
@@ -42,23 +44,24 @@
 | 14 | `contarAciertos` con questions vacío → 0 | unit | PASS |
 | 15 | `calcularResultadoSimulador` devuelve `{aciertos, puntaje}` consistentes en 0, total y proporción 5/10 | 4 casos | unit | PASS |
 
-## Bug encontrado y NO corregido (por instrucción del usuario)
+## Bug encontrado durante el ciclo y corregido
 
-**`aciertosACeneval(0, 0)` devuelve `NaN`.**
+**`aciertosACeneval(0, 0)` devolvía `NaN`.**
 
-- Causa raíz (`src/config/rediseno.js:23`): `aciertos / total` = `0/0` = `NaN`. El clamping con `Math.max/Math.min` deja pasar `NaN` porque `Math.min(1, NaN) === NaN` y `Math.max(0, NaN) === NaN`. `Math.round(min + NaN * ...)` = `NaN`.
-- Riesgo real hoy: bajo. El llamador siempre pasa `SIMULADOR_TOTAL_PREGUNTAS = 138` o `questions.length > 0`.
-- Riesgo futuro: medio. Si un simulador vacío llega a este cálculo (banco mal armado, feature flag), la UI pintaría "NaN" como puntaje. El `Pastilla` y el aciertos sí renderizarían.
-- Documentado en la suite con `it.fails` (bug conocido, no corregido) + un test afirmativo del comportamiento observado para marcar el regress point.
-- Arreglo sugerido (cuando se decida corregir): devolver `MIN` cuando `total <= 0` como guard clause.
+- Causa raíz (`src/config/rediseno.js`): `aciertos / total` = `0/0` = `NaN`. El clamping con `Math.max/Math.min` dejaba pasar `NaN` porque `Math.min(1, NaN) === NaN` y `Math.max(0, NaN) === NaN`. `Math.round(min + NaN * ...)` = `NaN`.
+- Detectado durante este ciclo TDD mientras se escribían los casos edge de `aciertosACeneval`.
+- Riesgo real previo: bajo. El llamador siempre pasa `SIMULADOR_TOTAL_PREGUNTAS = 138` o `questions.length > 0`.
+- Riesgo futuro evitado: si un simulador vacío llegase a este cálculo (banco mal armado, feature flag), la UI habría pintado "NaN" como puntaje.
+- **Fix aplicado**: guard clause `if (total <= 0) return min;` al inicio de `aciertosACeneval`.
+- **Tests actualizados**: se reemplazaron el `it.fails` (que anclaba la expectativa correcta) y el test que anclaba el comportamiento observado por dos aserciones directas del comportamiento correcto (`total = 0` → `MIN`, `total < 0` → `MIN`).
 
 ## Comandos verificados
 
 ```bash
-npm test                 # 29 passed | 1 expected fail (30)
+npm test                 # 30 passed (post-fix: ya sin expected fails)
 npm run test:coverage    # 100% en los dos archivos del scope
 npm run lint             # pasa (warnings pre-existentes, ninguno nuevo)
-npm run build            # ✓ built in 488ms
+npm run build            # ✓ built in 471ms
 ```
 
 ## Checkpoints en `feature/tests-simulador`
@@ -69,6 +72,6 @@ ed8fe2f refactor(exam): compute puntaje via calcularResultadoSimulador
 eac2dca test: add vitest + failing specs for exam scoring extraction
 ```
 
-## Nota pendiente
+## Nota
 
-- El directorio `coverage/` queda untracked. El `.gitignore` del proyecto tenía ya un cambio pre-existente al iniciar la sesión, así que no se tocó; agregarlo queda a criterio del dueño del repo.
+- Se añadió `coverage/` al `.gitignore` preservando el cambio pendiente que ya tenía el archivo.

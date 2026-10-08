@@ -67,21 +67,12 @@ describe('aciertosACeneval', () => {
   });
 
   describe('casos edge', () => {
-    // BUG CANDIDATE: con total=0 la fórmula produce NaN (0/0).
-    // Comportamiento esperado razonable: devolver MIN o un valor finito del rango.
-    // Marcado con it.fails para dejar documentado el bug sin romper la suite
-    // ni modificar la función (instrucción del usuario: no corregir, reportar).
-    it.fails('devuelve un valor finito dentro del rango cuando total es 0', () => {
-      const r = aciertosACeneval(0, 0);
-      expect(Number.isFinite(r)).toBe(true);
-      expect(r).toBeGreaterThanOrEqual(MIN);
-      expect(r).toBeLessThanOrEqual(MAX);
+    it('devuelve MIN cuando total es 0', () => {
+      expect(aciertosACeneval(0, 0)).toBe(MIN);
     });
 
-    it('comportamiento actual con total=0 produce NaN (regresión conocida)', () => {
-      // Este test fija el comportamiento OBSERVADO para que un futuro arreglo
-      // sea una decisión explícita (bump + cambio del it.fails de arriba).
-      expect(Number.isNaN(aciertosACeneval(0, 0))).toBe(true);
+    it('devuelve MIN cuando total es negativo', () => {
+      expect(aciertosACeneval(5, -1)).toBe(MIN);
     });
   });
 });

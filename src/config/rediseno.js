@@ -20,6 +20,7 @@ export const SIMULADOR_EXTRAS_CUENTAN = false;
 // 0 aciertos ≈ 700, SIMULADOR_TOTAL_PREGUNTAS ≈ 1300.
 export function aciertosACeneval(aciertos, total = SIMULADOR_TOTAL_PREGUNTAS) {
   const { min, max } = SIMULADOR_RANGO_CENEVAL;
+  if (total <= 0) return min;
   const ratio = Math.max(0, Math.min(1, aciertos / total));
   return Math.round(min + ratio * (max - min));
 }
