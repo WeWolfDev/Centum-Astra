@@ -20,8 +20,8 @@ import {
   SIMULADOR_TOTAL_PREGUNTAS,
   SIMULADOR_REPARTO,
   SIMULADOR_TIEMPO_LIMITE_MIN,
-  aciertosACeneval,
 } from '../../config/rediseno';
+import { calcularResultadoSimulador } from '../../lib/examScoring';
 
 /* ── Áreas EXANI-II (orden del HANDOFF) ─────────────── */
 // Icon paths vienen de mockups/Alumno-Simulador.dc.html.
@@ -88,8 +88,7 @@ function formatTime(totalSeconds) {
 }
 
 /* ── Pantalla de resultado (puntaje Ceneval) ───────── */
-function ResultadoSimulador({ aciertos, total, onReiniciar }) {
-  const puntaje = aciertosACeneval(aciertos, total);
+function ResultadoSimulador({ aciertos, total, puntaje, onReiniciar }) {
   return (
     <div
       style={{
@@ -236,13 +235,16 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
   // tiene exactamente SIMULADOR_TOTAL_PREGUNTAS. Si en el futuro se añaden,
   // esta cuenta sigue respetando la regla porque solo recorre `questions`.
   if (finished) {
-    const aciertos = questions.reduce((acc, q, i) => {
-      return acc + (answers[i] === q.correct ? 1 : 0);
-    }, 0);
+    const { aciertos, puntaje } = calcularResultadoSimulador(
+      questions,
+      answers,
+      SIMULADOR_TOTAL_PREGUNTAS,
+    );
     return (
       <ResultadoSimulador
         aciertos={aciertos}
         total={SIMULADOR_TOTAL_PREGUNTAS}
+        puntaje={puntaje}
         onReiniciar={reiniciar}
       />
     );
