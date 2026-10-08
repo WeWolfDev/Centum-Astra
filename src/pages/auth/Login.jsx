@@ -42,17 +42,19 @@ const STATS = [
 ];
 
 /* ── Animated focus underline ─────────────────────────── */
-function FocusInput({ type = 'text', value, onChange, placeholder, id }) {
+function FocusInput({ type = 'text', value, onChange, placeholder, id, autoComplete }) {
   const [focused,  setFocused]  = useState(false);
   const [showPass, setShowPass] = useState(false);
   const isPassword = type === 'password';
+  const effectiveType = isPassword ? (showPass ? 'text' : 'password') : type;
 
   return (
     <div className="field" style={{ position: 'relative' }}>
       <div style={{ position: 'relative' }}>
         <input
           id={id}
-          type={isPassword && !showPass ? 'password' : 'text'}
+          type={effectiveType}
+          autoComplete={autoComplete}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
@@ -89,11 +91,10 @@ function FocusInput({ type = 'text', value, onChange, placeholder, id }) {
 
 export default function Login() {
   const { login, error, setError } = useAuth();
-  const [email,        setEmail]        = useState('');
-  const [password,     setPassword]     = useState('');
-  const [loading,      setLoading]      = useState(false);
-  const [selectedRole, setSelectedRole] = useState(null);
-  const [videoReady,   setVideoReady]   = useState(false);
+  const [email,      setEmail]      = useState('');
+  const [password,   setPassword]   = useState('');
+  const [loading,    setLoading]    = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
   const videoRef = useRef(null);
 
   // Load video only after all critical resources (LCP) are done.
@@ -117,18 +118,22 @@ export default function Login() {
     return () => { cancelled = true; };
   }, []);
 
-  function handleRoleSelect(role) {
-    setSelectedRole(role.key);
-    setEmail(role.hint.split(' / ')[0]);
-    setPassword(role.hint.split(' / ')[1]);
-    setError('');
-  }
-
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
     await new Promise(r => setTimeout(r, 600));
     login(email, password);
+    setLoading(false);
+  }
+
+  async function handleDevQuickLogin(role) {
+    const [quickEmail, quickPassword] = role.hint.split(' / ');
+    setEmail(quickEmail);
+    setPassword(quickPassword);
+    setError('');
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 600));
+    login(quickEmail, quickPassword);
     setLoading(false);
   }
 
@@ -282,7 +287,8 @@ export default function Login() {
           className="login-right-panel"
           style={{
             flex: '0 0 42%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            gap: 20,
             padding: '48px 48px', position: 'relative', zIndex: 2,
           }}
         >
@@ -293,45 +299,11 @@ export default function Login() {
             {/* Form header */}
             <div className="mb-7">
               <h2 className="font-syne text-[22px] font-bold text-white mb-[5px] tracking-[-0.02em]">
-                Bienvenido
+                Bienvenido de nuevo
               </h2>
               <p className="text-white/38 text-[13.5px] leading-[1.5]">
-                Selecciona tu perfil para continuar
+                Ingresa con tu correo y contraseña
               </p>
-            </div>
-
-            {/* Role selector */}
-            <div className="grid grid-cols-3 gap-[7px] mb-[26px]">
-              {roles.map(role => {
-                const active = selectedRole === role.key;
-                return (
-                  <motion.button
-                    key={role.key}
-                    onClick={() => handleRoleSelect(role)}
-                    whileTap={{ scale: 0.97 }}
-                    style={{
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
-                      padding: '13px 8px', borderRadius: 10, cursor: 'pointer',
-                      background: active ? role.accentBg : 'rgba(255,255,255,0.02)',
-                      border: `1px solid ${active ? role.accentBorder : 'rgba(255,255,255,0.06)'}`,
-                      transition: 'background 0.15s ease, border-color 0.15s ease',
-                    }}
-                  >
-                    <role.Icon
-                      size={18}
-                      strokeWidth={1.6}
-                      style={{ color: active ? role.accentColor : 'rgba(255,255,255,0.3)', transition: 'color 0.15s ease' }}
-                    />
-                    <span style={{
-                      fontSize: 11, fontWeight: 500,
-                      color: active ? role.accentColor : 'rgba(255,255,255,0.38)',
-                      transition: 'color 0.15s ease',
-                    }}>
-                      {role.label}
-                    </span>
-                  </motion.button>
-                );
-              })}
             </div>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-[14px]">
@@ -340,6 +312,7 @@ export default function Login() {
                 <FocusInput
                   id="email"
                   type="email"
+                  autoComplete="email"
                   value={email}
                   onChange={e => { setEmail(e.target.value); setError(''); }}
                   placeholder="usuario@centum.mx"
@@ -351,6 +324,7 @@ export default function Login() {
                 <FocusInput
                   id="password"
                   type="password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={e => { setPassword(e.target.value); setError(''); }}
                   placeholder="••••••••"
@@ -360,6 +334,7 @@ export default function Login() {
               <AnimatePresence>
                 {error && (
                   <motion.p
+                    role="alert"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
@@ -391,6 +366,44 @@ export default function Login() {
               © 2025 Centum Astra · Todos los derechos reservados
             </p>
           </div>
+
+          {/* ── DEV quick-login — removed by Vite tree-shake in prod ── */}
+          {import.meta.env.DEV && (
+            <div className="w-full max-w-[372px]">
+              <p className="text-white/35 text-[10.5px] tracking-[0.12em] uppercase mb-[8px] text-center">
+                Acceso rápido · DEV
+              </p>
+              <div className="grid grid-cols-3 gap-[7px]">
+                {roles.map(role => (
+                  <motion.button
+                    key={role.key}
+                    type="button"
+                    onClick={() => handleDevQuickLogin(role)}
+                    disabled={loading}
+                    whileTap={{ scale: 0.97 }}
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+                      padding: '13px 8px', borderRadius: 10,
+                      cursor: loading ? 'not-allowed' : 'pointer',
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      opacity: loading ? 0.5 : 1,
+                      transition: 'background 0.15s ease, border-color 0.15s ease',
+                    }}
+                  >
+                    <role.Icon
+                      size={18}
+                      strokeWidth={1.6}
+                      style={{ color: role.accentColor }}
+                    />
+                    <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>
+                      {role.label}
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          )}
         </motion.div>
 
       </div>
