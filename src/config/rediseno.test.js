@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   aciertosACeneval,
+  puedeDescargarPdf,
   SIMULADOR_RANGO_CENEVAL,
   SIMULADOR_TOTAL_PREGUNTAS,
 } from './rediseno';
@@ -82,5 +83,27 @@ describe('aciertosACeneval', () => {
       // sea una decisión explícita (bump + cambio del it.fails de arriba).
       expect(Number.isNaN(aciertosACeneval(0, 0))).toBe(true);
     });
+  });
+});
+
+describe('puedeDescargarPdf', () => {
+  it('permite descargar al rol teacher', () => {
+    expect(puedeDescargarPdf('teacher')).toBe(true);
+  });
+
+  it('permite descargar al rol admin', () => {
+    expect(puedeDescargarPdf('admin')).toBe(true);
+  });
+
+  it('niega la descarga al rol student', () => {
+    expect(puedeDescargarPdf('student')).toBe(false);
+  });
+
+  it('niega la descarga a rol desconocido', () => {
+    expect(puedeDescargarPdf('guest')).toBe(false);
+  });
+
+  it('niega la descarga sin rol', () => {
+    expect(puedeDescargarPdf(undefined)).toBe(false);
   });
 });
