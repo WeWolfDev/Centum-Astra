@@ -798,7 +798,10 @@ export default function PublicNav({ onLoginClick }) {
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <img
-            src={`${import.meta.env.BASE_URL}logo-astra.jpeg`}
+            src={`${import.meta.env.BASE_URL}logo-astra-sm.png`}
+            srcSet={`${import.meta.env.BASE_URL}logo-astra-sm.png 1x, ${import.meta.env.BASE_URL}logo-astra-sm@2x.png 2x`}
+            width={32}
+            height={32}
             alt="Centum Astra"
             style={{
               width: 32, height: 32, borderRadius: 8,

@@ -99,12 +99,6 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
   const subida = ultimo && primero ? ultimo.puntaje - primero.puntaje : 0;
   const subidaPositiva = subida > 0;
 
-  function handleIniciar() {
-    // TODO(rediseno): conectar el flujo "Iniciar" con ExamSimulator.
-    // El en-curso vive en src/pages/exam/ExamSimulator.jsx (lo implementa otro subagente).
-    alert('TODO(rediseno): conectar el flujo "Iniciar" con ExamSimulator.');
-  }
-
   // ----- Gráfica (SVG) -----
   const chartW = 560;
   const chartH = 196;
@@ -159,8 +153,8 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
         >
           {/* CTA en el borde superior del cuerpo, como el mockup */}
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <BotonPrimario onClick={handleIniciar} aria-label="Iniciar nuevo simulador">
-              Iniciar nuevo simulador
+            <BotonPrimario disabled aria-label="Iniciar nuevo simulador (próximamente)">
+              Próximamente
             </BotonPrimario>
           </div>
 
