@@ -152,6 +152,32 @@
   }
   .btn-gold-flat:disabled { opacity: 0.5; cursor: not-allowed; }
 
+  /* ── Rediseño: botón secundario plano (paridad con BotonSecundario original) ── */
+  .btn-flat-secundario {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 12px 20px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #e2e8f0;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  @media (hover: hover) {
+    .btn-flat-secundario:hover:not(:disabled) {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.2);
+    }
+  }
+  .btn-flat-secundario:disabled { opacity: 0.5; cursor: not-allowed; }
+
   /* ── Buttons ────────────────────────────────────── */
   .btn-gold {
     display: inline-flex;

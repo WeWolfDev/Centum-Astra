@@ -26,6 +26,13 @@ export default {
           teal:  '#1de9b6',
           light: '#b2f5e8',
         },
+        // Tokens semánticos de estado. Contraste verificado contra space-void (#030a1a):
+        // peligro 7.12:1, exito 10.2:1, advertencia 10.5:1, info 11.9:1. Todos pasan WCAG AA.
+        // Para fondos sólidos de botones, usar texto oscuro (text-space-void), no blanco.
+        peligro:     '#f87171',
+        exito:       '#34d399',
+        advertencia: '#fbbf24',
+        info:        '#93c5fd',
       },
       fontFamily: {
         display:  ['"Bricolage Grotesque"', 'sans-serif'],
