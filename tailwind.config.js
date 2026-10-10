@@ -51,6 +51,9 @@ export default {
       backgroundImage: {
         'nebula':          'radial-gradient(ellipse 80% 60% at 50% 0%, #0c1d45 0%, #030a1a 70%)',
         'space-radial':    'radial-gradient(ellipse at top, #0d1533 0%, #030a1a 50%, #000 100%)',
+        // Degradado sutil azul marino que varias páginas internas repiten como
+        // style inline. Login lo adopta aquí vía token; otras páginas se migran aparte.
+        'fondo-app':       'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(12,29,69,0.85), rgba(12,29,69,0) 70%)',
         'gold-beam':       'linear-gradient(135deg, #b8880f 0%, #f5c842 50%, #b8880f 100%)',
         'clinical-beam':   'linear-gradient(135deg, #0d9488 0%, #1de9b6 50%, #0d9488 100%)',
         'card-surface':    'linear-gradient(145deg, rgba(22,40,80,0.6) 0%, rgba(12,29,69,0.4) 100%)',

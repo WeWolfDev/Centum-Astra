@@ -83,7 +83,7 @@ export default function StudentDashboard({ setActiveSection }) {
 
   return (
     <div
-      className="scrollbar-hide"
+      className="scrollbar-hide bg-fondo-app"
       style={{
         padding: 'clamp(20px, 4vw, 40px) clamp(16px, 4vw, 48px)',
         display: 'flex',
@@ -91,8 +91,6 @@ export default function StudentDashboard({ setActiveSection }) {
         gap: 36,
         overflowY: 'auto',
         maxHeight: 'calc(100vh - 4rem)',
-        background:
-          'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(12,29,69,0.85), rgba(12,29,69,0) 70%)',
       }}
     >
       <HeaderSaludo nombre={nombreCorto} onContinuar={() => setActiveSection('modules')} />

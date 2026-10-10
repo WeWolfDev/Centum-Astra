@@ -117,14 +117,12 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
 
   return (
     <div
-      className="scrollbar-hide"
+      className="scrollbar-hide bg-fondo-app"
       style={{
         padding: 'clamp(20px, 4vw, 40px) clamp(16px, 4vw, 48px)',
         display: 'flex',
         flexDirection: 'column',
         gap: 32,
-        background:
-          'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(12,29,69,0.85), rgba(12,29,69,0) 70%)',
         color: '#cbd5e1',
         maxHeight: 'calc(100vh - 4rem)',
         overflowY: 'auto',

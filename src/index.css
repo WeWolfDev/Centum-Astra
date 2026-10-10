@@ -441,41 +441,6 @@
   background: rgba(29, 233, 182, 0.055);
 }
 
-/* ── Raw Form: Directional fill button ───────────────── */
-.btn-fill {
-  position: relative;
-  isolation: isolate;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 11px 24px;
-  font-size: 13.5px;
-  font-weight: 600;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  letter-spacing: 0.02em;
-  color: #f5c842;
-  background: rgba(3, 10, 26, 0.8);
-  border: 1px solid rgba(245, 200, 66, 0.22);
-  border-radius: 10px;
-  cursor: pointer;
-  overflow: hidden;
-  transition: color 0.24s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.24s ease;
-}
-.btn-fill::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, #b8880f 0%, #f5c842 50%, #fde68a 100%);
-  transform: translateX(-101%);
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: -1;
-}
-@media (hover: hover) {
-  .btn-fill:hover::before { transform: translateX(0); }
-  .btn-fill:hover { color: #030a1a; border-color: #f5c842; }
-}
-
 /* ── Raw Form: Brutalist section divider ─────────────── */
 .section-divider {
   display: flex;
@@ -535,16 +500,6 @@
   /* Nav CTA label: hide text on very small screens */
   .nav-cta-label { display: none; }
 
-  /* Login: collapse to single column (form only) */
-  .login-left-panel { display: none !important; }
-  .login-right-panel {
-    flex: 0 0 100% !important;
-    padding: 32px 20px !important;
-  }
-
-  /* Hero headline font size */
-  .resp-hero-h1 { font-size: 40px !important; line-height: 0.95 !important; }
-
   /* Teacher 2-col chart grid → 1 col */
   .resp-grid-2 { grid-template-columns: 1fr !important; }
 
@@ -556,9 +511,4 @@
 
   /* VideoLibrary padding */
   .p-8 { padding: 16px !important; }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-  /* Hero text slightly smaller */
-  .resp-hero-h1 { font-size: 58px !important; }
 }
