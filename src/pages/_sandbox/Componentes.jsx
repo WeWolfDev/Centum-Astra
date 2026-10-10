@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Boton from '../../components/rediseno/Boton';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import BotonSecundario from '../../components/rediseno/BotonSecundario';
+import Input from '../../components/rediseno/Input';
 import Modal from '../../components/rediseno/Modal';
 import DialogoConfirmacion from '../../components/rediseno/DialogoConfirmacion';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
@@ -62,6 +63,9 @@ function Contenido() {
   const [confirmarAbierto, setConfirmarAbierto] = useState(false);
   const [confirmarDangerAbierto, setConfirmarDangerAbierto] = useState(false);
   const [ultimaAccion, setUltimaAccion] = useState('');
+  const [correoDemo, setCorreoDemo] = useState('');
+  const [pwdDemo, setPwdDemo] = useState('');
+  const [correoError, setCorreoError] = useState('');
 
   return (
     <main className="min-h-screen bg-space-void p-6 md:p-10 flex flex-col gap-8">
@@ -142,6 +146,41 @@ function Contenido() {
           <Trash2 size={15} strokeWidth={1.7} aria-hidden="true" />
           Eliminar
         </BotonSecundario>
+      </Seccion>
+
+      <Seccion titulo="Input · label, password toggle y error">
+        <div className="flex flex-col gap-3 w-full max-w-sm">
+          <Input
+            id="demo-correo"
+            label="Correo electrónico"
+            type="email"
+            autoComplete="email"
+            placeholder="usuario@centum.mx"
+            value={correoDemo}
+            onChange={e => {
+              setCorreoDemo(e.target.value);
+              setCorreoError('');
+            }}
+            error={correoError}
+          />
+          <Input
+            id="demo-pwd"
+            label="Contraseña"
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            value={pwdDemo}
+            onChange={e => setPwdDemo(e.target.value)}
+          />
+          <Boton
+            variant="secundario"
+            onClick={() =>
+              setCorreoError(correoDemo ? '' : 'El correo es obligatorio')
+            }
+          >
+            Simular validación de correo
+          </Boton>
+        </div>
       </Seccion>
 
       <Seccion titulo="Modal base">

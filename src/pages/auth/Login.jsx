@@ -1,8 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, GraduationCap, Rocket, Eye, EyeOff } from 'lucide-react';
+import { Shield, GraduationCap, Rocket } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import PublicNav from '../../components/layout/PublicNav';
+import Boton from '../../components/rediseno/Boton';
+import Input from '../../components/rediseno/Input';
 import { cn } from '../../lib/utils';
 
 const roles = [
@@ -11,27 +13,21 @@ const roles = [
     label: 'Administrador',
     Icon: Shield,
     hint: 'admin@centum.mx / admin123',
-    accentColor: '#f5c842',
-    accentBg: 'rgba(245,200,66,0.07)',
-    accentBorder: 'rgba(245,200,66,0.2)',
+    iconColor: 'text-gold-bright',
   },
   {
     key: 'teacher',
     label: 'Profesor',
     Icon: GraduationCap,
     hint: 'sofia@centum.mx / prof123',
-    accentColor: '#93c5fd',
-    accentBg: 'rgba(96,165,250,0.07)',
-    accentBorder: 'rgba(96,165,250,0.2)',
+    iconColor: 'text-info',
   },
   {
     key: 'student',
     label: 'Alumno',
     Icon: Rocket,
     hint: 'ana@centum.mx / alu123',
-    accentColor: '#5eead4',
-    accentBg: 'rgba(45,212,191,0.07)',
-    accentBorder: 'rgba(45,212,191,0.2)',
+    iconColor: 'text-clinical-teal',
   },
 ];
 
@@ -41,82 +37,11 @@ const STATS = [
   { val: '5 años', label: 'de experiencia' },
 ];
 
-/* ── Animated focus underline ─────────────────────────── */
-function FocusInput({ type = 'text', value, onChange, placeholder, id, autoComplete }) {
-  const [focused,  setFocused]  = useState(false);
-  const [showPass, setShowPass] = useState(false);
-  const isPassword = type === 'password';
-  const effectiveType = isPassword ? (showPass ? 'text' : 'password') : type;
-
-  return (
-    <div className="field" style={{ position: 'relative' }}>
-      <div style={{ position: 'relative' }}>
-        <input
-          id={id}
-          type={effectiveType}
-          autoComplete={autoComplete}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          style={{ paddingRight: isPassword ? 44 : 16 }}
-          required
-        />
-        {isPassword && (
-          <button
-            type="button"
-            onClick={() => setShowPass(s => !s)}
-            style={{
-              position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center',
-            }}
-          >
-            {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
-        )}
-      </div>
-      <motion.div
-        animate={{ width: focused ? '100%' : '0%' }}
-        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-        style={{
-          position: 'absolute', bottom: 0, left: 0, height: 2,
-          background: 'linear-gradient(90deg, #b8880f, #f5c842)', borderRadius: '0 0 0 10px',
-        }}
-      />
-    </div>
-  );
-}
-
 export default function Login() {
   const { login, error, setError } = useAuth();
-  const [email,      setEmail]      = useState('');
-  const [password,   setPassword]   = useState('');
-  const [loading,    setLoading]    = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
-  const videoRef = useRef(null);
-
-  // Load video only after all critical resources (LCP) are done.
-  // Static space photo renders instantly as the fallback/poster.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    let cancelled = false;
-
-    const startVideo = () => {
-      if (cancelled) return;
-      // TODO(rediseno): video de fondo eliminado (space.mp4 borrado del repo).
-      // Login seguirá con el poster estático hasta que haya nuevo mockup.
-    };
-
-    if (document.readyState === 'complete') {
-      startVideo();
-    } else {
-      window.addEventListener('load', startVideo, { once: true });
-    }
-    return () => { cancelled = true; };
-  }, []);
+  const [email,    setEmail]    = useState('');
+  const [password, setPassword] = useState('');
+  const [loading,  setLoading]  = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -146,105 +71,51 @@ export default function Login() {
     show:   { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } },
   };
 
+  const currentYear = new Date().getFullYear();
+
   return (
-    <div className="relative flex flex-col overflow-hidden min-h-screen bg-[radial-gradient(ellipse_at_top,_#0d1533_0%,_#030a1a_45%,_#060f28_100%)]">
+    <div className="relative flex flex-col overflow-hidden min-h-screen bg-fondo-app">
       <PublicNav />
 
-      {/* ── Layer 1: Static space photo — renders instantly, acts as poster ── */}
-      <div style={{
-        position: 'absolute', inset: 0, zIndex: 0,
-        backgroundImage: `url(${import.meta.env.BASE_URL}timrael-space-4984262_1920.jpg)`,
-        backgroundSize: 'cover', backgroundPosition: 'center 20%',
-      }} />
+      {/* pt-[60px] se mantiene arbitrario: depende de la altura real
+          (60px) de PublicNav fija en la parte superior. */}
+      <div className="relative z-10 flex flex-1 flex-col md:flex-row pt-[60px]">
 
-      {/* ── Layer 2: Video — src injected after window.load, fades in on canplay ── */}
-      <video
-        ref={videoRef}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="none"
-        onCanPlay={() => setVideoReady(true)}
-        style={{
-          position: 'absolute', inset: 0, zIndex: 1,
-          width: '100%', height: '100%',
-          objectFit: 'cover', objectPosition: 'center 30%',
-          opacity: videoReady ? 0.55 : 0,
-          transition: 'opacity 2.4s cubic-bezier(0.16, 1, 0.3, 1)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* ── Layer 3: Dark veil — ensures text legibility regardless of video ── */}
-      <div className="absolute inset-0 bg-[rgba(3,10,26,0.52)]" style={{ zIndex: 3 }} />
-
-      {/* ── Depth nebula — passive ── */}
-      <div className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] pointer-events-none"
-        style={{ zIndex: 4, background: 'radial-gradient(ellipse at center,rgba(245,200,66,0.05) 0%,transparent 65%)' }} />
-
-      {/* ── PANELS ── */}
-      <div className="flex flex-1 pt-[60px]" style={{ position: 'relative', zIndex: 5 }}>
-
-        {/* ── LEFT PANEL — Hero ── */}
+        {/* ── LEFT PANEL — Hero (oculto en móvil) ── */}
         <motion.div
-          className="login-left-panel"
           variants={container}
           initial="hidden"
           animate="show"
-          style={{
-            flex: '0 0 58%', padding: '52px 64px 48px',
-            display: 'flex', flexDirection: 'column', justifyContent: 'center',
-            position: 'relative', zIndex: 2,
-          }}
+          className="hidden md:flex md:w-7/12 md:flex-col md:justify-center relative px-16 py-14"
         >
           {/* Aceternity dot-grid overlay — fades at edges */}
           <div
-            aria-hidden
-            className="absolute inset-0 pointer-events-none bg-dot-grid bg-dot-32 opacity-100"
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none bg-dot-grid bg-dot-32"
             style={{
               maskImage: 'linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.55) 25%, rgba(0,0,0,0.55) 75%, transparent 100%)',
               WebkitMaskImage: 'linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.55) 25%, rgba(0,0,0,0.55) 75%, transparent 100%)',
             }}
           />
 
-          {/* Glow beam — left edge pointing at headline */}
+          {/* Glow beam dorado — ya existe como token hero-glow en tailwind.config.js */}
           <div
-            aria-hidden
-            className="absolute pointer-events-none"
-            style={{
-              top: '28%', left: '-10%',
-              width: '55%', height: '45%',
-              background: 'radial-gradient(ellipse at 30% 50%, rgba(245,200,66,0.09) 0%, transparent 68%)',
-              filter: 'blur(40px)',
-            }}
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none bg-hero-glow"
           />
 
           {/* Hero headline */}
           <motion.div variants={item} className="mb-8 relative">
-            <h1
-              className="resp-hero-h1 relative z-10"
-              style={{
-                fontFamily: 'Syne, sans-serif', fontWeight: 900,
-                fontSize: 76, lineHeight: 0.95, letterSpacing: '-0.04em',
-                marginBottom: 24,
-              }}
-            >
-              {/* First line — white fading to white/55, giving depth */}
-              <span className="bg-gradient-to-b from-white to-white/55 bg-clip-text text-transparent">
+            <h1 className="relative z-10 font-display font-bold tracking-tight leading-tight text-4xl md:text-5xl lg:text-6xl mb-6">
+              <span className="bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">
                 Domina el EXANI-II.
               </span>
               <br />
-              {/* Second line — gold gradient, hero accent */}
-              <span style={{
-                background: 'linear-gradient(90deg, #b8880f 0%, #f5c842 45%, #fde68a 100%)',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text', fontWeight: 800,
-              }}>
+              <span className="bg-gold-beam bg-clip-text text-transparent">
                 Vive tu vocación.
               </span>
             </h1>
-            <p className="relative z-10 text-white/45 text-[15.5px] leading-[1.75] max-w-[400px] font-normal tracking-[0.005em]">
+            <p className="relative z-10 text-white/70 text-base leading-relaxed max-w-sm">
               La plataforma que prepara a los mejores aspirantes a carreras de salud — metodología probada, simuladores reales.
             </p>
           </motion.div>
@@ -253,24 +124,20 @@ export default function Login() {
           <motion.div variants={item} className="flex items-stretch">
             {STATS.map((s, i) => (
               <div key={s.label} className="flex items-stretch">
-                {i > 0 && (
-                  <div className="w-px bg-white/[0.07] self-stretch mx-8" />
-                )}
+                {i > 0 && <div className="w-px bg-white/10 self-stretch mx-8" />}
                 <div className="relative">
-                  {/* Micro glow only on hero stat */}
                   {s.hero && (
-                    <div className="absolute -inset-4 pointer-events-none
-                      bg-[radial-gradient(ellipse_at_center,rgba(245,200,66,0.12)_0%,transparent_65%)]" />
+                    <div className="absolute -inset-4 pointer-events-none bg-stat-glow" />
                   )}
                   <p className={cn(
-                    'font-syne text-[23px] font-bold leading-none mb-[6px] tracking-tight relative',
+                    'font-display text-2xl font-bold leading-none mb-1.5 tracking-tight relative',
                     s.hero
-                      ? 'bg-gradient-to-br from-yellow-200 via-gold-bright to-amber-500/80 bg-clip-text text-transparent'
+                      ? 'bg-gold-beam bg-clip-text text-transparent'
                       : 'text-white',
                   )}>
                     {s.val}
                   </p>
-                  <p className="text-[11px] text-white/60 font-normal tracking-[0.045em] relative">
+                  <p className="text-xs text-white/70 font-normal tracking-wide relative">
                     {s.label}
                   </p>
                 </div>
@@ -284,52 +151,41 @@ export default function Login() {
           initial={{ opacity: 0, x: 24 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="login-right-panel"
-          style={{
-            flex: '0 0 42%',
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            gap: 20,
-            padding: '48px 48px', position: 'relative', zIndex: 2,
-          }}
+          className="relative flex w-full md:w-5/12 flex-col items-center justify-center gap-5 px-5 md:px-12 py-8 md:py-12"
         >
-          <div className="w-full max-w-[372px] rounded-[18px] p-[36px_32px]
-            bg-[rgba(3,10,26,0.55)] backdrop-blur-[18px] border border-white/[0.08]"
-            style={{ WebkitBackdropFilter: 'blur(18px)' }}
-          >
+          <div className="w-full max-w-sm rounded-2xl p-8 bg-space-void/60 backdrop-blur-xl border border-white/10">
             {/* Form header */}
             <div className="mb-7">
-              <h2 className="font-syne text-[22px] font-bold text-white mb-[5px] tracking-[-0.02em]">
+              <h2 className="font-display text-xl font-bold text-white mb-1.5 tracking-tight">
                 Bienvenido de nuevo
               </h2>
-              <p className="text-white/38 text-[13.5px] leading-[1.5]">
+              <p className="text-white/70 text-sm leading-snug">
                 Ingresa con tu correo y contraseña
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-[14px]">
-              <div>
-                <label className="field-label" htmlFor="email">Correo electrónico</label>
-                <FocusInput
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  value={email}
-                  onChange={e => { setEmail(e.target.value); setError(''); }}
-                  placeholder="usuario@centum.mx"
-                />
-              </div>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+              <Input
+                id="email"
+                label="Correo electrónico"
+                type="email"
+                autoComplete="email"
+                placeholder="usuario@centum.mx"
+                value={email}
+                onChange={e => { setEmail(e.target.value); setError(''); }}
+                required
+              />
 
-              <div>
-                <label className="field-label" htmlFor="password">Contraseña</label>
-                <FocusInput
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={e => { setPassword(e.target.value); setError(''); }}
-                  placeholder="••••••••"
-                />
-              </div>
+              <Input
+                id="password"
+                label="Contraseña"
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={e => { setPassword(e.target.value); setError(''); }}
+                required
+              />
 
               <AnimatePresence>
                 {error && (
@@ -338,42 +194,35 @@ export default function Login() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="text-[#f87171] text-[12.5px] text-center rounded-[8px] px-[12px] py-[8px]
-                      bg-[rgba(248,113,113,0.06)] border border-[rgba(248,113,113,0.15)]"
+                    className="text-peligro text-xs text-center rounded-lg px-3 py-2 bg-peligro/5 border border-peligro/20"
                   >
                     {error}
                   </motion.p>
                 )}
               </AnimatePresence>
 
-              <button
+              <Boton
+                variant="primario"
                 type="submit"
-                disabled={loading}
-                className="btn-fill mt-1 w-full"
-                style={{ padding: '13px 22px', opacity: loading ? 0.6 : 1 }}
+                isLoading={loading}
+                className="w-full mt-1"
               >
-                {loading ? (
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
-                    style={{ width: 14, height: 14, border: '2px solid rgba(245,200,66,0.25)', borderTopColor: '#f5c842', borderRadius: '50%' }}
-                  />
-                ) : 'Ingresar'}
-              </button>
+                Ingresar
+              </Boton>
             </form>
 
-            <p className="text-center text-white/[0.18] text-[11.5px] mt-6">
-              © 2025 Centum Astra · Todos los derechos reservados
+            <p className="text-center text-white/60 text-xs mt-6">
+              © {currentYear} Centum Astra · Todos los derechos reservados
             </p>
           </div>
 
           {/* ── DEV quick-login — removed by Vite tree-shake in prod ── */}
           {import.meta.env.DEV && (
-            <div className="w-full max-w-[372px]">
-              <p className="text-white/35 text-[10.5px] tracking-[0.12em] uppercase mb-[8px] text-center">
+            <div className="w-full max-w-sm">
+              <p className="text-white/70 text-xs tracking-widest uppercase mb-2 text-center">
                 Acceso rápido · DEV
               </p>
-              <div className="grid grid-cols-3 gap-[7px]">
+              <div className="grid grid-cols-3 gap-2">
                 {roles.map(role => (
                   <motion.button
                     key={role.key}
@@ -381,22 +230,15 @@ export default function Login() {
                     onClick={() => handleDevQuickLogin(role)}
                     disabled={loading}
                     whileTap={{ scale: 0.97 }}
-                    style={{
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
-                      padding: '13px 8px', borderRadius: 10,
-                      cursor: loading ? 'not-allowed' : 'pointer',
-                      background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      opacity: loading ? 0.5 : 1,
-                      transition: 'background 0.15s ease, border-color 0.15s ease',
-                    }}
+                    className="flex flex-col items-center gap-1.5 px-2 py-3 rounded-xl bg-white/[0.02] border border-white/10 transition-colors hover:bg-white/5 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <role.Icon
                       size={18}
                       strokeWidth={1.6}
-                      style={{ color: role.accentColor }}
+                      className={role.iconColor}
+                      aria-hidden="true"
                     />
-                    <span style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.55)' }}>
+                    <span className="text-xs font-medium text-white/70">
                       {role.label}
                     </span>
                   </motion.button>

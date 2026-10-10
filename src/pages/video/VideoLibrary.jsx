@@ -349,7 +349,7 @@ export default function VideoLibrary() {
 
   return (
     <div
-      className="scrollbar-hide"
+      className="scrollbar-hide bg-fondo-app"
       style={{
         maxHeight: 'calc(100vh - 4rem)',
         overflowY: 'auto',
@@ -357,7 +357,6 @@ export default function VideoLibrary() {
         display: 'flex',
         flexDirection: 'column',
         gap: 28,
-        background: 'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(12,29,69,0.85), rgba(12,29,69,0) 70%)',
       }}
     >
       {showUpload && (
