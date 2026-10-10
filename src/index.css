@@ -534,8 +534,6 @@
 @media (max-width: 767px) {
   /* Nav CTA label: hide text on very small screens */
   .nav-cta-label { display: none; }
-  /* Padding override for main panel wrappers */
-  .resp-padding { padding: 16px !important; }
 
   /* Login: collapse to single column (form only) */
   .login-left-panel { display: none !important; }
@@ -546,9 +544,6 @@
 
   /* Hero headline font size */
   .resp-hero-h1 { font-size: 40px !important; line-height: 0.95 !important; }
-
-  /* Stat grids: 4 cols → 2 cols */
-  .resp-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* Teacher 2-col chart grid → 1 col */
   .resp-grid-2 { grid-template-columns: 1fr !important; }
@@ -563,14 +558,7 @@
   .p-8 { padding: 16px !important; }
 }
 
-@media (max-width: 479px) {
-  /* Very small phones: 4-col → 1 col */
-  .resp-grid-4 { grid-template-columns: 1fr !important; }
-}
-
 @media (min-width: 768px) and (max-width: 1023px) {
-  /* Tablet: 4-col → 2-col for stat cards */
-  .resp-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
   /* Hero text slightly smaller */
   .resp-hero-h1 { font-size: 58px !important; }
 }

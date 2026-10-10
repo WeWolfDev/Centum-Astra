@@ -1,11 +1,13 @@
 // Etiqueta tipo pill. Variantes de tono:
-//   neutral | positivo | negativo
+//   neutral | positivo | negativo | advertencia | peligro
 //   rol-alumno | rol-maestro | rol-admin
 //   materia-math | materia-reading | materia-writing | materia-premed | materia-health
 const TONOS = {
   neutral:       { bg: 'rgba(255,255,255,0.05)',  color: '#cbd5e1',  border: 'rgba(255,255,255,0.13)' },
   positivo:      { bg: 'rgba(52,211,153,0.1)',    color: '#34d399',  border: 'rgba(52,211,153,0.3)'  },
   negativo:      { bg: 'rgba(255,255,255,0.05)',  color: '#cbd5e1',  border: 'rgba(255,255,255,0.18)' }, // HANDOFF: baja en gris, no en rojo
+  advertencia:   { bg: 'rgba(251,191,36,0.1)',    color: '#fbbf24',  border: 'rgba(251,191,36,0.3)'  },
+  peligro:       { bg: 'rgba(248,113,113,0.1)',   color: '#f87171',  border: 'rgba(248,113,113,0.3)' },
   'rol-admin':   { bg: 'rgba(245,200,66,0.1)',    color: '#f5c842',  border: 'rgba(245,200,66,0.3)'  },
   'rol-maestro': { bg: 'rgba(147,197,253,0.1)',   color: '#93c5fd',  border: 'rgba(147,197,253,0.3)' },
   'rol-alumno':  { bg: 'rgba(94,234,212,0.1)',    color: '#5eead4',  border: 'rgba(94,234,212,0.3)'  },

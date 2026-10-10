@@ -17,10 +17,15 @@ if (esSandbox) {
     );
   });
 } else {
-  import('./App.jsx').then(({ default: App }) => {
+  Promise.all([
+    import('./App.jsx'),
+    import('./components/rediseno/Aviso.jsx'),
+  ]).then(([{ default: App }, { AvisoProvider }]) => {
     createRoot(document.getElementById('root')).render(
       <StrictMode>
-        <App />
+        <AvisoProvider>
+          <App />
+        </AvisoProvider>
       </StrictMode>,
     );
   });
