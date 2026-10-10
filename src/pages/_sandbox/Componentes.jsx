@@ -5,9 +5,11 @@ import BotonSecundario from '../../components/rediseno/BotonSecundario';
 import Modal from '../../components/rediseno/Modal';
 import DialogoConfirmacion from '../../components/rediseno/DialogoConfirmacion';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
+import Pastilla from '../../components/rediseno/Pastilla';
+import StatCard from '../../components/rediseno/StatCard';
 import { AvisoProvider, useAviso } from '../../components/rediseno/Aviso';
 import IconSubject from '../../components/rediseno/IconSubject';
-import { Trash2, Eye, Download } from 'lucide-react';
+import { Trash2, Eye, Download, Users, CheckCircle, TrendingUp } from 'lucide-react';
 
 // Página sandbox para verificar los componentes del rediseño.
 // Solo se monta cuando import.meta.env.DEV y la URL trae ?sandbox=1
@@ -77,6 +79,14 @@ function Contenido() {
         <Boton variant="secundario">Secundario</Boton>
         <Boton variant="ghost">Ghost</Boton>
         <Boton variant="danger">Danger</Boton>
+      </Seccion>
+
+      <Seccion titulo="Boton · size=sm (32px, para celdas de tabla)">
+        <Boton size="sm" variant="primario">Primario sm</Boton>
+        <Boton size="sm" variant="secundario">Secundario sm</Boton>
+        <Boton size="sm" variant="ghost">Ghost sm</Boton>
+        <Boton size="sm" variant="danger">Danger sm</Boton>
+        <Boton size="sm" variant="primario" isLoading>Cargando</Boton>
       </Seccion>
 
       <Seccion titulo="Boton · estados">
@@ -193,6 +203,48 @@ function Contenido() {
           descripcion="Crea tu primera clase para empezar a organizar tu curso."
           accion={<Boton variant="primario">Nueva clase</Boton>}
         />
+      </Seccion>
+
+      <Seccion titulo="Pastilla · tonos semánticos">
+        <Pastilla tono="positivo">Aprobado</Pastilla>
+        <Pastilla tono="advertencia">Pendiente</Pastilla>
+        <Pastilla tono="peligro">Rechazado</Pastilla>
+        <Pastilla tono="negativo">Dado de baja</Pastilla>
+        <Pastilla tono="neutral">Neutral</Pastilla>
+      </Seccion>
+
+      <Seccion titulo="StatCard · tonos">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          <StatCard
+            icono={Users}
+            cifra="248"
+            etiqueta="Total alumnos"
+            tono="dorado"
+            cambio="+8%"
+            degradado
+          />
+          <StatCard
+            icono={CheckCircle}
+            cifra="192"
+            etiqueta="Alumnos activos"
+            tono="exito"
+            cambio="+4%"
+          />
+          <StatCard
+            icono={TrendingUp}
+            cifra="72%"
+            etiqueta="Progreso promedio"
+            tono="info"
+            cambio="-2%"
+            cambioUp={false}
+          />
+          <StatCard
+            icono={TrendingUp}
+            cifra="312"
+            etiqueta="Alumnos evaluados"
+            tono="violeta"
+          />
+        </div>
       </Seccion>
 
       {ultimaAccion && (
