@@ -87,17 +87,22 @@ export default function Pestanas({ valor, onCambio, children, 'aria-label': aria
   return <PestanasCtx.Provider value={ctx}>{children}</PestanasCtx.Provider>;
 }
 
-function Lista({ children, className = '' }) {
+// `apariencia`:
+//   'chip' (default) — barra pill compacta con fondo y borde (uso histórico).
+//   'personalizada' — solo role=tablist + aria-label; el consumidor controla
+//                     el layout vía `className`.
+function Lista({ children, className = '', apariencia = 'chip' }) {
   const { ariaLabel } = usePestanas();
+  const base =
+    apariencia === 'personalizada'
+      ? ''
+      : 'inline-flex items-center gap-1 p-1 rounded-xl ' +
+        'bg-white/[0.03] border border-white/10 ';
   return (
     <div
       role="tablist"
       aria-label={ariaLabel}
-      className={
-        'inline-flex items-center gap-1 p-1 rounded-xl ' +
-        'bg-white/[0.03] border border-white/10 ' +
-        className
-      }
+      className={`${base}${className}`.trim()}
     >
       {children}
     </div>
@@ -111,7 +116,18 @@ function panelIdFor(baseId, valor) {
   return `${baseId}-panel-${valor}`;
 }
 
-function Tab({ valor, children, className = '' }) {
+// `apariencia`:
+//   'chip' (default) — píldora horizontal con fondo activo (uso histórico).
+//   'personalizada' — solo semántica WAI-ARIA + anillo dorado de foco; el
+//                     consumidor decide el markup visual vía `className` y
+//                     `children`. `data-activa` queda expuesto para estilar
+//                     por estado con `data-[activa=true]:…` si hiciera falta.
+const FOCUS_RING =
+  'focus-visible:outline-none focus-visible:ring-2 ' +
+  'focus-visible:ring-gold-bright focus-visible:ring-offset-2 ' +
+  'focus-visible:ring-offset-space-void';
+
+function Tab({ valor, children, className = '', apariencia = 'chip' }) {
   const {
     valor: activo,
     baseId,
@@ -145,6 +161,16 @@ function Tab({ valor, children, className = '' }) {
     }
   }
 
+  const chrome =
+    apariencia === 'personalizada'
+      ? `${FOCUS_RING}`
+      : 'inline-flex items-center justify-center min-h-11 px-4 py-2 ' +
+        'rounded-lg font-body text-sm font-semibold transition-colors ' +
+        FOCUS_RING + ' ' +
+        (activa
+          ? 'bg-white/10 text-white'
+          : 'text-white/70 hover:text-white hover:bg-white/5');
+
   return (
     <button
       ref={node => registrarTab(valor, node)}
@@ -154,20 +180,10 @@ function Tab({ valor, children, className = '' }) {
       aria-selected={activa}
       aria-controls={panelIdFor(baseId, valor)}
       tabIndex={activa ? 0 : -1}
+      data-activa={activa}
       onClick={() => seleccionar(valor)}
       onKeyDown={handleKey}
-      className={
-        'inline-flex items-center justify-center min-h-11 px-4 py-2 ' +
-        'rounded-lg font-body text-sm font-semibold transition-colors ' +
-        'focus-visible:outline-none focus-visible:ring-2 ' +
-        'focus-visible:ring-gold-bright focus-visible:ring-offset-2 ' +
-        'focus-visible:ring-offset-space-void ' +
-        (activa
-          ? 'bg-white/10 text-white'
-          : 'text-white/70 hover:text-white hover:bg-white/5') +
-        ' ' +
-        className
-      }
+      className={`${chrome} ${className}`.trim()}
     >
       {children}
     </button>

@@ -9,23 +9,12 @@ import { mockModules, mockSessionsByModule, mockVideos } from '../../data/mockDa
 import { useAuth } from '../../context/AuthContext';
 import { useMaterial } from '../../context/MaterialContext';
 import { puedeDescargarPdf } from '../../config/rediseno';
-import IconSubject from '../../components/rediseno/IconSubject';
 import Pastilla from '../../components/rediseno/Pastilla';
 import PdfCard from '../../components/rediseno/PdfCard';
 import VideoCard from '../../components/rediseno/VideoCard';
 import QuizBlock from '../../components/rediseno/QuizBlock';
-
-// Los iconos de mockModules están en nombres Lucide (Sigma, Book, PenTool, Stethoscope, HeartPulse).
-// IconSubject usa la taxonomía del HANDOFF: 'math' | 'reading' | 'writing' | 'premed' | 'health'.
-// Mapeo local, aislado al rediseño.
-// TODO(rediseno): considerar que mockModules exponga directamente el nombre normalizado.
-const SUBJECT_BY_ICON = {
-  Sigma: 'math',
-  Book: 'reading',
-  PenTool: 'writing',
-  Stethoscope: 'premed',
-  HeartPulse: 'health',
-};
+import Pestanas from '../../components/rediseno/Pestanas';
+import SelectorAreas from '../../components/rediseno/SelectorAreas';
 
 // TODO(rediseno): tomar el maestro real por módulo. Mientras tanto, texto neutro.
 const TEACHER_BY_MODULE_ID = {
@@ -294,34 +283,31 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
   );
 }
 
-export default function Modulos({ defaultModuleId = null }) {
+// Contenido del tab-panel por área. Se monta sólo cuando la pestaña está
+// activa (Pestanas.Panel ya renderiza children únicamente si valor === activo),
+// por lo que los hooks internos se ejecutan sólo para el módulo visible.
+function ContenidoDeArea({ mod }) {
   const { user } = useAuth();
   const canDownload = puedeDescargarPdf(user?.role);
   const { clasesExtraPorModulo, pdfsExtraPorSesion, videosExtraPorSesion } = useMaterial();
 
-  const [selectedId, setSelectedId] = useState(() => {
-    if (defaultModuleId && mockModules.some(m => m.id === defaultModuleId)) {
-      return defaultModuleId;
-    }
-    return mockModules[0]?.id ?? null;
-  });
-
-  const selected = mockModules.find(m => m.id === selectedId) || mockModules[0];
   const sessions = useMemo(() => {
-    const base = (mockSessionsByModule[selected?.id] || []).filter(s => s.visible !== false);
-    const extras = clasesExtraPorModulo[selected?.id] || [];
+    const base = (mockSessionsByModule[mod.id] || []).filter(s => s.visible !== false);
+    const extras = clasesExtraPorModulo[mod.id] || [];
     return [...base, ...extras];
-  }, [selected?.id, clasesExtraPorModulo]);
+  }, [mod.id, clasesExtraPorModulo]);
+
   const statuses = useMemo(
-    () => deriveClassStatuses(sessions, selected?.progress),
-    [sessions, selected?.progress],
-  );
-  const videosDeModulo = useMemo(
-    () => mockVideos.filter(v => v.subject === selected?.title),
-    [selected?.title],
+    () => deriveClassStatuses(sessions, mod.progress),
+    [sessions, mod.progress],
   );
 
-  const teacher = TEACHER_BY_MODULE_ID[selected?.id];
+  const videosDeModulo = useMemo(
+    () => mockVideos.filter(v => v.subject === mod.title),
+    [mod.title],
+  );
+
+  const teacher = TEACHER_BY_MODULE_ID[mod.id];
 
   // TODO(rediseno): abrir visor PDF embebido (sin descarga) desde Modulos.
   function handleVerPdf(_resource) {
@@ -339,141 +325,60 @@ export default function Modulos({ defaultModuleId = null }) {
   }
 
   return (
-    <div
-      className="scrollbar-hide bg-fondo-app"
-      style={{
-        padding: 'clamp(20px, 4vw, 40px) clamp(16px, 4vw, 48px)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 28,
-        color: '#cbd5e1',
-        fontFamily: '"Plus Jakarta Sans", sans-serif',
-        maxHeight: 'calc(100vh - 4rem)',
-        overflowY: 'auto',
-        minHeight: '100%',
-      }}
-    >
-      <h1
-        style={{
-          margin: 0,
-          fontFamily: '"Bricolage Grotesque", sans-serif',
-          fontWeight: 700,
-          fontSize: 36,
-          lineHeight: 1.1,
-          letterSpacing: '-0.03em',
-          color: '#ffffff',
-        }}
-      >
-        Módulos
-      </h1>
-
-      {/* Selector de materias */}
-      <div
-        aria-label="Materias"
-        style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}
-      >
-        {mockModules.map(mod => {
-          const active = mod.id === selected?.id;
-          const subjectKey = SUBJECT_BY_ICON[mod.icon];
-          return (
-            <button
-              key={mod.id}
-              type="button"
-              onClick={() => setSelectedId(mod.id)}
-              aria-current={active ? 'true' : undefined}
-              style={{
-                flex: '1 1 150px',
-                minWidth: 0,
-                boxSizing: 'border-box',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 10,
-                padding: '16px 10px',
-                borderRadius: 14,
-                border: active
-                  ? '1.5px solid #f5c842'
-                  : '1.5px solid rgba(255,255,255,0.13)',
-                background: active ? 'rgba(245,200,66,0.1)' : 'transparent',
-                color: active ? '#ffffff' : '#cbd5e1',
-                fontSize: 14,
-                fontWeight: 600,
-                lineHeight: 1.25,
-                textAlign: 'center',
-                cursor: 'pointer',
-                minHeight: 44,
-                transition: 'border-color 0.15s ease, background 0.15s ease, color 0.15s ease',
-              }}
-            >
-              {subjectKey ? (
-                <IconSubject
-                  name={subjectKey}
-                  size={30}
-                  strokeWidth={1.6}
-                  color={active ? '#f5c842' : 'currentColor'}
-                />
-              ) : null}
-              <span>{mod.title}</span>
-            </button>
-          );
-        })}
-      </div>
-
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
       {/* Encabezado del módulo seleccionado */}
-      {selected && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '12px 24px',
+          }}
+        >
+          <h2
             style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              gap: '12px 24px',
+              margin: 0,
+              fontFamily: '"Bricolage Grotesque", sans-serif',
+              fontWeight: 700,
+              fontSize: 26,
+              lineHeight: 1.15,
+              letterSpacing: '-0.02em',
+              color: '#ffffff',
             }}
           >
-            <h2
-              style={{
-                margin: 0,
-                fontFamily: '"Bricolage Grotesque", sans-serif',
-                fontWeight: 700,
-                fontSize: 26,
-                lineHeight: 1.15,
-                letterSpacing: '-0.02em',
-                color: '#ffffff',
-              }}
-            >
-              {selected.title}
-            </h2>
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              gap: '8px 20px',
-              fontSize: 14,
-            }}
-          >
-            {teacher && (
-              <span style={{ color: '#e2e8f0' }}>Material de {teacher}</span>
-            )}
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '6px 14px',
-                borderRadius: 999,
-                background: 'rgba(255,255,255,0.08)',
-                color: '#e2e8f0',
-                fontSize: 13,
-              }}
-            >
-              <Lock size={14} strokeWidth={1.9} color="#f5c842" aria-hidden="true" />
-              Solo lectura · sin descarga · exclusivo de Centum Astra
-            </span>
-          </div>
+            {mod.title}
+          </h2>
         </div>
-      )}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            gap: '8px 20px',
+            fontSize: 14,
+          }}
+        >
+          {teacher && (
+            <span style={{ color: '#e2e8f0' }}>Material de {teacher}</span>
+          )}
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '6px 14px',
+              borderRadius: 999,
+              background: 'rgba(255,255,255,0.08)',
+              color: '#e2e8f0',
+              fontSize: 13,
+            }}
+          >
+            <Lock size={14} strokeWidth={1.9} color="#f5c842" aria-hidden="true" />
+            Solo lectura · sin descarga · exclusivo de Centum Astra
+          </span>
+        </div>
+      </div>
 
       {/* Lista de clases */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -507,6 +412,61 @@ export default function Modulos({ defaultModuleId = null }) {
           </p>
         )}
       </div>
+    </div>
+  );
+}
+
+export default function Modulos({ defaultModuleId = null }) {
+  const [selectedId, setSelectedId] = useState(() => {
+    if (defaultModuleId && mockModules.some(m => m.id === defaultModuleId)) {
+      return defaultModuleId;
+    }
+    return mockModules[0]?.id ?? null;
+  });
+
+  return (
+    <div
+      className="scrollbar-hide bg-fondo-app"
+      style={{
+        padding: 'clamp(20px, 4vw, 40px) clamp(16px, 4vw, 48px)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 28,
+        color: '#cbd5e1',
+        fontFamily: '"Plus Jakarta Sans", sans-serif',
+        maxHeight: 'calc(100vh - 4rem)',
+        overflowY: 'auto',
+        minHeight: '100%',
+      }}
+    >
+      <h1
+        style={{
+          margin: 0,
+          fontFamily: '"Bricolage Grotesque", sans-serif',
+          fontWeight: 700,
+          fontSize: 36,
+          lineHeight: 1.1,
+          letterSpacing: '-0.03em',
+          color: '#ffffff',
+        }}
+      >
+        Módulos
+      </h1>
+
+      <Pestanas
+        valor={selectedId}
+        onCambio={setSelectedId}
+        aria-label="Materias"
+      >
+        <div className="flex flex-col gap-7">
+          <SelectorAreas modulos={mockModules} />
+          {mockModules.map(mod => (
+            <Pestanas.Panel key={mod.id} valor={mod.id}>
+              <ContenidoDeArea mod={mod} />
+            </Pestanas.Panel>
+          ))}
+        </div>
+      </Pestanas>
     </div>
   );
 }

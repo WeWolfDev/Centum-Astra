@@ -19,17 +19,9 @@ import {
 } from '../../config/rediseno';
 import BotonSecundario from '../../components/rediseno/BotonSecundario';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
-import IconSubject from '../../components/rediseno/IconSubject';
+import TarjetaArea from '../../components/rediseno/TarjetaArea';
+import { AREA_POR_ID } from '../../config/areas';
 
-// Mapea el icono del mock al nombre que entiende IconSubject.
-// TODO(rediseno): mover a config/rediseno.js si otra pantalla lo necesita.
-const SUBJECT_ICON_BY_MODULE_ID = {
-  1: 'math',
-  2: 'reading',
-  3: 'writing',
-  4: 'premed',
-  5: 'health',
-};
 
 // Historial Ceneval del alumno. HANDOFF: lo primero que ve es cuánto subió desde
 // su primer simulador. En el mock no existe una tabla de simuladores completados
@@ -700,81 +692,24 @@ function EvolucionBlock({
 function TuMaterial({ onAbrirModulo }) {
   return (
     <section aria-label="Tu material">
-      <h2
-        style={{
-          margin: '0 0 16px',
-          fontFamily: '"Bricolage Grotesque", sans-serif',
-          fontWeight: 700,
-          fontSize: 20,
-          lineHeight: 1.2,
-          letterSpacing: '-0.02em',
-          color: '#ffffff',
-        }}
-      >
+      <h2 className="m-0 mb-4 font-display font-bold text-xl text-white tracking-tight">
         Tu material
       </h2>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-        {mockModules.map((mod) => (
-          <button
-            key={mod.id}
-            type="button"
-            onClick={() => onAbrirModulo(mod.id)}
-            style={{
-              flex: '1 1 170px',
-              minWidth: 0,
-              boxSizing: 'border-box',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 14,
-              minHeight: 132,
-              padding: 18,
-              borderRadius: 16,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: '#ffffff',
-              textAlign: 'left',
-              cursor: 'pointer',
-            }}
-            aria-label={`Abrir módulo ${mod.title}`}
-          >
-            <span
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <span
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: 48,
-                  height: 48,
-                  borderRadius: 12,
-                  background: 'rgba(245,200,66,0.14)',
-                }}
-              >
-                <IconSubject
-                  name={SUBJECT_ICON_BY_MODULE_ID[mod.id] ?? 'math'}
-                  size={26}
-                  color="#f5c842"
-                />
-              </span>
-              <ArrowRight size={20} strokeWidth={2} color="#cbd5e1" aria-hidden="true" />
-            </span>
-            <span
-              style={{
-                marginTop: 'auto',
-                fontSize: 15,
-                fontWeight: 600,
-                lineHeight: 1.3,
-              }}
-            >
-              {mod.title}
-            </span>
-          </button>
-        ))}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {mockModules.map((mod) => {
+          const area = AREA_POR_ID[mod.id];
+          return (
+            <TarjetaArea
+              key={mod.id}
+              titulo={mod.title}
+              icono={area?.icono ?? 'math'}
+              imagen={area?.imagen}
+              intensidadTinte={area?.intensidadTinte ?? 'media'}
+              onClick={() => onAbrirModulo(mod.id)}
+              ariaLabel={`Abrir módulo ${mod.title}`}
+            />
+          );
+        })}
       </div>
     </section>
   );

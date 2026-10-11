@@ -11,6 +11,10 @@ import Pestanas from '../../components/rediseno/Pestanas';
 import StatCard from '../../components/rediseno/StatCard';
 import { AvisoProvider, useAviso } from '../../components/rediseno/Aviso';
 import IconSubject from '../../components/rediseno/IconSubject';
+import TarjetaArea from '../../components/rediseno/TarjetaArea';
+import SelectorAreas from '../../components/rediseno/SelectorAreas';
+import { AREA_POR_ID } from '../../config/areas';
+import { mockModules } from '../../data/mockData';
 import { Trash2, Eye, Download, Users, CheckCircle, TrendingUp } from 'lucide-react';
 
 // Página sandbox para verificar los componentes del rediseño.
@@ -322,10 +326,91 @@ function Contenido() {
         </div>
       </Seccion>
 
+      <Seccion titulo="TarjetaArea · intensidad del tinte (comparativa)">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-white/60">suave · bg-space-navy/35</span>
+            <TarjetaArea
+              titulo="Pensamiento Matemático"
+              icono="math"
+              imagen={AREA_POR_ID[1].imagen}
+              intensidadTinte="suave"
+              onClick={() => {}}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-white/60">media · bg-space-navy/55 (default)</span>
+            <TarjetaArea
+              titulo="Pensamiento Matemático"
+              icono="math"
+              imagen={AREA_POR_ID[1].imagen}
+              intensidadTinte="media"
+              onClick={() => {}}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-white/60">fuerte · bg-space-navy/75</span>
+            <TarjetaArea
+              titulo="Pensamiento Matemático"
+              icono="math"
+              imagen={AREA_POR_ID[1].imagen}
+              intensidadTinte="fuerte"
+              onClick={() => {}}
+            />
+          </div>
+        </div>
+      </Seccion>
+
+      <Seccion titulo="TarjetaArea · fondo por área (grilla real)">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 w-full">
+          {mockModules.map((mod) => {
+            const area = AREA_POR_ID[mod.id];
+            return (
+              <TarjetaArea
+                key={mod.id}
+                titulo={mod.title}
+                icono={area?.icono ?? 'math'}
+                imagen={area?.imagen}
+                intensidadTinte={area?.intensidadTinte ?? 'media'}
+                onClick={() => {}}
+              />
+            );
+          })}
+        </div>
+      </Seccion>
+
+      <SelectorAreasDemo />
+
       {ultimaAccion && (
         <p className="text-white/50 text-xs">Última acción: {ultimaAccion}</p>
       )}
     </main>
+  );
+}
+
+function SelectorAreasDemo() {
+  const [valor, setValor] = useState(1);
+  const activo = mockModules.find((m) => m.id === valor);
+  return (
+    <Seccion titulo="SelectorAreas · pestañas con foto (Pestanas personalizada)">
+      <div className="w-full flex flex-col gap-3">
+        <Pestanas valor={valor} onCambio={setValor} aria-label="Materias (demo)">
+          <div className="flex flex-col gap-4">
+            <SelectorAreas modulos={mockModules} />
+            {mockModules.map((mod) => (
+              <Pestanas.Panel key={mod.id} valor={mod.id}>
+                <p className="m-0 text-sm text-white/80">
+                  Panel de <strong>{mod.title}</strong> (id {mod.id}).
+                </p>
+              </Pestanas.Panel>
+            ))}
+          </div>
+        </Pestanas>
+        <p className="text-xs text-white/50">
+          Activa: {activo?.title}. Usa flechas ← → y Home/End para navegar.
+        </p>
+      </div>
+    </Seccion>
   );
 }
 
