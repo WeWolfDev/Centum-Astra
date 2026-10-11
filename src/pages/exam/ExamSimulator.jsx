@@ -16,6 +16,7 @@ import { useBreakpoint } from '../../hooks/useBreakpoint';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import BotonSecundario from '../../components/rediseno/BotonSecundario';
 import Pastilla from '../../components/rediseno/Pastilla';
+import IconSubject from '../../components/rediseno/IconSubject';
 import {
   SIMULADOR_TOTAL_PREGUNTAS,
   SIMULADOR_REPARTO,
@@ -24,13 +25,14 @@ import {
 import { calcularResultadoSimulador } from '../../lib/examScoring';
 
 /* ── Áreas EXANI-II (orden del HANDOFF) ─────────────── */
-// Icon paths vienen de mockups/Alumno-Simulador.dc.html.
-const AREAS = [
-  { name: 'Pensamiento Matemático', icon: 'M18 6V4H6l6 8-6 8h12v-2' },
-  { name: 'Comprensión Lectora',   icon: 'M12 7C10 5.5 7 5 4 5.5v12c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-12C17 5 14 5.5 12 7zM12 7v12' },
-  { name: 'Redacción Indirecta',   icon: 'M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3' },
-  { name: 'Pre-medicina',          icon: 'M2 12h5l2-6 4 12 2-6h7' },
-  { name: 'Ciencias de la Salud',  icon: 'M9 3h6v6h6v6h-6v6H9v-6H3V9h6z' },
+// Áreas del simulador. `icono` es el nombre canónico de IconSubject,
+// unificado con el resto de la app.
+const AREAS_EXAMEN = [
+  { name: 'Pensamiento Matemático', icono: 'math' },
+  { name: 'Comprensión Lectora',    icono: 'reading' },
+  { name: 'Redacción Indirecta',    icono: 'writing' },
+  { name: 'Pre-medicina',           icono: 'premed' },
+  { name: 'Ciencias de la Salud',   icono: 'health' },
 ];
 
 // Índices donde empieza cada área, derivados del reparto.
@@ -60,7 +62,7 @@ function areaOf(index) {
 function buildQuestionBank() {
   const bank = [];
   for (let i = 0; i < SIMULADOR_TOTAL_PREGUNTAS; i++) {
-    const subject = AREAS[areaOf(i)].name;
+    const subject = AREAS_EXAMEN[areaOf(i)].name;
     // Elige una pregunta del mock del mismo subject si existe; si no, cualquiera.
     const pool = mockExamQuestions.filter((q) => q.subject === subject);
     const src = pool.length > 0
@@ -253,7 +255,7 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
   // Estado derivado para la pregunta activa.
   const q = questions[current];
   const areaIdx = areaOf(current);
-  const area = AREAS[areaIdx];
+  const area = AREAS_EXAMEN[areaIdx];
   const selected = answers[current];
   const flagged = !!flags[current];
   const answeredCount = Object.keys(answers).length;
@@ -286,7 +288,7 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
   }
 
   // Conteos por área para la lista lateral.
-  const areaStats = AREAS.map((_, k) => {
+  const areaStats = AREAS_EXAMEN.map((_, k) => {
     const start = AREA_STARTS[k];
     const size = SIMULADOR_REPARTO[k];
     let done = 0;
@@ -324,15 +326,9 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
             Simulador EXANI-II
           </div>
           <Pastilla tono="neutral">
-            <svg
-              width="14" height="14" viewBox="0 0 24 24"
-              fill="none" stroke="#f5c842"
-              strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-              aria-hidden="true"
-              style={{ marginRight: 2 }}
-            >
-              <path d={area.icon} />
-            </svg>
+            <span style={{ marginRight: 2, display: 'inline-flex', color: '#f5c842' }}>
+              <IconSubject name={area.icono} size={14} />
+            </span>
             {area.name}
           </Pastilla>
         </div>
@@ -597,7 +593,7 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {AREAS.map((a, k) => {
+            {AREAS_EXAMEN.map((a, k) => {
               const on = k === areaIdx;
               const stats = areaStats[k];
               return (
@@ -631,15 +627,9 @@ export default function ExamSimulator({ customQuizzes = [], onAddQuiz, onDeleteQ
                   }}
                 >
                   <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <svg
-                      width="20" height="20" viewBox="0 0 24 24"
-                      fill="none" stroke={on ? '#f5c842' : '#cbd5e1'}
-                      strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"
-                      aria-hidden="true"
-                      style={{ flexShrink: 0 }}
-                    >
-                      <path d={a.icon} />
-                    </svg>
+                    <span style={{ flexShrink: 0, display: 'inline-flex', color: on ? '#f5c842' : '#cbd5e1' }}>
+                      <IconSubject name={a.icono} size={20} />
+                    </span>
                     <span
                       style={{
                         flex: '1 1 auto',
