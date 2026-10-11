@@ -1,0 +1,77 @@
+# TDD Evidence — Extracción del cálculo de puntuación del simulador
+
+- Fecha: 2026-10-08
+- Rama: `feature/tests-simulador`
+- Plan: conversacional (no `*.plan.md`). Aprobado por el usuario con 5 ajustes antes de implementar.
+
+## User journeys
+
+1. Como alumno que termina el simulador, veo mi número de aciertos y mi puntaje Ceneval en pantalla, con el mismo comportamiento visible que antes del refactor.
+2. Como desarrollador, puedo testear la fórmula de puntuación de forma aislada, sin montar React.
+
+## Tareas y resultados
+
+| # | Tarea | Evidencia |
+|---|-------|-----------|
+| 1 | Setup de Vitest 5 compat Vite 8 | `npm view vitest peerDependencies` → `vite: '^6.4.0 \|\| ^7.0.0 \|\| ^8.0.0'`. Instalado `vitest@^5.0.3` y `@vitest/coverage-v8@^5.0.3`. |
+| 2 | Threshold 80% solo en scope | `vite.config.js` `test.coverage.thresholds` con dos entradas por archivo. Verificado por fallo esperado en primera corrida (functions 50% < 80% en `rediseno.js`). |
+| 3 | `npm test` en CI tras lint | `.github/workflows/pr.yml`: step `Test` entre `Lint` y `Build`. |
+| 4 | RED: tests sin impl | `npm test` falló con `Cannot find module './examScoring'` (RED runtime válido). |
+| 5 | GREEN: `contarAciertos` + `calcularResultadoSimulador` | `npm test`: 24 passed, 1 expected fail. |
+| 6 | Refactor: un solo camino | `grep -n aciertosACeneval src/pages/exam/ExamSimulator.jsx` → vacío. `ResultadoSimulador` recibe `puntaje` como prop; nadie en el archivo llama `aciertosACeneval`. |
+| 7 | Cobertura final | `npm run test:coverage` → 100% statements/branches/functions/lines en los dos archivos del scope. |
+| 8 | Build no se rompe | `npm run build` → `✓ built in 488ms`, sin errores. |
+| 9 | Bug encontrado durante el ciclo y corregido | Guard clause `if (total <= 0) return min;` añadida en `src/config/rediseno.js`. Los tests que anclaban el bug se reemplazaron por aserciones del comportamiento correcto. |
+
+## Especificación de tests
+
+| # | Guarantía | Archivo / caso | Tipo | Resultado |
+|---|-----------|----------------|------|-----------|
+| 1 | `aciertosACeneval(0)` devuelve MIN (700) | `rediseno.test.js` → "devuelve MIN con 0 aciertos..." | unit | PASS |
+| 2 | `aciertosACeneval(total)` devuelve MAX (1300) | `rediseno.test.js` → "devuelve MAX..." | unit | PASS |
+| 3 | Interpolación lineal exacta en tercios y mitad | 3 casos (`5/10`, `1/3`, `2/3`) | unit | PASS |
+| 4 | Redondeo al entero más cercano con fracciones no exactas | `aciertosACeneval(1, 7) === 786` | unit | PASS |
+| 5 | Clamp a MAX cuando `aciertos > total` | `aciertosACeneval(200, 138) === 1300` | unit | PASS |
+| 6 | Clamp a MIN cuando `aciertos < 0` | `aciertosACeneval(-5, 138) === 700` | unit | PASS |
+| 7 | `aciertosACeneval(0, 0)` devuelve MIN (guard clause) | `rediseno.test.js` → "devuelve MIN cuando total es 0" | unit | PASS |
+| 7b | `aciertosACeneval(x, total < 0)` devuelve MIN (guard clause) | `rediseno.test.js` → "devuelve MIN cuando total es negativo" | unit | PASS |
+| 8 | `puedeDescargarPdf` permite teacher/admin, niega el resto | 5 casos | unit | PASS |
+| 9 | `contarAciertos` con answers vacío → 0 | `examScoring.test.js` | unit | PASS |
+| 10 | `contarAciertos` todos incorrectos → 0 | unit | PASS |
+| 11 | `contarAciertos` todos correctos → `questions.length` | unit | PASS |
+| 12 | `contarAciertos` ignora índices fuera de rango | unit | PASS |
+| 13 | `contarAciertos` requiere `===` estricto (null/undefined no cuentan como 0) | 2 casos | unit | PASS |
+| 14 | `contarAciertos` con questions vacío → 0 | unit | PASS |
+| 15 | `calcularResultadoSimulador` devuelve `{aciertos, puntaje}` consistentes en 0, total y proporción 5/10 | 4 casos | unit | PASS |
+
+## Bug encontrado durante el ciclo y corregido
+
+**`aciertosACeneval(0, 0)` devolvía `NaN`.**
+
+- Causa raíz (`src/config/rediseno.js`): `aciertos / total` = `0/0` = `NaN`. El clamping con `Math.max/Math.min` dejaba pasar `NaN` porque `Math.min(1, NaN) === NaN` y `Math.max(0, NaN) === NaN`. `Math.round(min + NaN * ...)` = `NaN`.
+- Detectado durante este ciclo TDD mientras se escribían los casos edge de `aciertosACeneval`.
+- Riesgo real previo: bajo. El llamador siempre pasa `SIMULADOR_TOTAL_PREGUNTAS = 138` o `questions.length > 0`.
+- Riesgo futuro evitado: si un simulador vacío llegase a este cálculo (banco mal armado, feature flag), la UI habría pintado "NaN" como puntaje.
+- **Fix aplicado**: guard clause `if (total <= 0) return min;` al inicio de `aciertosACeneval`.
+- **Tests actualizados**: se reemplazaron el `it.fails` (que anclaba la expectativa correcta) y el test que anclaba el comportamiento observado por dos aserciones directas del comportamiento correcto (`total = 0` → `MIN`, `total < 0` → `MIN`).
+
+## Comandos verificados
+
+```bash
+npm test                 # 30 passed (post-fix: ya sin expected fails)
+npm run test:coverage    # 100% en los dos archivos del scope
+npm run lint             # pasa (warnings pre-existentes, ninguno nuevo)
+npm run build            # ✓ built in 471ms
+```
+
+## Checkpoints en `feature/tests-simulador`
+
+```
+ed8fe2f refactor(exam): compute puntaje via calcularResultadoSimulador
+1942537 feat(lib): add pure contarAciertos y calcularResultadoSimulador
+eac2dca test: add vitest + failing specs for exam scoring extraction
+```
+
+## Nota
+
+- Se añadió `coverage/` al `.gitignore` preservando el cambio pendiente que ya tenía el archivo.

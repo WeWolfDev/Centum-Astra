@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { MaterialProvider } from './context/MaterialContext';
 
-import Stars from './components/ui/Stars';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 
@@ -13,8 +13,12 @@ import Statistics from './pages/admin/Statistics';
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import StudentDashboard from './pages/student/StudentDashboard';
 import FileManager from './pages/modules/FileManager';
+import Modulos from './pages/modules/Modulos';
+import Material from './pages/modules/Material';
 import VideoLibrary from './pages/video/VideoLibrary';
 import ExamSimulator from './pages/exam/ExamSimulator';
+import SimuladoresQuizzes from './pages/exam/SimuladoresQuizzes';
+import MaestroQuizzes from './pages/exam/MaestroQuizzes';
 import Whiteboard from './pages/whiteboard/Whiteboard';
 
 function AppContent() {
@@ -74,6 +78,23 @@ function AppContent() {
 
     if (user.role === 'student') {
       if (activeSection === 'dashboard') return <StudentDashboard setActiveSection={handleNavigation} />;
+      if (activeSection === 'modules')   return <Modulos defaultModuleId={activeModuleId} />;
+      if (activeSection === 'exam')      return <SimuladoresQuizzes customQuizzes={customQuizzes} onAddQuiz={addCustomQuiz} onDeleteQuiz={deleteCustomQuiz} />;
+    }
+
+    if (user.role === 'teacher') {
+      if (activeSection === 'modules')   return <Material defaultModuleId={activeModuleId} />;
+      if (activeSection === 'exam')      return <MaestroQuizzes />;
+    }
+
+    if (user.role === 'admin') {
+      if (activeSection === 'modules')   return <Material defaultModuleId={activeModuleId} />;
+      if (activeSection === 'exam')      return <MaestroQuizzes />;
+      if (activeSection === 'payments')  return (
+        <div className="flex items-center justify-center h-full p-8 text-white/60">
+          TODO(rediseno): Pagos — sin mockup todavía.
+        </div>
+      );
     }
 
     if (activeSection === 'modules') return <FileManager defaultModuleId={activeModuleId} />;
@@ -82,18 +103,14 @@ function AppContent() {
     if (activeSection === 'whiteboard' && user.role !== 'student') return <Whiteboard />;
 
     return (
-      <div className="flex items-center justify-center h-full text-white/20 text-lg p-8">
-        Sección en desarrollo 🚧
+      <div className="flex items-center justify-center h-full text-white/60 text-lg p-8">
+        Sección en desarrollo.
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen relative">
-      <Stars count={60} />
-      <div className="blob blob-gold" style={{ width: '55vw', height: '55vw', top: '-25%', right: '-10%', position: 'fixed', zIndex: 0, pointerEvents: 'none' }} />
-      <div className="blob blob-teal" style={{ width: '40vw', height: '40vw', bottom: '-20%', left: '12%', position: 'fixed', zIndex: 0, pointerEvents: 'none' }} />
-
       {/* Mobile overlay — closes sidebar on tap outside */}
       {isMobile && sidebarOpen && (
         <div
@@ -143,7 +160,9 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <MaterialProvider>
+        <AppContent />
+      </MaterialProvider>
     </AuthProvider>
   );
 }

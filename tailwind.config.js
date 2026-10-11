@@ -5,6 +5,14 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    screens: {
+      xs: '480px',
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1536px',
+    },
     extend: {
       colors: {
         space: {
@@ -26,15 +34,26 @@ export default {
           teal:  '#1de9b6',
           light: '#b2f5e8',
         },
+        // Tokens semánticos de estado. Contraste verificado contra space-void (#030a1a):
+        // peligro 7.12:1, exito 10.2:1, advertencia 10.5:1, info 11.9:1. Todos pasan WCAG AA.
+        // Para fondos sólidos de botones, usar texto oscuro (text-space-void), no blanco.
+        peligro:     '#f87171',
+        exito:       '#34d399',
+        advertencia: '#fbbf24',
+        info:        '#93c5fd',
+        violeta:     '#c084fc',
       },
       fontFamily: {
-        display: ['Orbitron', 'sans-serif'],
-        body:    ['Inter', 'sans-serif'],
-        syne:    ['Syne', 'sans-serif'],
+        display:  ['"Bricolage Grotesque"', 'sans-serif'],
+        body:     ['"Plus Jakarta Sans"', 'sans-serif'],
+        wordmark: ['Orbitron', 'sans-serif'],
       },
       backgroundImage: {
         'nebula':          'radial-gradient(ellipse 80% 60% at 50% 0%, #0c1d45 0%, #030a1a 70%)',
         'space-radial':    'radial-gradient(ellipse at top, #0d1533 0%, #030a1a 50%, #000 100%)',
+        // Degradado sutil azul marino que varias páginas internas repiten como
+        // style inline. Login lo adopta aquí vía token; otras páginas se migran aparte.
+        'fondo-app':       'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(12,29,69,0.85), rgba(12,29,69,0) 70%)',
         'gold-beam':       'linear-gradient(135deg, #b8880f 0%, #f5c842 50%, #b8880f 100%)',
         'clinical-beam':   'linear-gradient(135deg, #0d9488 0%, #1de9b6 50%, #0d9488 100%)',
         'card-surface':    'linear-gradient(145deg, rgba(22,40,80,0.6) 0%, rgba(12,29,69,0.4) 100%)',
@@ -63,16 +82,11 @@ export default {
         'card-teal':     '0 0 0 1px rgba(29,233,182,0.28), 0 12px 48px rgba(0,0,0,0.65), 0 0 36px rgba(29,233,182,0.07)',
       },
       animation: {
-        'twinkle':       'twinkle 3s ease-in-out infinite',
         'ring-glow':     'ring-glow 3s ease-in-out infinite',
         'slide-in-left': 'slide-in-left 0.4s cubic-bezier(0.16,1,0.3,1)',
         'shimmer':       'shimmer 2.4s ease-in-out infinite',
       },
       keyframes: {
-        twinkle: {
-          '0%, 100%': { opacity: '0.9' },
-          '50%':      { opacity: '0.15' },
-        },
         'ring-glow': {
           '0%, 100%': { filter: 'drop-shadow(0 0 6px rgba(245,200,66,0.4))' },
           '50%':      { filter: 'drop-shadow(0 0 14px rgba(245,200,66,0.7))' },
