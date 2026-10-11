@@ -7,7 +7,9 @@
 //  - videosExtraPorSesion:  { [sessionId]: Video[] }   (videos subidos a una clase)
 //  - videosDeVideoteca:     Video[]                    (videos marcados por el maestro
 //                                                       para la Videoteca general)
-//  - quizzesMaestro:        Quiz[]                     (cuestionarios del maestro)
+//  - evaluaciones:          Evaluacion[]               (simuladores y quizzes del maestro,
+//                                                       discriminados por `tipo`)
+// Selectores derivados: `simuladores`, `quizzes`. Alias legacy: `quizzesMaestro`.
 import { createContext, useContext, useMemo, useState, useCallback } from 'react';
 
 const MaterialCtx = createContext(null);
@@ -28,7 +30,7 @@ export function MaterialProvider({ children }) {
   const [pdfsExtraPorSesion, setPdfsExtra] = useState({});
   const [videosExtraPorSesion, setVideosExtra] = useState({});
   const [videosDeVideoteca, setVideotecaVideos] = useState([]);
-  const [quizzesMaestro, setQuizzes] = useState([]);
+  const [evaluaciones, setEvaluaciones] = useState([]);
 
   const agregarClase = useCallback((moduleId, label) => {
     const sesion = { id: nuevoId('clase'), label, resources: [], visible: true, nueva: true };
@@ -70,27 +72,57 @@ export function MaterialProvider({ children }) {
     setVideotecaVideos(prev => prev.filter(v => v.id !== videoId));
   }, []);
 
-  const agregarQuiz = useCallback((quiz) => {
-    const nuevo = { id: nuevoId('quiz'), ...quiz, creadoEn: new Date().toISOString() };
-    setQuizzes(prev => [...prev, nuevo]);
-    return nuevo;
+  // API unificada. `tipo` discrimina simulador vs quiz.
+  // Si falta `tipo` (compatibilidad con legacy agregarQuiz), se trata como quiz.
+  const agregarEvaluacion = useCallback((tipo, data) => {
+    const tipoEfectivo = tipo === 'simulador' ? 'simulador' : 'quiz';
+    const prefijo = tipoEfectivo === 'simulador' ? 'simulador' : 'quiz';
+    const nueva = {
+      id: nuevoId(prefijo),
+      tipo: tipoEfectivo,
+      ...data,
+      creadoEn: new Date().toISOString(),
+    };
+    setEvaluaciones(prev => [...prev, nueva]);
+    return nueva;
   }, []);
 
-  const eliminarQuiz = useCallback((quizId) => {
-    setQuizzes(prev => prev.filter(q => q.id !== quizId));
+  const eliminarEvaluacion = useCallback((id) => {
+    setEvaluaciones(prev => prev.filter(e => e.id !== id));
   }, []);
+
+  // Alias legacy: siguen existiendo para no romper call sites antiguos.
+  const agregarQuiz = useCallback((quiz) => agregarEvaluacion('quiz', quiz), [agregarEvaluacion]);
+  const eliminarQuiz = eliminarEvaluacion;
+
+  // Selectores derivados. Default defensivo: si una entrada no tiene `tipo`,
+  // la tratamos como quiz (compatibilidad con datos antiguos).
+  const simuladores = useMemo(
+    () => evaluaciones.filter(e => e.tipo === 'simulador'),
+    [evaluaciones],
+  );
+  const quizzes = useMemo(
+    () => evaluaciones.filter(e => (e.tipo ?? 'quiz') === 'quiz'),
+    [evaluaciones],
+  );
 
   const value = useMemo(() => ({
     clasesExtraPorModulo,
     pdfsExtraPorSesion,
     videosExtraPorSesion,
     videosDeVideoteca,
-    quizzesMaestro,
+    evaluaciones,
+    simuladores,
+    quizzes,
+    // Alias legacy para consumidores antiguos (vista alumno).
+    quizzesMaestro: quizzes,
     agregarClase,
     agregarPdf,
     agregarVideo,
     eliminarPdf,
     eliminarVideo,
+    agregarEvaluacion,
+    eliminarEvaluacion,
     agregarQuiz,
     eliminarQuiz,
   }), [
@@ -98,12 +130,16 @@ export function MaterialProvider({ children }) {
     pdfsExtraPorSesion,
     videosExtraPorSesion,
     videosDeVideoteca,
-    quizzesMaestro,
+    evaluaciones,
+    simuladores,
+    quizzes,
     agregarClase,
     agregarPdf,
     agregarVideo,
     eliminarPdf,
     eliminarVideo,
+    agregarEvaluacion,
+    eliminarEvaluacion,
     agregarQuiz,
     eliminarQuiz,
   ]);

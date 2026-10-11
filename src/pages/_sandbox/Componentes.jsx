@@ -7,6 +7,7 @@ import Modal from '../../components/rediseno/Modal';
 import DialogoConfirmacion from '../../components/rediseno/DialogoConfirmacion';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
 import Pastilla from '../../components/rediseno/Pastilla';
+import Pestanas from '../../components/rediseno/Pestanas';
 import StatCard from '../../components/rediseno/StatCard';
 import { AvisoProvider, useAviso } from '../../components/rediseno/Aviso';
 import IconSubject from '../../components/rediseno/IconSubject';
@@ -54,6 +55,32 @@ function AvisoTriggers() {
         Aviso error
       </BotonTrigger>
     </>
+  );
+}
+
+function PestanasDemo() {
+  const [valor, setValor] = useState('uno');
+  return (
+    <Seccion titulo="Pestanas · tabs accesibles (←/→, Home/End)">
+      <div className="w-full flex flex-col gap-3">
+        <Pestanas valor={valor} onCambio={setValor} aria-label="Pestañas de ejemplo">
+          <Pestanas.Lista>
+            <Pestanas.Tab valor="uno">Uno</Pestanas.Tab>
+            <Pestanas.Tab valor="dos">Dos</Pestanas.Tab>
+            <Pestanas.Tab valor="tres">Tres</Pestanas.Tab>
+          </Pestanas.Lista>
+          <Pestanas.Panel valor="uno">
+            <p className="m-0 text-sm text-white/80">Contenido de la pestaña Uno.</p>
+          </Pestanas.Panel>
+          <Pestanas.Panel valor="dos">
+            <p className="m-0 text-sm text-white/80">Contenido de la pestaña Dos.</p>
+          </Pestanas.Panel>
+          <Pestanas.Panel valor="tres">
+            <p className="m-0 text-sm text-white/80">Contenido de la pestaña Tres.</p>
+          </Pestanas.Panel>
+        </Pestanas>
+      </div>
+    </Seccion>
   );
 }
 
@@ -251,6 +278,15 @@ function Contenido() {
         <Pastilla tono="negativo">Dado de baja</Pastilla>
         <Pastilla tono="neutral">Neutral</Pastilla>
       </Seccion>
+
+      <Seccion titulo="Pastilla · tipo de evaluación">
+        <Pastilla tono="tipo-simulador">Simulador</Pastilla>
+        <Pastilla tono="tipo-quiz">Quiz</Pastilla>
+      </Seccion>
+
+      <PestanasDemo />
+
+
 
       <Seccion titulo="StatCard · tonos">
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 w-full">

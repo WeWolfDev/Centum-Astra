@@ -21,3 +21,29 @@ export function calcularResultadoSimulador(questions, answers, total) {
   const puntaje = aciertosACeneval(aciertos, total);
   return { aciertos, puntaje };
 }
+
+// Punto único de entrada que despacha por `tipo` de la evaluación.
+// - simulador → delega en calcularResultadoSimulador (puntaje Ceneval).
+// - quiz      → solo aciertos sobre total; nunca expone `puntaje`.
+export function calcularResultado(evaluacion, respuestas) {
+  const { tipo, preguntas } = evaluacion || {};
+  if (tipo === 'simulador') {
+    const total = evaluacion.total ?? preguntas.length;
+    const { aciertos, puntaje } = calcularResultadoSimulador(preguntas, respuestas, total);
+    return { tipo, aciertos, puntaje };
+  }
+  if (tipo === 'quiz') {
+    const aciertos = contarAciertos(preguntas, respuestas);
+    return { tipo, aciertos, total: preguntas.length };
+  }
+  throw new Error(`calcularResultado: tipo inválido "${tipo}"`);
+}
+
+// Fuente de verdad para la gráfica principal del alumno:
+// solo entran los resultados de simulador que ya tengan puntaje numérico.
+// Un quiz, aunque llevara un `puntaje` por error, queda fuera.
+export function resultadosParaGrafica(resultados) {
+  return resultados.filter(
+    r => r && r.tipo === 'simulador' && typeof r.puntaje === 'number',
+  );
+}

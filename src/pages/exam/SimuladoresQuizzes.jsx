@@ -3,10 +3,12 @@ import { ArrowUp, ArrowDown, Flag } from 'lucide-react';
 
 import SimuladorBlock from '../../components/rediseno/SimuladorBlock';
 import QuizBlock from '../../components/rediseno/QuizBlock';
+import Pastilla from '../../components/rediseno/Pastilla';
 import { useMaterial } from '../../context/MaterialContext';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import IconSubject from '../../components/rediseno/IconSubject';
 import { aciertosACeneval, SIMULADOR_TOTAL_PREGUNTAS, META_OCULTA_POR_DEFECTO, SIMULADOR_RANGO_CENEVAL } from '../../config/rediseno';
+import { resultadosParaGrafica } from '../../lib/examScoring';
 import { mockStudents, mockModules } from '../../data/mockData';
 
 // Nota del HANDOFF: "Estimación. No es resultado oficial del Ceneval."
@@ -40,12 +42,16 @@ function buildSimuladoresHistoricos(student) {
     { n: 5, fecha: '14 sep', aciertos: Math.max(0, ultimo - 8)  },
     { n: 6, fecha: '28 sep', aciertos: ultimo                    },
   ];
-  return serie.map((s, i) => {
+  // Marcamos `tipo: 'simulador'` para pasar por resultadosParaGrafica.
+  // Cuando conectemos resultados reales, el mismo filtro ignorará quizzes
+  // y simuladores sin puntaje.
+  const items = serie.map((s, i) => {
     const puntaje = aciertosACeneval(s.aciertos, total);
     const prev = i > 0 ? aciertosACeneval(serie[i - 1].aciertos, total) : null;
     const delta = prev == null ? null : puntaje - prev;
-    return { ...s, total, puntaje, delta };
+    return { tipo: 'simulador', ...s, total, puntaje, delta };
   });
+  return resultadosParaGrafica(items);
 }
 
 // TODO(rediseno): tabla real de StudentQuizResult. Mientras tanto, derivamos
@@ -81,7 +87,7 @@ function buildMateriasConProgreso() {
 }
 
 export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQuiz }) { // eslint-disable-line no-unused-vars
-  const { quizzesMaestro } = useMaterial();
+  const { simuladores: simuladoresMaestro, quizzes: quizzesMaestro } = useMaterial();
   const [metaVisible, setMetaVisible] = useState(!META_OCULTA_POR_DEFECTO);
   // TODO(rediseno): meta real del alumno (viene de su carrera objetivo o la elige él).
   const [metaCeneval] = useState(1240);
@@ -365,6 +371,68 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
               })}
             </div>
           </div>
+
+          {/* Simuladores creados por los profesores. Hoy no se pueden contestar
+              (CTA deshabilitado "Próximamente"); cuando se habiliten, sus
+              resultados también entrarán a la gráfica vía resultadosParaGrafica. */}
+          {simuladoresMaestro.length > 0 && (
+            <div>
+              <h3
+                style={{
+                  margin: '0 0 10px',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: '#e2e8f0',
+                }}
+              >
+                Simuladores de tus profesores
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {simuladoresMaestro.map(s => {
+                  const materia = mockModules.find(m => m.id === s.moduleId);
+                  return (
+                    <article
+                      key={s.id}
+                      aria-label={`Simulador ${s.tema}, próximamente`}
+                      style={{
+                        padding: 14,
+                        borderRadius: 12,
+                        border: '1px solid rgba(245,200,66,0.3)',
+                        background: 'rgba(245,200,66,0.06)',
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        gap: '8px 14px',
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <h4 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#ffffff' }}>
+                          {s.tema}
+                        </h4>
+                        <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+                          <Pastilla tono="tipo-simulador">Simulador</Pastilla>
+                          <span>{materia?.title ?? 'Materia'}</span>
+                          <span>· {s.preguntas.length} pregunta{s.preguntas.length === 1 ? '' : 's'}</span>
+                        </div>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: 'rgba(255,255,255,0.6)',
+                          padding: '4px 10px',
+                          borderRadius: 999,
+                          border: '1px solid rgba(255,255,255,0.15)',
+                        }}
+                      >
+                        Próximamente
+                      </span>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </SimuladorBlock>
         </div>
 
@@ -554,9 +622,14 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                       aciertos={null}
                       total={q.preguntas.length}
                     >
-                      <p style={{ margin: '6px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
-                        {materia?.title ?? 'Materia'} · {q.preguntas.length} pregunta{q.preguntas.length === 1 ? '' : 's'}
-                      </p>
+                      <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+                        <Pastilla tono="tipo-quiz">Quiz</Pastilla>
+                        <span>{materia?.title ?? 'Materia'}</span>
+                        <span>· {q.preguntas.length} pregunta{q.preguntas.length === 1 ? '' : 's'}</span>
+                        {/* TODO(rediseno): contestar un quiz del profesor sigue pendiente.
+                            Cuando se habilite, el resultado pasará por calcularResultado
+                            con tipo='quiz' y nunca entrará a la gráfica. */}
+                      </div>
                     </QuizBlock>
                   );
                 })}

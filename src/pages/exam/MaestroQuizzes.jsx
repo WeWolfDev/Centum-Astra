@@ -1,10 +1,10 @@
 // Simuladores y quizzes (maestro/admin).
-// Pantalla nueva, sin mockup: el maestro arma quizzes cortos por tema
-// (aciertos/total) que luego ven sus alumnos en SimuladoresQuizzes.
+// Dos pestañas con su propio listado, estado vacío y botón de crear.
 //
 // Reglas del HANDOFF que aplican:
+//  - Simulador = da puntaje Ceneval y alimenta la gráfica del alumno.
 //  - Quiz = aciertos sobre total. Nunca puntaje Ceneval.
-//  - Visualmente: contorno con acento azul claro #93c5fd (patrón quiz).
+//  - Visualmente: cards con acento azul claro #93c5fd, pastilla por tipo.
 //  - Sin degradado dorado, sin emojis.
 import { useMemo, useState } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
@@ -12,6 +12,7 @@ import { mockModules } from '../../data/mockData';
 import { useMaterial } from '../../context/MaterialContext';
 import IconSubject from '../../components/rediseno/IconSubject';
 import Pastilla from '../../components/rediseno/Pastilla';
+import Pestanas from '../../components/rediseno/Pestanas';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import BotonSecundario from '../../components/rediseno/BotonSecundario';
 
@@ -23,11 +24,38 @@ const SUBJECT_BY_ICON = {
   HeartPulse: 'health',
 };
 
+// Copy por tipo. Agrupa en un solo mapa para que el componente no se ramifique.
+const TIPO_COPY = {
+  simulador: {
+    singular: 'simulador',
+    singularMay: 'Simulador',
+    nuevoTitulo: 'Nuevo simulador',
+    nombrePh: 'Simulador EXANI-II · set 1',
+    aparecera: 'Este simulador aparecerá para los alumnos y su puntaje alimenta su gráfica.',
+    vacioTitulo: 'Aún no has creado simuladores',
+    vacioDescripcion: 'Un simulador largo con puntaje Ceneval le sirve al alumno para medir su progreso.',
+    vacioCta: 'Crear mi primer simulador',
+    tono: 'tipo-simulador',
+  },
+  quiz: {
+    singular: 'quiz',
+    singularMay: 'Quiz',
+    nuevoTitulo: 'Nuevo quiz',
+    nombrePh: 'Álgebra básica · set 1',
+    aparecera: 'Este quiz aparecerá para los alumnos como un cuestionario corto.',
+    vacioTitulo: 'Aún no has creado quizzes',
+    vacioDescripcion: 'Un quiz corto por tema te sirve para que tus alumnos repasen antes del simulador.',
+    vacioCta: 'Crear mi primer quiz',
+    tono: 'tipo-quiz',
+  },
+};
+
 function pregVacia() {
   return { enunciado: '', opciones: ['', '', '', ''], correcta: 0, explicacion: '' };
 }
 
-function ModalNuevoQuiz({ abierto, onCerrar, onGuardar }) {
+function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuardar }) {
+  const copy = TIPO_COPY[tipo];
   const [tema, setTema] = useState('');
   const [moduleId, setModuleId] = useState(mockModules[0]?.id ?? null);
   const [preguntas, setPreguntas] = useState([pregVacia()]);
@@ -70,7 +98,7 @@ function ModalNuevoQuiz({ abierto, onCerrar, onGuardar }) {
 
   function handleGuardar(e) {
     e.preventDefault();
-    if (!tema.trim()) return setError('Dale un nombre al quiz.');
+    if (!tema.trim()) return setError(`Dale un nombre al ${copy.singular}.`);
     if (!moduleId) return setError('Selecciona una materia.');
     const invalid = preguntas.findIndex(p => !p.enunciado.trim() || p.opciones.some(o => !o.trim()));
     if (invalid !== -1) return setError(`Completa el enunciado y las 4 opciones de la pregunta ${invalid + 1}.`);
@@ -93,7 +121,7 @@ function ModalNuevoQuiz({ abierto, onCerrar, onGuardar }) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="modal-quiz-titulo"
+        aria-labelledby="modal-eval-titulo"
         style={{
           position: 'fixed',
           inset: 0,
@@ -126,7 +154,7 @@ function ModalNuevoQuiz({ abierto, onCerrar, onGuardar }) {
         >
           <header style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
             <h2
-              id="modal-quiz-titulo"
+              id="modal-eval-titulo"
               style={{
                 margin: 0,
                 fontFamily: '"Bricolage Grotesque", sans-serif',
@@ -136,7 +164,7 @@ function ModalNuevoQuiz({ abierto, onCerrar, onGuardar }) {
                 letterSpacing: '-0.02em',
               }}
             >
-              Nuevo quiz
+              {copy.nuevoTitulo}
             </h2>
             <button
               type="button"
@@ -162,12 +190,12 @@ function ModalNuevoQuiz({ abierto, onCerrar, onGuardar }) {
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <label style={{ flex: '2 1 240px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>Nombre del quiz</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>Nombre del {copy.singular}</span>
               <input
                 type="text"
                 value={tema}
                 onChange={e => setTema(e.target.value)}
-                placeholder="Álgebra básica · set 1"
+                placeholder={copy.nombrePh}
                 style={{
                   minHeight: 44, padding: '10px 14px', borderRadius: 10,
                   border: '1px solid rgba(255,255,255,0.13)',
@@ -307,7 +335,7 @@ function ModalNuevoQuiz({ abierto, onCerrar, onGuardar }) {
 
           {materia && (
             <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
-              Este quiz aparecerá para los alumnos como un cuestionario corto en {materia.title}.
+              {copy.aparecera} ({materia.title})
             </p>
           )}
 
@@ -315,7 +343,7 @@ function ModalNuevoQuiz({ abierto, onCerrar, onGuardar }) {
 
           <footer style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             <BotonSecundario type="button" onClick={handleCerrar}>Cancelar</BotonSecundario>
-            <BotonPrimario type="submit">Publicar quiz</BotonPrimario>
+            <BotonPrimario type="submit">Publicar {copy.singular}</BotonPrimario>
           </footer>
         </form>
       </div>
@@ -323,9 +351,10 @@ function ModalNuevoQuiz({ abierto, onCerrar, onGuardar }) {
   );
 }
 
-function QuizCreadoCard({ quiz, onEliminar }) {
-  const materia = mockModules.find(m => m.id === quiz.moduleId);
+function EvaluacionCreadaCard({ evaluacion, onEliminar }) {
+  const materia = mockModules.find(m => m.id === evaluacion.moduleId);
   const key = SUBJECT_BY_ICON[materia?.icon];
+  const copy = TIPO_COPY[evaluacion.tipo];
   return (
     <article
       style={{
@@ -350,17 +379,18 @@ function QuizCreadoCard({ quiz, onEliminar }) {
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#ffffff' }}>
-          {quiz.tema}
+          {evaluacion.tema}
         </h3>
         <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 12px', fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+          <Pastilla tono={copy.tono}>{copy.singularMay}</Pastilla>
           <Pastilla tono="neutral">{materia?.title ?? 'Materia'}</Pastilla>
-          <span>{quiz.preguntas.length} pregunta{quiz.preguntas.length === 1 ? '' : 's'}</span>
+          <span>{evaluacion.preguntas.length} pregunta{evaluacion.preguntas.length === 1 ? '' : 's'}</span>
         </div>
       </div>
       <button
         type="button"
-        onClick={() => onEliminar(quiz.id)}
-        aria-label={`Eliminar quiz ${quiz.tema}`}
+        onClick={() => onEliminar(evaluacion.id)}
+        aria-label={`Eliminar ${copy.singular} ${evaluacion.tema}`}
         style={{
           flex: '0 0 44px', width: 44, height: 44, borderRadius: 10,
           border: '1px solid rgba(255,255,255,0.1)',
@@ -374,19 +404,96 @@ function QuizCreadoCard({ quiz, onEliminar }) {
   );
 }
 
-export default function MaestroQuizzes() {
-  const { quizzesMaestro, agregarQuiz, eliminarQuiz } = useMaterial();
-  const [modalAbierto, setModalAbierto] = useState(false);
-
+function ListadoPorMateria({ items, onEliminar }) {
   const porMateria = useMemo(() => {
     const map = new Map();
-    quizzesMaestro.forEach(q => {
-      const key = q.moduleId;
+    items.forEach(e => {
+      const key = e.moduleId;
       if (!map.has(key)) map.set(key, []);
-      map.get(key).push(q);
+      map.get(key).push(e);
     });
     return map;
-  }, [quizzesMaestro]);
+  }, [items]);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+      {[...porMateria.entries()].map(([moduleId, entries]) => {
+        const materia = mockModules.find(m => m.id === moduleId);
+        return (
+          <section key={moduleId} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <h2
+              style={{
+                margin: 0,
+                fontFamily: '"Bricolage Grotesque", sans-serif',
+                fontWeight: 700,
+                fontSize: 20,
+                color: '#ffffff',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              {materia?.title ?? 'Materia'}
+            </h2>
+            {entries.map(e => (
+              <EvaluacionCreadaCard key={e.id} evaluacion={e} onEliminar={onEliminar} />
+            ))}
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function EstadoVacioPanel({ tipo, onCrear }) {
+  const copy = TIPO_COPY[tipo];
+  return (
+    <section
+      style={{
+        padding: '48px 24px',
+        borderRadius: 16,
+        border: '1px dashed rgba(255,255,255,0.13)',
+        background: 'rgba(255,255,255,0.03)',
+        textAlign: 'center',
+      }}
+    >
+      <h2
+        style={{
+          margin: 0,
+          fontFamily: '"Bricolage Grotesque", sans-serif',
+          fontWeight: 700,
+          fontSize: 22,
+          color: '#ffffff',
+          letterSpacing: '-0.02em',
+        }}
+      >
+        {copy.vacioTitulo}
+      </h2>
+      <p style={{ margin: '8px 0 20px', fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
+        {copy.vacioDescripcion}
+      </p>
+      <BotonPrimario onClick={onCrear} aria-label={copy.vacioCta}>
+        <Plus size={18} strokeWidth={2.2} /> {copy.vacioCta}
+      </BotonPrimario>
+    </section>
+  );
+}
+
+export default function MaestroQuizzes() {
+  const { simuladores, quizzes, agregarEvaluacion, eliminarEvaluacion } = useMaterial();
+  const [tabActiva, setTabActiva] = useState('simuladores');
+  const [modalTipo, setModalTipo] = useState(null); // 'simulador' | 'quiz' | null
+
+  const itemsActivos = tabActiva === 'simuladores' ? simuladores : quizzes;
+  const tipoActivo = tabActiva === 'simuladores' ? 'simulador' : 'quiz';
+  const copyActivo = TIPO_COPY[tipoActivo];
+  const hayItems = itemsActivos.length > 0;
+
+  function abrirModal() {
+    setModalTipo(tipoActivo);
+  }
+
+  function handleGuardar(data) {
+    agregarEvaluacion(modalTipo, data);
+  }
 
   return (
     <div
@@ -426,72 +533,88 @@ export default function MaestroQuizzes() {
             Simuladores y quizzes
           </h1>
           <p style={{ margin: '6px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>
-            Arma quizzes cortos para tus alumnos. Los verán junto a los simuladores EXANI-II.
+            Arma simuladores con puntaje Ceneval y quizzes cortos por tema. Los verán tus alumnos.
           </p>
         </div>
-        <BotonPrimario onClick={() => setModalAbierto(true)} aria-label="Crear nuevo quiz">
-          <Plus size={18} strokeWidth={2.2} /> Nuevo quiz
-        </BotonPrimario>
+        {hayItems && (
+          <BotonPrimario onClick={abrirModal} aria-label={copyActivo.nuevoTitulo}>
+            <Plus size={18} strokeWidth={2.2} /> {copyActivo.nuevoTitulo}
+          </BotonPrimario>
+        )}
       </header>
 
-      {quizzesMaestro.length === 0 ? (
-        <section
-          style={{
-            padding: '48px 24px',
-            borderRadius: 16,
-            border: '1px dashed rgba(255,255,255,0.13)',
-            background: 'rgba(255,255,255,0.03)',
-            textAlign: 'center',
-          }}
-        >
-          <h2
-            style={{
-              margin: 0,
-              fontFamily: '"Bricolage Grotesque", sans-serif',
-              fontWeight: 700,
-              fontSize: 22,
-              color: '#ffffff',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            Aún no has creado quizzes
-          </h2>
-          <p style={{ margin: '8px 0 20px', fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
-            Un quiz corto por tema te sirve para que tus alumnos repasen antes del simulador.
-          </p>
-          <BotonPrimario onClick={() => setModalAbierto(true)} aria-label="Crear primer quiz">
-            <Plus size={18} strokeWidth={2.2} /> Crear mi primer quiz
-          </BotonPrimario>
-        </section>
-      ) : (
-        [...porMateria.entries()].map(([moduleId, quizzes]) => {
-          const materia = mockModules.find(m => m.id === moduleId);
-          return (
-            <section key={moduleId} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <h2
+      <Pestanas
+        valor={tabActiva}
+        onCambio={setTabActiva}
+        aria-label="Simuladores y quizzes"
+      >
+        <Pestanas.Lista>
+          <Pestanas.Tab valor="simuladores">
+            Simuladores
+            {simuladores.length > 0 && (
+              <span
+                aria-hidden="true"
                 style={{
-                  margin: 0,
-                  fontFamily: '"Bricolage Grotesque", sans-serif',
+                  marginLeft: 8,
+                  padding: '2px 8px',
+                  borderRadius: 999,
+                  background: 'rgba(245,200,66,0.14)',
+                  color: '#f5c842',
+                  fontSize: 12,
                   fontWeight: 700,
-                  fontSize: 20,
-                  color: '#ffffff',
-                  letterSpacing: '-0.02em',
                 }}
               >
-                {materia?.title ?? 'Materia'}
-              </h2>
-              {quizzes.map(q => (
-                <QuizCreadoCard key={q.id} quiz={q} onEliminar={eliminarQuiz} />
-              ))}
-            </section>
-          );
-        })
-      )}
+                {simuladores.length}
+              </span>
+            )}
+          </Pestanas.Tab>
+          <Pestanas.Tab valor="quizzes">
+            Quizzes
+            {quizzes.length > 0 && (
+              <span
+                aria-hidden="true"
+                style={{
+                  marginLeft: 8,
+                  padding: '2px 8px',
+                  borderRadius: 999,
+                  background: 'rgba(147,197,253,0.14)',
+                  color: '#93c5fd',
+                  fontSize: 12,
+                  fontWeight: 700,
+                }}
+              >
+                {quizzes.length}
+              </span>
+            )}
+          </Pestanas.Tab>
+        </Pestanas.Lista>
 
-      <ModalNuevoQuiz
-        abierto={modalAbierto}
-        onCerrar={() => setModalAbierto(false)}
-        onGuardar={agregarQuiz}
+        <Pestanas.Panel valor="simuladores">
+          <div style={{ marginTop: 20 }}>
+            {simuladores.length === 0 ? (
+              <EstadoVacioPanel tipo="simulador" onCrear={() => setModalTipo('simulador')} />
+            ) : (
+              <ListadoPorMateria items={simuladores} onEliminar={eliminarEvaluacion} />
+            )}
+          </div>
+        </Pestanas.Panel>
+
+        <Pestanas.Panel valor="quizzes">
+          <div style={{ marginTop: 20 }}>
+            {quizzes.length === 0 ? (
+              <EstadoVacioPanel tipo="quiz" onCrear={() => setModalTipo('quiz')} />
+            ) : (
+              <ListadoPorMateria items={quizzes} onEliminar={eliminarEvaluacion} />
+            )}
+          </div>
+        </Pestanas.Panel>
+      </Pestanas>
+
+      <ModalNuevaEvaluacion
+        tipo={modalTipo ?? 'quiz'}
+        abierto={modalTipo !== null}
+        onCerrar={() => setModalTipo(null)}
+        onGuardar={handleGuardar}
       />
     </div>
   );
