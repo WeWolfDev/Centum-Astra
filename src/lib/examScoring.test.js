@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { contarAciertos, calcularResultadoSimulador } from './examScoring';
+import {
+  contarAciertos,
+  calcularResultadoSimulador,
+  calcularResultado,
+  resultadosParaGrafica,
+} from './examScoring';
 import { SIMULADOR_RANGO_CENEVAL } from '../config/rediseno';
 
 const { min: MIN, max: MAX } = SIMULADOR_RANGO_CENEVAL;
@@ -110,5 +115,120 @@ describe('calcularResultadoSimulador', () => {
     };
     const r = calcularResultadoSimulador(qs, answers, 8);
     expect(r.aciertos).toBe(contarAciertos(qs, answers));
+  });
+});
+
+describe('calcularResultado', () => {
+  it('para simulador devuelve { tipo, aciertos, puntaje } con escala Ceneval', () => {
+    const qs = bank(10);
+    const r = calcularResultado(
+      { tipo: 'simulador', preguntas: qs, total: 10 },
+      allCorrect(qs),
+    );
+    expect(r).toEqual({ tipo: 'simulador', aciertos: 10, puntaje: MAX });
+  });
+
+  it('para quiz devuelve { tipo, aciertos, total } sin campo puntaje', () => {
+    const qs = bank(5);
+    const r = calcularResultado({ tipo: 'quiz', preguntas: qs }, allCorrect(qs));
+    expect(r).toEqual({ tipo: 'quiz', aciertos: 5, total: 5 });
+    // Invariante: un quiz nunca produce puntaje Ceneval.
+    expect(r).not.toHaveProperty('puntaje');
+  });
+
+  it('invariante: ningún quiz, con cualquier mix de respuestas, obtiene puntaje', () => {
+    const qs = bank(6);
+    const parciales = {
+      0: qs[0].correct,
+      2: (qs[2].correct + 1) % 4,
+      5: qs[5].correct,
+    };
+    const r = calcularResultado({ tipo: 'quiz', preguntas: qs }, parciales);
+    expect(r).not.toHaveProperty('puntaje');
+    expect(r.aciertos).toBe(2);
+    expect(r.total).toBe(6);
+  });
+
+  it('un simulador siempre expone puntaje numérico', () => {
+    const qs = bank(10);
+    const r = calcularResultado(
+      { tipo: 'simulador', preguntas: qs, total: 10 },
+      {},
+    );
+    expect(typeof r.puntaje).toBe('number');
+    expect(r.puntaje).toBe(MIN);
+  });
+
+  it('tipo inválido lanza error (fail-fast, no fallback silencioso)', () => {
+    const qs = bank(3);
+    expect(() => calcularResultado({ tipo: 'otro', preguntas: qs }, {})).toThrow();
+    expect(() => calcularResultado({ preguntas: qs }, {})).toThrow();
+  });
+
+  it('evaluacion null / undefined lanza error (sin TypeError silencioso)', () => {
+    // Cubre la guarda `evaluacion || {}`: en vez de un TypeError al leer .tipo
+    // sobre null, cae al throw explícito de tipo inválido.
+    expect(() => calcularResultado(null, {})).toThrow(/tipo inválido/);
+    expect(() => calcularResultado(undefined, {})).toThrow(/tipo inválido/);
+  });
+
+  it('simulador sin `total` usa preguntas.length como denominador por defecto', () => {
+    // Cubre la rama `evaluacion.total ?? preguntas.length`.
+    const qs = bank(10);
+    const r = calcularResultado(
+      { tipo: 'simulador', preguntas: qs } /* sin total */,
+      allCorrect(qs),
+    );
+    expect(r).toEqual({ tipo: 'simulador', aciertos: 10, puntaje: MAX });
+  });
+});
+
+describe('resultadosParaGrafica', () => {
+  it('devuelve [] si la entrada está vacía', () => {
+    expect(resultadosParaGrafica([])).toEqual([]);
+  });
+
+  it('devuelve [] si solo hay quizzes', () => {
+    const entrada = [
+      { tipo: 'quiz', aciertos: 3, total: 5 },
+      { tipo: 'quiz', aciertos: 4, total: 5 },
+    ];
+    expect(resultadosParaGrafica(entrada)).toEqual([]);
+  });
+
+  it('devuelve todos los simuladores con puntaje, en orden', () => {
+    const entrada = [
+      { tipo: 'simulador', aciertos: 60, puntaje: 950 },
+      { tipo: 'simulador', aciertos: 80, puntaje: 1100 },
+    ];
+    expect(resultadosParaGrafica(entrada)).toEqual(entrada);
+  });
+
+  it('filtra una mezcla y conserva solo simuladores con puntaje numérico', () => {
+    const sim1 = { tipo: 'simulador', puntaje: 950 };
+    const sim2 = { tipo: 'simulador', puntaje: 1100 };
+    const quiz1 = { tipo: 'quiz', aciertos: 3, total: 5 };
+    const entrada = [sim1, quiz1, sim2];
+    expect(resultadosParaGrafica(entrada)).toEqual([sim1, sim2]);
+  });
+
+  it('excluye simuladores sin puntaje numérico (defensivo)', () => {
+    const entrada = [
+      { tipo: 'simulador', puntaje: 1000 },
+      { tipo: 'simulador', puntaje: undefined },
+      { tipo: 'simulador', puntaje: null },
+      { tipo: 'simulador', puntaje: 'no-numero' },
+      { tipo: 'simulador' /* sin puntaje */ },
+    ];
+    expect(resultadosParaGrafica(entrada)).toEqual([{ tipo: 'simulador', puntaje: 1000 }]);
+  });
+
+  it('excluye items con tipo desconocido o faltante', () => {
+    const entrada = [
+      { tipo: 'simulador', puntaje: 1000 },
+      { tipo: 'otro', puntaje: 1000 },
+      { puntaje: 1000 },
+    ];
+    expect(resultadosParaGrafica(entrada)).toEqual([{ tipo: 'simulador', puntaje: 1000 }]);
   });
 });

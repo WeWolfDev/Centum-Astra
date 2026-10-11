@@ -2,6 +2,7 @@
 //   neutral | positivo | negativo | advertencia | peligro
 //   rol-alumno | rol-maestro | rol-admin
 //   materia-math | materia-reading | materia-writing | materia-premed | materia-health
+//   tipo-simulador | tipo-quiz   (tipo de evaluación — gold-bright / info)
 const TONOS = {
   neutral:       { bg: 'rgba(255,255,255,0.05)',  color: '#cbd5e1',  border: 'rgba(255,255,255,0.13)' },
   positivo:      { bg: 'rgba(52,211,153,0.1)',    color: '#34d399',  border: 'rgba(52,211,153,0.3)'  },
@@ -16,6 +17,12 @@ const TONOS = {
   'materia-writing': { bg: 'rgba(110,231,183,0.1)', color: '#6ee7b7', border: 'rgba(110,231,183,0.3)' },
   'materia-premed':  { bg: 'rgba(94,234,212,0.1)',  color: '#5eead4', border: 'rgba(94,234,212,0.3)'  },
   'materia-health':  { bg: 'rgba(103,232,249,0.1)', color: '#67e8f9', border: 'rgba(103,232,249,0.3)' },
+  // tipo-* identifica el tipo de evaluación en listados mixtos.
+  // Mismo patrón hex+opacidades que usamos para advertencia / peligro:
+  //   tipo-simulador → token gold-bright (#f5c842 = rgb 245,200,66)
+  //   tipo-quiz      → token info        (#93c5fd = rgb 147,197,253)
+  'tipo-simulador': { bg: 'rgba(245,200,66,0.1)',  color: '#f5c842',  border: 'rgba(245,200,66,0.3)'  },
+  'tipo-quiz':      { bg: 'rgba(147,197,253,0.1)', color: '#93c5fd',  border: 'rgba(147,197,253,0.3)' },
 };
 
 export default function Pastilla({ tono = 'neutral', children, className }) {
