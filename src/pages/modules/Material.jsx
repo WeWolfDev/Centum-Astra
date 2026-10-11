@@ -9,21 +9,14 @@ import { mockModules, mockSessionsByModule, mockVideos } from '../../data/mockDa
 import { useAuth } from '../../context/AuthContext';
 import { useMaterial } from '../../context/MaterialContext';
 import { puedeDescargarPdf } from '../../config/rediseno';
-import IconSubject from '../../components/rediseno/IconSubject';
 import PdfCard from '../../components/rediseno/PdfCard';
 import VideoCard from '../../components/rediseno/VideoCard';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import BotonSecundario from '../../components/rediseno/BotonSecundario';
 import ModalRecurso from '../../components/rediseno/ModalRecurso';
 import ModalClase from '../../components/rediseno/ModalClase';
-
-const SUBJECT_BY_ICON = {
-  Sigma: 'math',
-  Book: 'reading',
-  PenTool: 'writing',
-  Stethoscope: 'premed',
-  HeartPulse: 'health',
-};
+import Pestanas from '../../components/rediseno/Pestanas';
+import SelectorAreas from '../../components/rediseno/SelectorAreas';
 
 // TODO(rediseno): tabla real que vincule video→clase.
 function videosParaSesion(sesionIndex, totalSesiones, videosDeModulo) {
@@ -244,41 +237,35 @@ function ClaseCard({
   );
 }
 
-export default function Material({ defaultModuleId = null }) {
+// Panel por área: hooks y memos acotados al módulo visible. Se monta solo
+// cuando su `valor` coincide con la pestaña activa, por lo que `useMaterial`
+// y las memos se ejecutan únicamente para el módulo seleccionado.
+function ContenidoDeArea({ mod }) {
   const { user } = useAuth();
   const canDownload = puedeDescargarPdf(user?.role);
   const {
     clasesExtraPorModulo,
     pdfsExtraPorSesion,
     videosExtraPorSesion,
-    agregarClase,
     agregarPdf,
     agregarVideo,
     eliminarPdf,
     eliminarVideo,
   } = useMaterial();
 
-  const [selectedId, setSelectedId] = useState(() => {
-    if (defaultModuleId && mockModules.some(m => m.id === defaultModuleId)) {
-      return defaultModuleId;
-    }
-    return mockModules[0]?.id ?? null;
-  });
   const [modalRecursoAbierto, setModalRecursoAbierto] = useState(false);
-  const [modalClaseAbierto, setModalClaseAbierto] = useState(false);
   const [sesionActivaId, setSesionActivaId] = useState(null);
 
-  const selected = mockModules.find(m => m.id === selectedId) || mockModules[0];
   const sessions = useMemo(() => {
-    const base = (mockSessionsByModule[selected?.id] || []).filter(s => s.visible !== false);
-    const extras = clasesExtraPorModulo[selected?.id] || [];
+    const base = (mockSessionsByModule[mod.id] || []).filter(s => s.visible !== false);
+    const extras = clasesExtraPorModulo[mod.id] || [];
     return [...base, ...extras];
-  }, [selected?.id, clasesExtraPorModulo]);
+  }, [mod.id, clasesExtraPorModulo]);
+
   const videosDeModulo = useMemo(
-    () => mockVideos.filter(v => v.subject === selected?.title),
-    [selected?.title],
+    () => mockVideos.filter(v => v.subject === mod.title),
+    [mod.title],
   );
-  const subjectKey = SUBJECT_BY_ICON[selected?.icon];
 
   const sesionActiva = sessions.find(s => s.id === sesionActivaId) || null;
 
@@ -292,13 +279,8 @@ export default function Material({ defaultModuleId = null }) {
     if (tipo === 'pdf') {
       agregarPdf(sesionActivaId, data);
     } else {
-      agregarVideo(sesionActivaId, data, { enVideoteca, subject: selected?.title });
+      agregarVideo(sesionActivaId, data, { enVideoteca, subject: mod.title });
     }
-  }
-
-  function handleGuardarClase(label) {
-    if (!selected) return;
-    agregarClase(selected.id, label);
   }
 
   // Visor PDF/video queda como TODO(rediseno): sin backend.
@@ -307,121 +289,7 @@ export default function Material({ defaultModuleId = null }) {
   }
 
   return (
-    <div
-      className="scrollbar-hide bg-fondo-app"
-      style={{
-        padding: 'clamp(20px, 4vw, 40px) clamp(16px, 4vw, 48px)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 28,
-        color: '#cbd5e1',
-        fontFamily: '"Plus Jakarta Sans", sans-serif',
-        maxHeight: 'calc(100vh - 4rem)',
-        overflowY: 'auto',
-      }}
-    >
-      {/* Header */}
-      <header
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '16px 24px',
-        }}
-      >
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px 16px' }}>
-          <h1
-            style={{
-              margin: 0,
-              fontFamily: '"Bricolage Grotesque", sans-serif',
-              fontWeight: 700,
-              fontSize: 'clamp(28px, 5vw, 36px)',
-              lineHeight: 1.1,
-              letterSpacing: '-0.03em',
-              color: '#ffffff',
-            }}
-          >
-            Material
-          </h1>
-          {selected && (
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 10,
-                minHeight: 44,
-                padding: '0 16px',
-                borderRadius: 999,
-                border: '1.5px solid #f5c842',
-                background: 'rgba(245,200,66,0.1)',
-                fontSize: 14,
-                fontWeight: 600,
-                color: '#ffffff',
-              }}
-            >
-              {subjectKey ? (
-                <IconSubject name={subjectKey} size={20} strokeWidth={1.7} color="#f5c842" />
-              ) : null}
-              {selected.title}
-            </span>
-          )}
-        </div>
-        <BotonPrimario
-          onClick={() => setModalClaseAbierto(true)}
-          aria-label="Agregar nueva clase"
-        >
-          <Plus size={18} strokeWidth={2.2} aria-hidden="true" />
-          Nueva clase
-        </BotonPrimario>
-      </header>
-
-      {/* Selector de materias (consistente con Modulos del alumno) */}
-      <div aria-label="Materias" style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-        {mockModules.map(mod => {
-          const active = mod.id === selected?.id;
-          const key = SUBJECT_BY_ICON[mod.icon];
-          return (
-            <button
-              key={mod.id}
-              type="button"
-              onClick={() => setSelectedId(mod.id)}
-              aria-current={active ? 'true' : undefined}
-              style={{
-                flex: '1 1 150px',
-                minWidth: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 10,
-                padding: '14px 10px',
-                borderRadius: 14,
-                border: active ? '1.5px solid #f5c842' : '1.5px solid rgba(255,255,255,0.13)',
-                background: active ? 'rgba(245,200,66,0.1)' : 'transparent',
-                color: active ? '#ffffff' : '#cbd5e1',
-                fontSize: 14,
-                fontWeight: 600,
-                lineHeight: 1.25,
-                textAlign: 'center',
-                cursor: 'pointer',
-                minHeight: 44,
-                transition: 'border-color 0.15s ease, background 0.15s ease, color 0.15s ease',
-              }}
-            >
-              {key ? (
-                <IconSubject
-                  name={key}
-                  size={26}
-                  strokeWidth={1.6}
-                  color={active ? '#f5c842' : 'currentColor'}
-                />
-              ) : null}
-              <span>{mod.title}</span>
-            </button>
-          );
-        })}
-      </div>
-
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
       {/* Recordatorio */}
       <div
         style={{
@@ -482,8 +350,91 @@ export default function Material({ defaultModuleId = null }) {
         onCerrar={() => setModalRecursoAbierto(false)}
         onSubmit={handleGuardarRecurso}
         nombreClase={sesionActiva?.label}
-        nombreMateria={selected?.title}
+        nombreMateria={mod.title}
       />
+    </div>
+  );
+}
+
+export default function Material({ defaultModuleId = null }) {
+  const { agregarClase } = useMaterial();
+
+  const [selectedId, setSelectedId] = useState(() => {
+    if (defaultModuleId && mockModules.some(m => m.id === defaultModuleId)) {
+      return defaultModuleId;
+    }
+    return mockModules[0]?.id ?? null;
+  });
+  const [modalClaseAbierto, setModalClaseAbierto] = useState(false);
+
+  const selected = mockModules.find(m => m.id === selectedId) || mockModules[0];
+
+  function handleGuardarClase(label) {
+    if (!selected) return;
+    agregarClase(selected.id, label);
+  }
+
+  return (
+    <div
+      className="scrollbar-hide bg-fondo-app"
+      style={{
+        padding: 'clamp(20px, 4vw, 40px) clamp(16px, 4vw, 48px)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 28,
+        color: '#cbd5e1',
+        fontFamily: '"Plus Jakarta Sans", sans-serif',
+        maxHeight: 'calc(100vh - 4rem)',
+        overflowY: 'auto',
+      }}
+    >
+      {/* Header (sin pastilla del área activa: la pestaña ya la identifica con foto + icono + nombre) */}
+      <header
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px 24px',
+        }}
+      >
+        <h1
+          style={{
+            margin: 0,
+            fontFamily: '"Bricolage Grotesque", sans-serif',
+            fontWeight: 700,
+            fontSize: 'clamp(28px, 5vw, 36px)',
+            lineHeight: 1.1,
+            letterSpacing: '-0.03em',
+            color: '#ffffff',
+          }}
+        >
+          Material
+        </h1>
+        <BotonPrimario
+          onClick={() => setModalClaseAbierto(true)}
+          aria-label="Agregar nueva clase"
+        >
+          <Plus size={18} strokeWidth={2.2} aria-hidden="true" />
+          Nueva clase
+        </BotonPrimario>
+      </header>
+
+      <Pestanas
+        valor={selectedId}
+        onCambio={setSelectedId}
+        aria-label="Materias"
+      >
+        <div className="flex flex-col gap-7">
+          <SelectorAreas modulos={mockModules} />
+          {mockModules.map(mod => (
+            <Pestanas.Panel key={mod.id} valor={mod.id}>
+              <ContenidoDeArea mod={mod} />
+            </Pestanas.Panel>
+          ))}
+        </div>
+      </Pestanas>
+
       <ModalClase
         abierto={modalClaseAbierto}
         onCerrar={() => setModalClaseAbierto(false)}

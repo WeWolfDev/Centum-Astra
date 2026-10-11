@@ -16,18 +16,11 @@ import Pestanas from '../../components/rediseno/Pestanas';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import ModalNuevaEvaluacion from './ModalNuevaEvaluacion';
 import { TIPO_COPY } from './tipoCopy';
-
-const SUBJECT_BY_ICON = {
-  Sigma: 'math',
-  Book: 'reading',
-  PenTool: 'writing',
-  Stethoscope: 'premed',
-  HeartPulse: 'health',
-};
+import { AREA_POR_ID } from '../../config/areas';
 
 function EvaluacionCreadaCard({ evaluacion, onEliminar }) {
   const materia = mockModules.find(m => m.id === evaluacion.moduleId);
-  const key = SUBJECT_BY_ICON[materia?.icon];
+  const key = AREA_POR_ID[evaluacion.moduleId]?.icono;
   const copy = TIPO_COPY[evaluacion.tipo];
   return (
     <article

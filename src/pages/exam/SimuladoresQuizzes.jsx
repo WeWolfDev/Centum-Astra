@@ -10,18 +10,10 @@ import IconSubject from '../../components/rediseno/IconSubject';
 import { aciertosACeneval, SIMULADOR_TOTAL_PREGUNTAS, META_OCULTA_POR_DEFECTO, SIMULADOR_RANGO_CENEVAL } from '../../config/rediseno';
 import { resultadosParaGrafica } from '../../lib/examScoring';
 import { mockStudents, mockModules } from '../../data/mockData';
+import { AREA_POR_ID } from '../../config/areas';
 
 // Nota del HANDOFF: "Estimación. No es resultado oficial del Ceneval."
 const NOTA_ESTIMACION = 'Estimación. No es resultado oficial del Ceneval.';
-
-// Mapeo título de módulo → nombre de icono por materia.
-const SUBJECT_ICON = {
-  'Pensamiento Matemático': 'math',
-  'Comprensión Lectora': 'reading',
-  'Redacción Indirecta': 'writing',
-  'Pre-medicina': 'premed',
-  'Ciencias de la Salud': 'health',
-};
 
 // TODO(rediseno): tabla real de StudentSimulatorScore. Mientras tanto, derivamos
 // un histórico de simuladores a partir del alumno mock (Ana García López) con una
@@ -79,7 +71,7 @@ function buildMateriasConProgreso() {
     return {
       id: m.id,
       titulo: m.title,
-      iconName: SUBJECT_ICON[m.title] ?? 'math',
+      iconName: AREA_POR_ID[m.id]?.icono ?? 'math',
       hechos,
       total,
     };
