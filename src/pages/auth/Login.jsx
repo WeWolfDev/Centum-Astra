@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, GraduationCap, Rocket } from 'lucide-react';
+import { Shield, GraduationCap, Rocket, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import PublicNav from '../../components/layout/PublicNav';
 import Boton from '../../components/rediseno/Boton';
@@ -37,11 +37,15 @@ const STATS = [
   { val: '5 años', label: 'de experiencia' },
 ];
 
-export default function Login() {
+export default function Login({ onBack }) {
   const { login, error, setError } = useAuth();
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [loading,  setLoading]  = useState(false);
+
+  // Visible en dev siempre; en builds de producción solo si VITE_SHOW_DEMO=true.
+  // Pensado como feature flag temporal hasta que exista BE-01 (auth real).
+  const showQuickLogin = import.meta.env.VITE_SHOW_DEMO === 'true' || import.meta.env.DEV;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -76,6 +80,18 @@ export default function Login() {
   return (
     <div className="relative flex flex-col overflow-hidden min-h-screen bg-fondo-app">
       <PublicNav />
+
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="fixed top-[72px] left-4 md:left-6 z-20 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3 py-1.5 text-xs text-white/80 backdrop-blur transition-colors hover:bg-white/10 hover:text-white"
+          aria-label="Volver a la página principal"
+        >
+          <ArrowLeft size={14} strokeWidth={1.8} aria-hidden="true" />
+          Volver
+        </button>
+      )}
 
       {/* pt-[60px] se mantiene arbitrario: depende de la altura real
           (60px) de PublicNav fija en la parte superior. */}
@@ -216,11 +232,12 @@ export default function Login() {
             </p>
           </div>
 
-          {/* ── DEV quick-login — removed by Vite tree-shake in prod ── */}
-          {import.meta.env.DEV && (
+          {/* Acceso rápido demo — controlado por VITE_SHOW_DEMO en builds de producción.
+              Encendido en Netlify mientras no exista BE-01 (auth real). */}
+          {showQuickLogin && (
             <div className="w-full max-w-sm">
               <p className="text-white/70 text-xs tracking-widest uppercase mb-2 text-center">
-                Acceso rápido · DEV
+                Acceso rápido · Demo
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {roles.map(role => (
