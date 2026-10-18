@@ -18,27 +18,27 @@ export const mockStudents = [
 export const mockModules = [
   {
     id: 1, type: 'transversal', title: 'Pensamiento Matemático',
-    icon: '∑', color: 'blue', topics: 24, resources: 48, progress: 65,
+    icon: 'Sigma', color: 'blue', topics: 24, resources: 48, progress: 65,
     subtopics: ['Álgebra', 'Geometría', 'Estadística', 'Cálculo Diferencial', 'Probabilidad'],
   },
   {
     id: 2, type: 'transversal', title: 'Comprensión Lectora',
-    icon: '📖', color: 'purple', topics: 18, resources: 36, progress: 72,
+    icon: 'Book', color: 'purple', topics: 18, resources: 36, progress: 72,
     subtopics: ['Textos Argumentativos', 'Textos Narrativos', 'Inferencia', 'Vocabulario en Contexto'],
   },
   {
     id: 3, type: 'transversal', title: 'Redacción Indirecta',
-    icon: '✍️', color: 'emerald', topics: 15, resources: 30, progress: 58,
+    icon: 'PenTool', color: 'emerald', topics: 15, resources: 30, progress: 58,
     subtopics: ['Estructura del Texto', 'Coherencia', 'Cohesión', 'Ortografía'],
   },
   {
     id: 4, type: 'specific', title: 'Pre-medicina',
-    icon: '🩺', color: 'teal', topics: 32, resources: 64, progress: 40,
+    icon: 'Stethoscope', color: 'teal', topics: 32, resources: 64, progress: 40,
     subtopics: ['Biología Celular', 'Anatomía', 'Bioquímica', 'Fisiología', 'Química Orgánica'],
   },
   {
     id: 5, type: 'specific', title: 'Ciencias de la Salud',
-    icon: '⚕️', color: 'cyan', topics: 28, resources: 56, progress: 30,
+    icon: 'HeartPulse', color: 'cyan', topics: 28, resources: 56, progress: 30,
     subtopics: ['Epidemiología', 'Salud Pública', 'Nutrición', 'Microbiología'],
   },
 ];

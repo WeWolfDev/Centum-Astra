@@ -1,0 +1,423 @@
+import { useState } from 'react';
+import Boton from '../../components/rediseno/Boton';
+import BotonPrimario from '../../components/rediseno/BotonPrimario';
+import BotonSecundario from '../../components/rediseno/BotonSecundario';
+import Input from '../../components/rediseno/Input';
+import Modal from '../../components/rediseno/Modal';
+import DialogoConfirmacion from '../../components/rediseno/DialogoConfirmacion';
+import EstadoVacio from '../../components/rediseno/EstadoVacio';
+import Pastilla from '../../components/rediseno/Pastilla';
+import Pestanas from '../../components/rediseno/Pestanas';
+import StatCard from '../../components/rediseno/StatCard';
+import { AvisoProvider, useAviso } from '../../components/rediseno/Aviso';
+import IconSubject from '../../components/rediseno/IconSubject';
+import TarjetaArea from '../../components/rediseno/TarjetaArea';
+import SelectorAreas from '../../components/rediseno/SelectorAreas';
+import { AREA_POR_ID } from '../../config/areas';
+import { mockModules } from '../../data/mockData';
+import { Trash2, Eye, Download, Users, CheckCircle, TrendingUp } from 'lucide-react';
+
+// Página sandbox para verificar los componentes del rediseño.
+// Solo se monta cuando import.meta.env.DEV y la URL trae ?sandbox=1
+// (ver src/main.jsx). No entra al bundle de producción.
+
+function Seccion({ titulo, children }) {
+  return (
+    <section className="flex flex-col gap-3">
+      <h2 className="m-0 font-display font-bold text-lg text-white tracking-tight">
+        {titulo}
+      </h2>
+      <div className="p-4 rounded-xl border border-white/10 bg-white/[0.02] flex flex-wrap items-start gap-3">
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function BotonTrigger({ onClick, children }) {
+  return (
+    <Boton variant="ghost" onClick={onClick}>
+      {children}
+    </Boton>
+  );
+}
+
+function AvisoTriggers() {
+  const { mostrar } = useAviso();
+  return (
+    <>
+      <BotonTrigger onClick={() => mostrar({ tipo: 'info', titulo: 'Info', mensaje: 'Un aviso informativo.' })}>
+        Aviso info
+      </BotonTrigger>
+      <BotonTrigger onClick={() => mostrar({ tipo: 'exito', titulo: 'Éxito', mensaje: 'Operación completada.' })}>
+        Aviso éxito
+      </BotonTrigger>
+      <BotonTrigger onClick={() => mostrar({ tipo: 'advertencia', titulo: 'Advertencia', mensaje: 'Cuidado con esta acción.' })}>
+        Aviso advertencia
+      </BotonTrigger>
+      <BotonTrigger onClick={() => mostrar({ tipo: 'error', titulo: 'Error', mensaje: 'No se pudo guardar.' })}>
+        Aviso error
+      </BotonTrigger>
+    </>
+  );
+}
+
+function PestanasDemo() {
+  const [valor, setValor] = useState('uno');
+  return (
+    <Seccion titulo="Pestanas · tabs accesibles (←/→, Home/End)">
+      <div className="w-full flex flex-col gap-3">
+        <Pestanas valor={valor} onCambio={setValor} aria-label="Pestañas de ejemplo">
+          <Pestanas.Lista>
+            <Pestanas.Tab valor="uno">Uno</Pestanas.Tab>
+            <Pestanas.Tab valor="dos">Dos</Pestanas.Tab>
+            <Pestanas.Tab valor="tres">Tres</Pestanas.Tab>
+          </Pestanas.Lista>
+          <Pestanas.Panel valor="uno">
+            <p className="m-0 text-sm text-white/80">Contenido de la pestaña Uno.</p>
+          </Pestanas.Panel>
+          <Pestanas.Panel valor="dos">
+            <p className="m-0 text-sm text-white/80">Contenido de la pestaña Dos.</p>
+          </Pestanas.Panel>
+          <Pestanas.Panel valor="tres">
+            <p className="m-0 text-sm text-white/80">Contenido de la pestaña Tres.</p>
+          </Pestanas.Panel>
+        </Pestanas>
+      </div>
+    </Seccion>
+  );
+}
+
+function Contenido() {
+  const [cargando, setCargando] = useState(false);
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [confirmarAbierto, setConfirmarAbierto] = useState(false);
+  const [confirmarDangerAbierto, setConfirmarDangerAbierto] = useState(false);
+  const [ultimaAccion, setUltimaAccion] = useState('');
+  const [correoDemo, setCorreoDemo] = useState('');
+  const [pwdDemo, setPwdDemo] = useState('');
+  const [correoError, setCorreoError] = useState('');
+
+  return (
+    <main className="min-h-screen bg-space-void p-6 md:p-10 flex flex-col gap-8">
+      <header className="flex flex-col gap-1">
+        <h1 className="m-0 font-display font-bold text-3xl text-white tracking-tight">
+          Sandbox de componentes
+        </h1>
+        <p className="m-0 text-sm text-white/60">
+          Solo DEV · ruta <code className="text-info">?sandbox=1</code>
+        </p>
+      </header>
+
+      <Seccion titulo="Boton · variantes">
+        <Boton variant="primario">Primario</Boton>
+        <Boton variant="secundario">Secundario</Boton>
+        <Boton variant="ghost">Ghost</Boton>
+        <Boton variant="danger">Danger</Boton>
+      </Seccion>
+
+      <Seccion titulo="Boton · size=sm (32px, para celdas de tabla)">
+        <Boton size="sm" variant="primario">Primario sm</Boton>
+        <Boton size="sm" variant="secundario">Secundario sm</Boton>
+        <Boton size="sm" variant="ghost">Ghost sm</Boton>
+        <Boton size="sm" variant="danger">Danger sm</Boton>
+        <Boton size="sm" variant="primario" isLoading>Cargando</Boton>
+      </Seccion>
+
+      <Seccion titulo="Boton · estados">
+        <Boton variant="primario" disabled>Primario disabled</Boton>
+        <Boton variant="secundario" disabled>Secundario disabled</Boton>
+        <Boton
+          variant="primario"
+          isLoading={cargando}
+          onClick={() => {
+            setCargando(true);
+            setTimeout(() => setCargando(false), 1500);
+          }}
+        >
+          {cargando ? 'Guardando…' : 'Click: isLoading 1.5s'}
+        </Boton>
+        <Boton variant="danger" isLoading>Danger loading</Boton>
+      </Seccion>
+
+      <Seccion titulo="Paridad: BotonPrimario (wrapper) vs. <button class='btn-gold-flat'> directo">
+        <div className="flex items-center gap-3">
+          <BotonPrimario onClick={() => setUltimaAccion('BotonPrimario wrapper')}>
+            BotonPrimario
+          </BotonPrimario>
+          <span className="text-white/40">vs</span>
+          <button type="button" className="btn-gold-flat">
+            btn-gold-flat
+          </button>
+        </div>
+      </Seccion>
+
+      <Seccion titulo="Paridad: BotonSecundario (wrapper) vs. <button class='btn-flat-secundario'> directo">
+        <div className="flex items-center gap-3">
+          <BotonSecundario onClick={() => setUltimaAccion('BotonSecundario wrapper')}>
+            BotonSecundario
+          </BotonSecundario>
+          <span className="text-white/40">vs</span>
+          <button type="button" className="btn-flat-secundario">
+            btn-flat-secundario
+          </button>
+        </div>
+      </Seccion>
+
+      <Seccion titulo="Paridad: usos reales con iconos (como en PdfCard)">
+        <BotonSecundario aria-label="Ver archivo demo">
+          <Eye size={15} strokeWidth={1.7} aria-hidden="true" />
+          Ver
+        </BotonSecundario>
+        <BotonSecundario aria-label="Descargar archivo demo">
+          <Download size={15} strokeWidth={1.7} aria-hidden="true" />
+          Descargar
+        </BotonSecundario>
+        <BotonSecundario aria-label="Eliminar archivo demo">
+          <Trash2 size={15} strokeWidth={1.7} aria-hidden="true" />
+          Eliminar
+        </BotonSecundario>
+      </Seccion>
+
+      <Seccion titulo="Input · label, password toggle y error">
+        <div className="flex flex-col gap-3 w-full max-w-sm">
+          <Input
+            id="demo-correo"
+            label="Correo electrónico"
+            type="email"
+            autoComplete="email"
+            placeholder="usuario@centum.mx"
+            value={correoDemo}
+            onChange={e => {
+              setCorreoDemo(e.target.value);
+              setCorreoError('');
+            }}
+            error={correoError}
+          />
+          <Input
+            id="demo-pwd"
+            label="Contraseña"
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            value={pwdDemo}
+            onChange={e => setPwdDemo(e.target.value)}
+          />
+          <Boton
+            variant="secundario"
+            onClick={() =>
+              setCorreoError(correoDemo ? '' : 'El correo es obligatorio')
+            }
+          >
+            Simular validación de correo
+          </Boton>
+        </div>
+      </Seccion>
+
+      <Seccion titulo="Modal base">
+        <Boton onClick={() => setModalAbierto(true)}>Abrir modal</Boton>
+        <Modal
+          abierto={modalAbierto}
+          onCerrar={() => setModalAbierto(false)}
+          titulo="Modal de ejemplo"
+        >
+          <p className="m-0 text-white/80 text-sm">
+            Un modal base con focus trap, Escape y retorno de foco.
+          </p>
+          <footer className="flex gap-2 justify-end">
+            <Boton variant="secundario" onClick={() => setModalAbierto(false)}>
+              Cerrar
+            </Boton>
+          </footer>
+        </Modal>
+      </Seccion>
+
+      <Seccion titulo="Diálogo de confirmación">
+        <Boton onClick={() => setConfirmarAbierto(true)}>Confirmar (neutral)</Boton>
+        <Boton variant="danger" onClick={() => setConfirmarDangerAbierto(true)}>
+          Confirmar (danger)
+        </Boton>
+        <DialogoConfirmacion
+          abierto={confirmarAbierto}
+          titulo="Guardar cambios"
+          mensaje="¿Guardar antes de salir?"
+          textoConfirmar="Guardar"
+          onConfirmar={() => {
+            setUltimaAccion('confirmado (neutral)');
+            setConfirmarAbierto(false);
+          }}
+          onCancelar={() => setConfirmarAbierto(false)}
+        />
+        <DialogoConfirmacion
+          abierto={confirmarDangerAbierto}
+          tono="danger"
+          titulo="Eliminar recurso"
+          mensaje="Esta acción no se puede deshacer. ¿Continuar?"
+          textoConfirmar="Eliminar"
+          onConfirmar={() => {
+            setUltimaAccion('confirmado (danger)');
+            setConfirmarDangerAbierto(false);
+          }}
+          onCancelar={() => setConfirmarDangerAbierto(false)}
+        />
+      </Seccion>
+
+      <Seccion titulo="Avisos (toast)">
+        <AvisoTriggers />
+      </Seccion>
+
+      <Seccion titulo="Estado vacío">
+        <EstadoVacio
+          icono={<IconSubject name="reading" size={28} />}
+          titulo="Aún no hay clases"
+          descripcion="Crea tu primera clase para empezar a organizar tu curso."
+          accion={<Boton variant="primario">Nueva clase</Boton>}
+        />
+      </Seccion>
+
+      <Seccion titulo="Pastilla · tonos semánticos">
+        <Pastilla tono="positivo">Aprobado</Pastilla>
+        <Pastilla tono="advertencia">Pendiente</Pastilla>
+        <Pastilla tono="peligro">Rechazado</Pastilla>
+        <Pastilla tono="negativo">Dado de baja</Pastilla>
+        <Pastilla tono="neutral">Neutral</Pastilla>
+      </Seccion>
+
+      <Seccion titulo="Pastilla · tipo de evaluación">
+        <Pastilla tono="tipo-simulador">Simulador</Pastilla>
+        <Pastilla tono="tipo-quiz">Quiz</Pastilla>
+      </Seccion>
+
+      <PestanasDemo />
+
+
+
+      <Seccion titulo="StatCard · tonos">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+          <StatCard
+            icono={Users}
+            cifra="248"
+            etiqueta="Total alumnos"
+            tono="dorado"
+            cambio="+8%"
+            degradado
+          />
+          <StatCard
+            icono={CheckCircle}
+            cifra="192"
+            etiqueta="Alumnos activos"
+            tono="exito"
+            cambio="+4%"
+          />
+          <StatCard
+            icono={TrendingUp}
+            cifra="72%"
+            etiqueta="Progreso promedio"
+            tono="info"
+            cambio="-2%"
+            cambioUp={false}
+          />
+          <StatCard
+            icono={TrendingUp}
+            cifra="312"
+            etiqueta="Alumnos evaluados"
+            tono="violeta"
+          />
+        </div>
+      </Seccion>
+
+      <Seccion titulo="TarjetaArea · intensidad del tinte (comparativa)">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-white/60">suave · bg-space-navy/35</span>
+            <TarjetaArea
+              titulo="Pensamiento Matemático"
+              icono="math"
+              imagen={AREA_POR_ID[1].imagen}
+              intensidadTinte="suave"
+              onClick={() => {}}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-white/60">media · bg-space-navy/55 (default)</span>
+            <TarjetaArea
+              titulo="Pensamiento Matemático"
+              icono="math"
+              imagen={AREA_POR_ID[1].imagen}
+              intensidadTinte="media"
+              onClick={() => {}}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-xs text-white/60">fuerte · bg-space-navy/75</span>
+            <TarjetaArea
+              titulo="Pensamiento Matemático"
+              icono="math"
+              imagen={AREA_POR_ID[1].imagen}
+              intensidadTinte="fuerte"
+              onClick={() => {}}
+            />
+          </div>
+        </div>
+      </Seccion>
+
+      <Seccion titulo="TarjetaArea · fondo por área (grilla real)">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 w-full">
+          {mockModules.map((mod) => {
+            const area = AREA_POR_ID[mod.id];
+            return (
+              <TarjetaArea
+                key={mod.id}
+                titulo={mod.title}
+                icono={area?.icono ?? 'math'}
+                imagen={area?.imagen}
+                intensidadTinte={area?.intensidadTinte ?? 'media'}
+                onClick={() => {}}
+              />
+            );
+          })}
+        </div>
+      </Seccion>
+
+      <SelectorAreasDemo />
+
+      {ultimaAccion && (
+        <p className="text-white/50 text-xs">Última acción: {ultimaAccion}</p>
+      )}
+    </main>
+  );
+}
+
+function SelectorAreasDemo() {
+  const [valor, setValor] = useState(1);
+  const activo = mockModules.find((m) => m.id === valor);
+  return (
+    <Seccion titulo="SelectorAreas · pestañas con foto (Pestanas personalizada)">
+      <div className="w-full flex flex-col gap-3">
+        <Pestanas valor={valor} onCambio={setValor} aria-label="Materias (demo)">
+          <div className="flex flex-col gap-4">
+            <SelectorAreas modulos={mockModules} />
+            {mockModules.map((mod) => (
+              <Pestanas.Panel key={mod.id} valor={mod.id}>
+                <p className="m-0 text-sm text-white/80">
+                  Panel de <strong>{mod.title}</strong> (id {mod.id}).
+                </p>
+              </Pestanas.Panel>
+            ))}
+          </div>
+        </Pestanas>
+        <p className="text-xs text-white/50">
+          Activa: {activo?.title}. Usa flechas ← → y Home/End para navegar.
+        </p>
+      </div>
+    </Seccion>
+  );
+}
+
+export default function Componentes() {
+  return (
+    <AvisoProvider>
+      <Contenido />
+    </AvisoProvider>
+  );
+}
