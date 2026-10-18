@@ -1,12 +1,14 @@
-# REQUISITOS FUNCIONALES — Centum Astra
+# REQUISITOS FUNCIONALES Y NO FUNCIONALES — Centum Astra
 > Plataforma educativa de preparación EXANI-II para carreras de salud
-> Generado: 2026-09-09 | Stack: React 19 · Vite 8 · Tailwind 3
+> Actualizado: 2026-10-17 | Fuente: README y pantallas actuales del frontend
 
 ---
 
 ## FASE 1 — IMPLEMENTADO (Front-End Design)
 
-Todo lo que existe hoy es UI/UX con datos simulados (`src/data/mockData.js`). No hay persistencia real ni backend.
+Este documento distingue entre los flujos visibles en el frontend y su estado real. El frontend sirve como prototipo navegable, pero los datos provienen de mocks o estado en memoria: no hay autenticación real, persistencia, pagos, carga de archivos al servidor ni integración con servicios externos. Por ello, una pantalla o confirmación visual no implica que la operación se haya completado en producción.
+
+Los requisitos de esta fase se extrajeron del README y de las pantallas existentes. La Fase 2 recoge capacidades necesarias para convertir esos flujos en un producto operativo. Los objetivos no funcionales con métricas son una propuesta inicial que debe validarse con negocio antes de usarse como compromiso de servicio.
 
 ---
 
@@ -32,11 +34,11 @@ Todo lo que existe hoy es UI/UX con datos simulados (`src/data/mockData.js`). No
 
 ### RF-03 · Dashboard Administrador
 
-- **4 stat cards** con KPIs del sistema: total alumnos, activos, progreso promedio, calificación media.
+- **4 stat cards** con KPIs de demostración: total alumnos, activos, progreso promedio, calificación media.
 - **Tabla de alumnos** con columnas: nombre/email, módulo, barra de progreso, quizzes, promedio, estado de pago.
 - **Búsqueda en tiempo real** por nombre o email.
 - **Filtro** por estado de pago: Todos · Aprobados · Pendientes.
-- Botones de acción por fila: Ver / Aprobar (solo si pendiente).
+- La interfaz presenta botones de acción por fila: Ver / Aprobar (solo si pendiente); su efecto no está conectado a datos persistentes.
 - Fondo de textura dot-grid.
 
 ### RF-04 · Dashboard Profesor
@@ -91,19 +93,14 @@ Todo lo que existe hoy es UI/UX con datos simulados (`src/data/mockData.js`). No
   - Desglose por área: Transversales (dorado) y Clínicas (teal) con barras de progreso.
   - Acciones: Repetir / Ver simuladores.
 
-### RF-09 · Pizarra Colaborativa (`Whiteboard.jsx`) (no fundamental -yet)
-
-- Lienzo de dibujo libre (solo Admin y Profesor; alumnos no tienen acceso).
-- Herramientas: lápiz, borrador, paleta de colores, grosor de trazo.
-- Exportar como PNG: descarga local al equipo del usuario.
-
-### RF-10 · Estadísticas Admin/Profesor (`Statistics.jsx`)
+### RF-09 · Estadísticas Admin/Profesor (`Statistics.jsx`)
 
 - **2 KPI cards** accionables: Tasa de aprobación (78%), Alumnos evaluados (312).
 - **BarChart "Rendimiento por Materia"** a ancho completo — con subtítulo accionable "Identifica qué área necesita refuerzo urgente".
 - **LineChart "Evolución Semanal"** a ancho completo — con subtítulo "Detecta tendencias y ajusta el plan de estudio" — doble serie: promedio del grupo vs. calificación máxima.
+- Las cifras y gráficas se alimentan de `mockStats`; no son métricas calculadas en tiempo real.
 
-### RF-11 · Responsividad
+### RF-10 · Responsividad
 
 - Breakpoints cubiertos: móvil (< 480 px) · teléfono (480–767 px) · tablet (768–1023 px) · desktop (≥ 1024 px).
 - Sidebar como drawer en móvil; grids de 4 cols → 2 cols → 1 col según viewport.
@@ -112,14 +109,87 @@ Todo lo que existe hoy es UI/UX con datos simulados (`src/data/mockData.js`). No
 - Video de fondo: no bloquea interacción (`pointer-events: none`).
 - Tablas con `overflow-x: auto` para scroll horizontal en móvil.
 
-### RF-12 · Diseño y Accesibilidad
+### RF-11 · Diseño y Accesibilidad
 
 - Sistema de diseño glassmorphism: `bg-white/5`, `backdrop-blur`, bordes `rgba`.
 - Paleta: dorado `#f5c842 / #b8880f`, teal `#2dd4bf`, navy `#030a1a`.
 - Tipografía: Plus Jakarta Sans (cuerpo) · Syne (display/headings) · Orbitron (brand).
-- Animaciones con Framer Motion; respeta `prefers-reduced-motion` vía CSS.
+- Animaciones con Framer Motion; CSS reduce las animaciones cuando el sistema solicita `prefers-reduced-motion`. Esto no representa por sí solo una conformidad de accesibilidad.
 - Selección de texto con color dorado temático.
 - Grain de película sobre body para profundidad visual (SVG feTurbulence, sin costo de GPU).
+
+### RF-12 · Sitio público, cursos y prueba de muestra
+
+- La página pública presenta la propuesta de preparación EXANI-II, testimonios, indicadores promocionales y el plan de acceso completo.
+- La navegación pública permite abrir un selector de cursos y probar una muestra de preguntas para Pensamiento Matemático, Redacción Indirecta, Comprensión Lectora o Pre-medicina.
+- Cada prueba de muestra permite responder reactivos, muestra retroalimentación y explicación, controla un tiempo y presenta un resultado al terminar o agotarse el tiempo.
+- El botón principal de la página desplaza a la sección de registro; los accesos de inicio de sesión abren la pantalla de login.
+- Los testimonios, cifras promocionales, contenidos, precio y resultados de muestra son contenido fijo de demostración y no deben presentarse como datos verificados o personalizados.
+
+### RF-13 · Registro y solicitud de acceso
+
+- El formulario solicita nombres, apellidos, celular, estado de residencia y correo electrónico; todos los campos se marcan como obligatorios y el correo usa validación básica del navegador.
+- Al enviar el formulario, la interfaz muestra una confirmación con el correo ingresado.
+- **Límite actual:** el envío solo espera y cambia el estado visual; no crea una cuenta, registra una solicitud, cobra el precio mostrado ni envía un correo. La activación y el pago reales quedan pendientes de la Fase 2.
+
+---
+
+## REQUISITOS NO FUNCIONALES (objetivos propuestos)
+
+Las siguientes metas no pueden inferirse completamente de las pantallas. Se proponen para orientar el paso a producción y requieren validación de negocio y técnica.
+
+### RNF-01 · Diseño adaptable
+
+- La experiencia debe permitir completar los flujos principales en móvil, tablet y escritorio, desde 360 px de ancho; no debe aparecer desbordamiento horizontal salvo en tablas con desplazamiento intencional.
+- **Verificación:** probar al menos 360, 768, 1024 y 1440 px de ancho en landing, login, paneles, módulos, videoteca y simulador.
+
+### RNF-02 · Accesibilidad
+
+- Meta propuesta: conformidad WCAG 2.2 nivel AA en los flujos principales.
+- Todas las acciones deben poder operarse con teclado, tener foco visible y nombre accesible; los errores, estados y respuestas no deben comunicarse únicamente mediante color.
+- Los formularios deben asociar etiquetas con controles y anunciar errores y confirmaciones; las animaciones deben respetar la preferencia de movimiento reducido.
+- **Nota:** el frontend actual no ha sido auditado contra WCAG; esta meta requiere validación y correcciones antes de declarar conformidad.
+
+### RNF-03 · Rendimiento percibido
+
+- Meta propuesta en producción: LCP de hasta 2.5 s e INP de hasta 200 ms en el percentil 75, medidos en móvil bajo condiciones de red acordadas.
+- La carga de contenido decorativo pesado, como el video de fondo, no debe bloquear el acceso o la interacción con el contenido principal.
+
+### RNF-04 · Seguridad de cuentas y permisos
+
+- La autenticación y autorización deben verificarse en el servidor para cada operación protegida; ocultar controles en la interfaz no es suficiente.
+- Las contraseñas deben almacenarse con hash seguro; las sesiones deben protegerse contra robo y fijación, y el tráfico debe usar HTTPS.
+- Los datos sensibles y secretos no deben incorporarse al bundle público del frontend.
+
+### RNF-05 · Privacidad de datos
+
+- La plataforma debe limitar la recopilación y el acceso a los datos personales al propósito educativo y administrativo autorizado.
+- El registro y cualquier pago real deben informar al usuario qué datos se recaban y cómo se usan antes de enviarlos; los datos de pago deben procesarse mediante un proveedor adecuado, no almacenarse directamente en el frontend.
+
+### RNF-06 · Persistencia e integridad
+
+- Una vez confirmadas, las cuentas, pagos, publicaciones de materiales, cambios de visibilidad y resultados de simulador deben conservarse al cerrar sesión, recargar o cambiar de dispositivo.
+- Las operaciones que cambien pagos, permisos o resultados deben ser verificables y no deben mostrar éxito si la operación no fue confirmada por el servicio correspondiente.
+
+### RNF-07 · Disponibilidad
+
+- Objetivo inicial propuesto: disponibilidad mensual de 99.5% para login y acceso a los recursos principales, excluyendo mantenimientos anunciados.
+- **Pendiente de validar:** horario de operación, ventana de mantenimiento y consecuencias de indisponibilidad para las sesiones o exámenes en curso.
+
+### RNF-08 · Compatibilidad
+
+- La interfaz debe funcionar en las versiones estables actuales y las dos anteriores de Chrome, Edge, Firefox y Safari, así como en Safari de iOS y Chrome de Android.
+- Los flujos críticos no deben depender exclusivamente de hover, cursor o reproducción automática de audio/video.
+
+### RNF-09 · Idioma y consistencia
+
+- La interfaz de usuarios debe presentarse en español de México, con formatos comprensibles para fechas, teléfonos y puntuaciones.
+- Las cifras promocionales, los datos de ejemplo y las calificaciones simuladas deben identificarse claramente como demostración cuando se presenten como tales.
+
+### RNF-10 · Mantenibilidad y observabilidad
+
+- La integración futura con servicios debe conservar responsabilidades claras entre interfaz, autenticación, persistencia y proveedores externos.
+- Los errores operativos deben registrarse sin exponer contraseñas, tokens, datos personales innecesarios ni información de pago; las operaciones críticas deben poder monitorearse.
 
 ---
 
@@ -133,7 +203,7 @@ Lo que falta para pasar del diseño funcional al sistema operativo real.
 
 - Reemplazar `mockUsers` con llamadas a API REST o GraphQL.
 - Integrar JWT / OAuth 2.0 (Google, Microsoft) para SSO institucional.
-- Persistencia de sesión en `localStorage` o cookie HttpOnly — actualmente se pierde al recargar la página.
+- Persistencia de sesión segura (preferentemente cookie `HttpOnly`, `Secure` y `SameSite`) — actualmente se pierde al recargar la página.
 - Roles y permisos validados en servidor, no solo en UI.
 - Flujo de recuperación de contraseña.
 
@@ -149,7 +219,7 @@ Lo que falta para pasar del diseño funcional al sistema operativo real.
 - Base de datos de módulos y sesiones (MongoDB o PostgreSQL).
 - Upload real de recursos (PDF/PPT/Excel) a storage en la nube (S3, GCS, o Cloudflare R2).
 - URLs firmadas con expiración para proteger el acceso a archivos.
-- Control de visibilidad de sesiones por grupo o alumno individual (RF-08 grupos A1/A2/A3).
+- Control de visibilidad de sesiones por grupo o alumno individual; la estructura y asignación de grupos (por ejemplo A1/A2/A3) está pendiente de definición.
 - Progreso de alumno por módulo guardado en DB.
 
 ### BE-04 · Videoteca con Streaming Real
@@ -182,22 +252,16 @@ Lo que falta para pasar del diseño funcional al sistema operativo real.
 - Caché de métricas (Redis o similar) para no recalcular en cada petición.
 - Posibilidad de exportar reporte en PDF (admin).
 
-### BE-08 · Pizarra Colaborativa
-
-- Sincronización en tiempo real via WebSockets (Socket.io o Supabase Realtime).
-- Guardar canvas como imagen en storage para referencia posterior.
-- Sesiones de pizarra vinculadas a una clase o módulo específico.
-
-### BE-09 · Notificaciones y Comunicación
+### BE-08 · Notificaciones y Comunicación
 
 - Sistema de avisos in-app (nuevas sesiones publicadas, resultado de quiz, próximas clases).
 - Integración con WhatsApp Business API o email transaccional (SendGrid/Resend) para recordatorios.
 - Reemplazar el Foro eliminado (si se reintegra) con un sistema de mensajería real (Intercom, Crisp, o custom).
 
-### BE-10 · Infraestructura de Despliegue
+### BE-09 · Infraestructura de Despliegue
 
 - Variables de entorno en `.env` para API keys, DB URL, storage buckets.
-- CI/CD con GitHub Actions (ya existe `.github/workflows/deploy.yml`).
+- Revisar y definir CI/CD. En el repositorio inspeccionado existe `.github/workflows/pr.yml`; no se encontró un workflow de despliegue llamado `deploy.yml`.
 - Separar build de frontend (Vite → CDN) del backend (Node/Fastify o Python/FastAPI).
 - CORS configurado correctamente entre dominio de frontend y API.
 - HTTPS obligatorio; cabeceras de seguridad (CSP, HSTS, X-Frame-Options).
@@ -208,41 +272,41 @@ Lo que falta para pasar del diseño funcional al sistema operativo real.
 
 ```
 src/
-├── App.jsx                         # Router por estado, layout principal
-├── context/AuthContext.jsx          # Proveedor de sesión (reemplazar con JWT)
-├── data/mockData.js                 # Todos los datos simulados (reemplazar con API)
-├── components/
-│   ├── auth/Login.jsx               # Pantalla de acceso
-│   ├── layout/Sidebar.jsx           # Navegación por rol
-│   ├── layout/Header.jsx            # Barra superior
-│   ├── admin/AdminDashboard.jsx     # Panel Admin
-│   ├── admin/Statistics.jsx         # Gráficas Admin/Profesor
-│   ├── teacher/TeacherDashboard.jsx # Panel Profesor
-│   ├── student/StudentDashboard.jsx # Panel Alumno
-│   ├── modules/FileManager.jsx      # Vista de sesiones y recursos
-│   ├── video/VideoLibrary.jsx       # Catálogo de videos
-│   ├── exam/ExamSimulator.jsx       # Simulador + Reporte CENEVAL
-│   ├── whiteboard/Whiteboard.jsx    # Pizarra (solo staff)
-│   └── ui/Stars.jsx                 # Componente decorativo global
-├── hooks/useBreakpoint.js           # Detección de viewport
-├── lib/utils.js                     # cn() helper (clsx + tailwind-merge)
-└── index.css                        # Sistema de diseño completo (tokens, componentes, responsive)
+├── App.jsx                          # Navegación por estado y composición de vistas
+├── context/AuthContext.jsx           # Autenticación local de demostración
+├── data/mockData.js                  # Usuarios, alumnos, módulos, videos y reactivos simulados
+├── components/layout/                # Navegación pública, header y sidebar por rol
+├── pages/
+│   ├── landing/LandingPage.jsx       # Página pública, prueba de muestra y formulario
+│   ├── auth/Login.jsx                # Acceso de demostración
+│   ├── admin/                        # Panel administrativo y estadísticas
+│   ├── teacher/TeacherDashboard.jsx  # Panel del profesor
+│   ├── student/StudentDashboard.jsx  # Panel del alumno
+│   ├── modules/FileManager.jsx       # Módulos, sesiones y recursos
+│   ├── video/VideoLibrary.jsx        # Videoteca
+│   ├── exam/ExamSimulator.jsx        # Simuladores y reporte
+├── hooks/useBreakpoint.js            # Detección de viewport
+└── index.css                         # Estilos y reglas responsive
 
 public/
-├── space.mp4                        # Video de fondo login
-├── logo-astra.jpeg                  # Logo de la plataforma
-├── timrael-space-4984262_1920.jpg   # Imagen estática de fondo login (poster del video)
-├── math.jpg / spanish.jpg           # Texturas módulos transversales
-├── fernandozhiminaicela-*.jpg       # Textura módulos clínicos
-├── poldychromos-astronaut-*.jpg     # Imagen decorativa dashboard alumno
-└── favicon.svg                      # Ícono de pestaña
+├── space.mp4                         # Video decorativo de fondo
+├── logo-astra.jpeg                   # Logotipo
+└── imágenes de fondo y materias     # Recursos visuales del prototipo
 ```
+
+## Supuestos y decisiones pendientes
+
+- Los roles, grupos, permisos y tipos de usuario descritos son los que muestra el prototipo; los permisos definitivos requieren validación de negocio.
+- La página promociona un pago único de $1,499 MXN con seis meses de vigencia, pero no implementa procesamiento de pago. El precio, la vigencia, la garantía y las afirmaciones promocionales deben confirmarse antes de producción.
+- Los módulos visibles incluyen Pre-medicina y Ciencias de la Salud en el panel, mientras que el selector público de cursos muestra Pre-medicina como curso específico. Se debe confirmar el catálogo definitivo y qué cursos corresponden a cada plan.
+- La escala 700–1300 se presenta como reporte visual de práctica; no hay evidencia en el frontend de que la fórmula replique el método oficial de conversión CENEVAL.
+- No se definieron requisitos de carga, retención legal, recuperación ante desastres ni volumen concurrente; deben acordarse antes de dimensionar la arquitectura.
 
 ---
 
 ## Notas Técnicas para el Equipo Backend
 
-1. **Chunk size warning**: El bundle JS (895 kB minificado) supera el límite recomendado de Vite. Al integrar el backend, implementar **code splitting** con `React.lazy()` para cargar ExamSimulator, VideoLibrary y Whiteboard bajo demanda. Recharts y Framer Motion son las principales causas del tamaño.
+1. **Chunk size warning**: El bundle JS (895 kB minificado) supera el límite recomendado de Vite. Al integrar el backend, implementar **code splitting** con `React.lazy()` para cargar ExamSimulator y VideoLibrary bajo demanda. Recharts y Framer Motion son las principales causas del tamaño.
 
 2. **Sin react-router-dom**: La navegación actual es 100% por estado (`activeSection`). Si se requieren URLs directas (para compartir un módulo o simulador específico), se debe agregar `react-router-dom` de vuelta e implementar rutas reales.
 
