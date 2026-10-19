@@ -2,52 +2,116 @@
 
 ## 1. Descripción
 
-La entidad `ADMINISTRADOR` representa a los usuarios encargados de gestionar y supervisar las operaciones de la plataforma educativa.
+La entidad `ADMINISTRADOR` representa a los usuarios responsables de gestionar, supervisar y modificar la información administrativa y académica de la plataforma educativa.
 
 ## 2. Atributos
 
 | Atributo | Tipo de dato | Descripción |
 |---|---|---|
-| id_administrador | BIGINT (PK, FK) | Identificador único, relacionado con la entidad `USUARIO`. |
-| fecha_asignacion | TIMESTAMP | Fecha en la que se asignó el rol de administrador. |
+| id_administrador | BIGINT (PK, FK) | Identificador único relacionado con `USUARIO`. |
+| fecha_asignacion | TIMESTAMP | Fecha de asignación del rol administrativo. |
 | nivel_permiso | VARCHAR(30) | Nivel de privilegios del administrador. |
 
-Los datos personales y de autenticación, como nombre, correo y contraseña, se almacenarán en la entidad `USUARIO`.
+Los datos personales y de autenticación se almacenarán en la entidad `USUARIO`.
 
-## 3. Acciones del administrador
+## 3. Acciones y permisos del administrador
 
-El administrador podrá realizar las siguientes operaciones:
+### 3.1. Gestión de alumnos
 
-| Acción | Descripción | Entidad relacionada |
+- Consultar la información de los alumnos registrados.
+- Modificar datos de inscripción y corregir información administrativa.
+- Habilitar o suspender el acceso a cursos.
+- Autorizar el acceso después de verificar el pago.
+- Consultar el historial académico y las calificaciones.
+
+**Entidad relacionada:** `ALUMNO`, `INSCRIPCION`.
+
+### 3.2. Gestión de calificaciones
+
+- Consultar las calificaciones obtenidas en exámenes y quizzes.
+- Aprobar o rechazar calificaciones pendientes.
+- Cambiar el estado de aprobación de una calificación.
+- Registrar observaciones sobre los resultados.
+- Corregir calificaciones cuando exista una justificación, conservando el valor original y el historial del cambio.
+
+**Entidad relacionada:** `RESULTADO_EXAMEN`.
+
+### 3.3. Gestión de módulos educativos
+
+- Crear nuevos módulos.
+- Editar el nombre y la descripción de un módulo.
+- Modificar el orden de los módulos dentro de un curso.
+- Asignar o cambiar maestros responsables.
+- Activar, desactivar o archivar módulos.
+
+**Entidad relacionada:** `MODULO`.
+
+### 3.4. Gestión de maestros
+
+- Registrar nuevos maestros.
+- Consultar la información de los maestros existentes.
+- Editar datos administrativos y especialidades.
+- Asignar o cambiar los módulos que imparte cada maestro.
+- Activar o desactivar cuentas de maestros.
+
+**Entidad relacionada:** `MAESTRO`, `USUARIO`.
+
+### 3.5. Gestión de simuladores
+
+- Crear nuevos simuladores de examen.
+- Editar el título, descripción y duración.
+- Añadir, modificar o retirar preguntas.
+- Configurar las opciones de respuesta y las respuestas correctas.
+- Modificar el orden de las preguntas.
+- Establecer la disponibilidad y fechas de aplicación.
+- Publicar, desactivar o archivar simuladores.
+- Consultar simuladores existentes.
+
+**Entidad relacionada:** `SIMULADOR`, `PREGUNTA`, `OPCION_RESPUESTA`.
+
+**Restricción:** Si un simulador ya fue presentado por alumnos, las modificaciones de preguntas o respuestas correctas deberán gestionarse mediante versiones para no alterar los resultados históricos.
+
+### 3.6. Revisión de respuestas de simuladores
+
+- Consultar los intentos realizados por cada alumno.
+- Visualizar las respuestas seleccionadas.
+- Comparar las respuestas del alumno con las respuestas correctas.
+- Consultar el tiempo empleado y la calificación obtenida.
+- Registrar observaciones de revisión.
+- Aprobar o rechazar resultados.
+- Autorizar una recalificación justificada sin modificar las respuestas originales.
+
+**Entidad relacionada:** `INTENTO_SIMULADOR`, `RESPUESTA_ALUMNO`, `REVISION_SIMULADOR`.
+
+## 4. Atributos propuestos para otras entidades
+
+Las acciones administrativas se reflejarán mediante los siguientes atributos:
+
+| Entidad | Atributos propuestos | Función |
 |---|---|---|
-| Aprobar calificaciones | Revisar y aprobar las calificaciones obtenidas por los alumnos. | `RESULTADO_EXAMEN` |
-| Autorizar acceso | Habilitar el acceso de alumnos que hayan realizado su pago. | `INSCRIPCION` |
-| Crear módulos | Registrar nuevos módulos educativos dentro de los cursos. | `MODULO` |
-| Añadir maestros | Registrar nuevos maestros en la plataforma. | `MAESTRO` |
-| Crear simuladores | Crear y configurar nuevos simuladores de examen. | `SIMULADOR` |
-| Revisar simuladores | Consultar simuladores existentes y las respuestas registradas por los alumnos. | `SIMULADOR`, `RESPUESTA_ALUMNO` |
+| `RESULTADO_EXAMEN` | aprobado_por, estado_aprobacion, fecha_aprobacion | Controlar la aprobación de calificaciones. |
+| `INSCRIPCION` | autorizado_por, estado_acceso, fecha_autorizacion | Controlar el acceso de alumnos. |
+| `MODULO` | creado_por, actualizado_por, estado | Registrar creación y modificaciones. |
+| `MAESTRO` | registrado_por, actualizado_por | Identificar responsables del registro y cambios. |
+| `SIMULADOR` | creado_por, actualizado_por, estado, fecha_actualizacion | Gestionar creación, edición y publicación. |
+| `REVISION_SIMULADOR` | revisado_por, fecha_revision, observaciones | Registrar las revisiones realizadas. |
 
-## 4. Relaciones con otras entidades
+Los atributos terminados en `_por` serán claves foráneas relacionadas con `ADMINISTRADOR(id_administrador)`.
 
-Las acciones del administrador se representarán mediante atributos en las entidades relacionadas.
+## 5. Restricciones generales
 
-| Entidad | Atributo propuesto | Descripción |
-|---|---|---|
-| `RESULTADO_EXAMEN` | aprobado_por (FK) | Administrador que aprobó la calificación. |
-| `INSCRIPCION` | autorizado_por (FK) | Administrador que habilitó el acceso. |
-| `MODULO` | creado_por (FK) | Administrador que creó el módulo. |
-| `MAESTRO` | registrado_por (FK) | Administrador que registró al maestro. |
-| `SIMULADOR` | creado_por (FK) | Administrador que creó el simulador. |
-| `REVISION_SIMULADOR` | revisado_por (FK) | Administrador que realizó una revisión formal de las respuestas de un intento. |
+- Únicamente los usuarios con permisos administrativos podrán ejecutar estas operaciones.
+- Las modificaciones importantes deberán registrarse en una bitácora.
+- No se deberán eliminar definitivamente calificaciones, respuestas o intentos que formen parte del historial académico.
+- Las modificaciones de resultados deberán conservar la información original.
+- La autorización de acceso deberá estar respaldada por la verificación del pago correspondiente.
+- Los administradores podrán consultar las respuestas de los alumnos, pero no modificarlas directamente.
 
-Estos atributos serán claves foráneas que referencian a `ADMINISTRADOR(id_administrador)`.
+## 6. Conclusión
 
-## 5. Consideraciones
+La entidad `ADMINISTRADOR` permitirá gestionar alumnos, maestros, módulos, simuladores, calificaciones y accesos.
 
-- La entidad `ADMINISTRADOR` almacenará únicamente los atributos propios de su rol.
-- Las acciones administrativas no serán atributos de `ADMINISTRADOR`, sino operaciones relacionadas con otras entidades.
-- Un administrador podrá crear, aprobar o gestionar múltiples registros.
-- La consulta de simuladores y respuestas no requiere almacenar una relación adicional, salvo que se desee conservar un historial de revisiones.
+Sus permisos de creación, consulta, modificación y desactivación se implementarán mediante operaciones del sistema, mientras que las entidades relacionadas almacenarán los atributos necesarios para identificar quién realizó cada acción y mantener la integridad de la información.
 
 
 
