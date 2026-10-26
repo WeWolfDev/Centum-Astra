@@ -23,7 +23,7 @@ No es un banco de preguntas genérico. Es una experiencia de aprendizaje estruct
 |--------|-------------|
 |  **Autenticación por rol** | Login con selector de perfil: Administrador, Profesor y Alumno. Cada rol accede a una experiencia diferente. |
 | **Dark Space Theme** | Interfaz oscura con acentos dorados y clínicos. Fondo de video espacial, estrellas animadas y glassmorphism. |
-|  **Dashboard Admin** | Tabla de alumnos con búsqueda, filtro por estatus de pago y tarjetas de métricas en tiempo real. |
+|  **Dashboard Admin** | Tabla de alumnos con búsqueda, filtro por estatus de pago y tarjetas de métricas de demostración. |
 |  **Dashboard Profesor** | Vista de progreso del grupo, ranking de alumnos y gráfica de evolución semanal. |
 |  **Dashboard Alumno** | Anillo de progreso tipo constelación, resultados recientes y acceso directo a módulos. |
 |  **Módulos transversales** | Pensamiento Matemático, Comprensión Lectora y Redacción Indirecta — núcleo del EXANI-II. |
@@ -33,6 +33,8 @@ No es un banco de preguntas genérico. Es una experiencia de aprendizaje estruct
 |  **Simulador EXANI-II** | Simulacro con formato CENEVAL: temporizador, navegación por reactivos, retroalimentación y reporte de puntuación en escala 700–1300. Profesores pueden crear simuladores personalizados. |
 
 | 📈 **Estadísticas** | Gráficas de rendimiento por materia y evolución semanal del grupo (Recharts). |
+
+> El frontend actual es un prototipo navegable con datos simulados; sus formularios y acciones no equivalen a operaciones persistidas o pagos reales. Consulta los [requisitos funcionales y no funcionales](docs/REQUISITOS_FUNCIONALES.md) para conocer el alcance y los pendientes de producción.
 
 ---
 
