@@ -98,140 +98,26 @@ src/
 
 ---
 
-## Flujo de Trabajo — Git Flow
+## 🌳 Flujo de Trabajo — Trunk-Based Development
 
-Esta sección es la **regla de oro** del repositorio. Seguir este flujo evita conflictos, pérdida de trabajo y dolores de cabeza colectivos. **Léela, memorízala, síguela.**
-
-### Vista general de las ramas
+Trabajamos con **Trunk-Based Development** (no Git Flow): `main` es la única rama permanente, siempre compila y siempre se puede mostrar al cliente.
 
 ```
-main ──────────────────────────────────────────────────► [PRODUCCIÓN]
-  │
-  └── hotfix/* ──────────────────────────────────────► (merge → main + develop)
-  
-develop ───────────────────────────────────────────────► [INTEGRACIÓN]
-  │
-  ├── feature/login-backend ──────────────────────────► (merge → develop)
-  ├── feature/simulador-ui ───────────────────────────► (merge → develop)
-  └── release/v1.2.0 ──────────────────────────────────► (merge → main + develop)
+main ──●────●────●────●────●────●──────────► [TRONCO · siempre estable]
+        \  /      \  /      \  /
+         feat/…    fix/…     chore/…        (ramas cortas · máx. 2 días · PR + squash)
 ```
 
----
+| Regla | Detalle |
+|-------|---------|
+| Rama base | Siempre `main` actualizado (`git pull --rebase`) |
+| Nombre de rama | `<tipo>/<area>-<descripcion>` · ej. `feat/auth-login-supabase` |
+| Vida de la rama | **Máximo 2 días**; lo incompleto entra detrás de un *feature flag* |
+| Integración | PR a `main` con `Closes #N`, 1 aprobación y **PR Check** en verde |
+| Merge | **Squash and merge** y se borra la rama |
+| Push directo a `main` | ❌ Nunca |
 
-### 🔴 `main` — Producción
-
-**Lo que ven los alumnos. Siempre estable, siempre limpio.**
-
-- Contiene únicamente código **verificado, revisado y aprobado**.
-- **Nadie hace push directo a `main`.** Sin excepciones.
-- Solo recibe merges desde `release/*` (lanzamiento planeado) o `hotfix/*` (emergencia).
-- Cada merge a `main` debe ir acompañado de un **tag de versión** (ej. `v1.0.0`).
-
-```bash
-# ❌ PROHIBIDO
-git push origin main
-
-# ✅ CORRECTO — solo mediante Pull Request desde release/* o hotfix/*
-```
-
----
-
-### 🟡 `develop` — Integración del equipo
-
-**Aquí converge el trabajo de César, Omar y Misael.**
-
-- Es la rama base desde la que se crea cada `feature/*`.
-- Es la rama a la que regresa cada `feature/*` una vez terminada.
-- Debe compilar y funcionar en todo momento — no se sube código roto aquí.
-- Antes de hacer merge de una `feature/*` a `develop`, sincroniza primero:
-
-```bash
-git checkout develop
-git pull origin develop
-git checkout feature/mi-tarea
-git merge develop          # Resuelve conflictos aquí, no en develop
-```
-
----
-
-### 🟢 `feature/*` — Desarrollo de nuevas funciones
-
-**Aquí es donde vive tu trabajo diario.**
-
-- **Formato obligatorio:** `feature/<descripcion-corta-en-kebab-case>`
-- Siempre se crea a partir de `develop`, nunca de `main`.
-- Una tarea = una rama. No mezcles funcionalidades distintas en la misma rama.
-- Cuando termines, abre un **Pull Request hacia `develop`** y pide revisión.
-
-```bash
-git checkout develop
-git pull origin develop
-git checkout -b feature/videoteca-filtros
-
-# ... trabajas, haces commits descriptivos ...
-git push origin feature/videoteca-filtros
-
-# Luego abres un Pull Request en GitHub → base: develop
-```
-
-**Ejemplos de nombres válidos:**
-- `feature/login-backend`
-- `feature/simulador-temporizador`
-- `feature/premedicina-modulo-base`
-- `feature/navbar-responsive`
-
----
-
-### 🔵 `release/*` — QA antes de producción
-
-**La antesala de `main`. Aquí se hacen las pruebas finales.**
-
-- Se crea desde `develop` cuando el conjunto de features para una versión está listo.
-- **Formato:** `release/vX.X.X` (ej. `release/v1.2.0`)
-- Solo se permiten **bug fixes menores** en esta rama, no nuevas features.
-- Una vez aprobada, se mergea a `main` **y** de regreso a `develop`.
-
-```bash
-git checkout develop
-git pull origin develop
-git checkout -b release/v1.2.0
-
-# Después de QA exitoso:
-# PR → main  (con tag v1.2.0)
-# PR → develop (para sincronizar fixes)
-```
-
----
-
-### 🚨 `hotfix/*` — Emergencias en producción
-
-**Para apagar incendios. Uso exclusivo de situaciones críticas.**
-
-- Se crea **directamente desde `main`**, no desde `develop`.
-- **Formato:** `hotfix/<descripcion-del-problema>`
-- Después del fix, se mergea a `main` **y** a `develop`.
-
-```bash
-git checkout main
-git pull origin main
-git checkout -b hotfix/simulador-crash-ios
-
-# Fix, commit, push...
-# PR → main  (deploy inmediato)
-# PR → develop (para no perder el fix)
-```
-
----
-
-### 📋 Resumen de reglas
-
-| Rama | Sale de | Mergea a | ¿Push directo? |
-|------|---------|----------|----------------|
-| `main` | — | — | ❌ Nunca |
-| `develop` | `main` (inicial) | — | ❌ Solo via PR |
-| `feature/*` | `develop` | `develop` | ✅ Tu propia rama |
-| `release/*` | `develop` | `main` + `develop` | ✅ Tu propia rama |
-| `hotfix/*` | `main` | `main` + `develop` | ✅ Tu propia rama |
+👉 **Lee la [Guía de contribución](CONTRIBUTING.md)** para el flujo completo de issues y PRs, los estados del [tablero](https://github.com/orgs/WeWolfDev/projects/4), las automatizaciones y qué hacer a mano si alguna falla.
 
 ---
 
