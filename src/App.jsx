@@ -22,7 +22,7 @@ import MaestroQuizzes from './pages/exam/MaestroQuizzes';
 import Whiteboard from './pages/whiteboard/Whiteboard';
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, isInitializing } = useAuth();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [activeModuleId, setActiveModuleId] = useState(null);
   const [customQuizzes, setCustomQuizzes] = useState([]);
@@ -58,6 +58,15 @@ function AppContent() {
   }
 
   const [showLogin, setShowLogin] = useState(false);
+
+  // Evita mostrar la landing un instante mientras se restaura la sesión de Supabase.
+  if (isInitializing) {
+    return (
+      <div role="status" className="flex items-center justify-center min-h-screen text-white/60 text-sm">
+        Cargando…
+      </div>
+    );
+  }
 
   if (!user) {
     if (showLogin) return <Login onBack={() => setShowLogin(false)} />;

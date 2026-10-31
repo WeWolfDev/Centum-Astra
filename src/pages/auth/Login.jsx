@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, GraduationCap, Rocket, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { mockAuthEnabled } from '../../lib/supabaseClient';
 import PublicNav from '../../components/layout/PublicNav';
 import Boton from '../../components/rediseno/Boton';
 import Input from '../../components/rediseno/Input';
@@ -43,15 +44,13 @@ export default function Login({ onBack }) {
   const [password, setPassword] = useState('');
   const [loading,  setLoading]  = useState(false);
 
-  // Visible en dev siempre; en builds de producción solo si VITE_SHOW_DEMO=true.
-  // Pensado como feature flag temporal hasta que exista BE-01 (auth real).
-  const showQuickLogin = import.meta.env.VITE_SHOW_DEMO === 'true' || import.meta.env.DEV;
+  // Solo con auth mock: sin Supabase configurado, en dev o con VITE_SHOW_DEMO=true.
+  const showQuickLogin = mockAuthEnabled;
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    await new Promise(r => setTimeout(r, 600));
-    login(email, password);
+    await login(email, password);
     setLoading(false);
   }
 
@@ -61,8 +60,7 @@ export default function Login({ onBack }) {
     setPassword(quickPassword);
     setError('');
     setLoading(true);
-    await new Promise(r => setTimeout(r, 600));
-    login(quickEmail, quickPassword);
+    await login(quickEmail, quickPassword);
     setLoading(false);
   }
 
@@ -232,8 +230,8 @@ export default function Login({ onBack }) {
             </p>
           </div>
 
-          {/* Acceso rápido demo — controlado por VITE_SHOW_DEMO en builds de producción.
-              Encendido en Netlify mientras no exista BE-01 (auth real). */}
+          {/* Acceso rápido demo — solo con auth mock (ver mockAuthEnabled en lib/supabaseClient).
+              Se oculta automáticamente cuando Supabase está configurado. */}
           {showQuickLogin && (
             <div className="w-full max-w-sm">
               <p className="text-white/70 text-xs tracking-widest uppercase mb-2 text-center">

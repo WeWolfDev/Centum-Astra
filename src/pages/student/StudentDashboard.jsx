@@ -57,7 +57,8 @@ export default function StudentDashboard({ setActiveSection }) {
   // Ceneval directo. Lo derivamos con la conversión supuesta del HANDOFF.
   // TODO(rediseno): leer el puntaje Ceneval real del último simulador cuando
   // exista la tabla StudentSimulatorScore.
-  const aciertosActuales = Math.round((user.progress / 100) * 138);
+  // Los usuarios de Supabase aún no traen `progress` (#36/#37); sin dato, se parte de 0.
+  const aciertosActuales = Math.round(((user.progress ?? 0) / 100) * 138);
   const puntajeActual = aciertosACeneval(aciertosActuales);
 
   // Meta del alumno. HANDOFF: oculta por defecto. Hoy no hay fuente de la meta.
