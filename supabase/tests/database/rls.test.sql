@@ -24,24 +24,24 @@ insert into public.profiles (id, email, full_name, role, status) values
   ('00000000-0000-0000-0000-000000000006', 'suspendido@test.mx', 'Suspendido', 'admin', 'suspended');
 
 insert into public.courses (id, name) values
-  ('10000000-0000-0000-0000-000000000001', 'Curso 1'),
-  ('10000000-0000-0000-0000-000000000002', 'Curso 2');
+  ('a1000000-0000-0000-0000-000000000001', 'Curso 1'),
+  ('a1000000-0000-0000-0000-000000000002', 'Curso 2');
 
 insert into public.groups (id, course_id, name, code) values
-  ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'Grupo 1', 'G1'),
-  ('20000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', 'Grupo 2', 'G2');
+  ('a2000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 'Grupo 1', 'G1'),
+  ('a2000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000002', 'Grupo 2', 'G2');
 
 insert into public.group_teachers (group_id, teacher_id) values
-  ('20000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002'),
-  ('20000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000003');
+  ('a2000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002'),
+  ('a2000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000003');
 
 insert into public.group_students (group_id, student_id) values
-  ('20000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004'),
-  ('20000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000005');
+  ('a2000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000004'),
+  ('a2000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000005');
 
 insert into public.modules (id, course_id, title) values
-  ('30000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', 'Módulo 1'),
-  ('30000000-0000-0000-0000-000000000002', '10000000-0000-0000-0000-000000000002', 'Módulo 2');
+  ('30000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 'Módulo 1'),
+  ('30000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000002', 'Módulo 2');
 
 insert into public.sessions (id, module_id, title) values
   ('40000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', 'Sesión 1'),
@@ -58,12 +58,12 @@ insert into public.audit_logs (actor_id, action, entity_type) values
 -- ── Integridad ───────────────────────────────────────────────────────────────
 select throws_ok(
   $$ insert into public.group_students (group_id, student_id) values
-     ('20000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000004') $$,
+     ('a2000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000004') $$,
   '23505', null, 'un alumno no puede pertenecer a dos grupos'
 );
 select throws_ok(
   $$ insert into public.group_students (group_id, student_id) values
-     ('20000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002') $$,
+     ('a2000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000002') $$,
   'P0001', null, 'un profesor no puede inscribirse como alumno'
 );
 select throws_ok(
@@ -148,7 +148,7 @@ select is_empty(
 );
 select throws_ok(
   $$ insert into public.group_teachers (group_id, teacher_id) values
-     ('20000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002') $$,
+     ('a2000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002') $$,
   '42501', null, 'el profesor no se asigna a otro grupo'
 );
 reset role;
@@ -156,15 +156,16 @@ reset role;
 -- ── Administrador ────────────────────────────────────────────────────────────
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000001"}', true);
 set local role authenticated;
-select is((select count(*) from public.profiles), 6::bigint, 'el administrador ve todas las cuentas');
-select is((select count(*) from public.audit_logs), 1::bigint, 'el administrador ve la auditoría');
+-- Filtrado a los datos de esta prueba: la base local puede tener otras cuentas.
+select is((select count(*) from public.profiles where email like '%@test.mx'), 6::bigint, 'el administrador ve todas las cuentas');
+select is((select count(*) from public.audit_logs where actor_id = '00000000-0000-0000-0000-000000000001'), 1::bigint, 'el administrador ve la auditoría');
 select lives_ok(
   $$ insert into public.courses (name) values ('Curso admin') $$,
   'el administrador crea cursos'
 );
 select lives_ok(
   $$ insert into public.group_students (group_id, student_id) values
-     ('20000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000005')
+     ('a2000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000005')
      on conflict (student_id) do update set group_id = excluded.group_id $$,
   'el administrador cambia de grupo a un alumno'
 );
