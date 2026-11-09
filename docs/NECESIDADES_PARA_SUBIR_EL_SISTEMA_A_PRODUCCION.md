@@ -80,7 +80,7 @@ Resolver y documentar antes de cerrar el diseño de datos y los flujos:
 - [ ] Usar Supabase Storage u otro proveedor aprobado para guardar PDFs, imágenes de reactivos y adjuntos en buckets privados; la decisión debe considerar cuota, región, costo y salida de datos.
 - [ ] Subir archivos mediante el backend o URLs firmadas de corta duración, autorizadas para el usuario y recurso correspondientes.
 - [ ] Configurar y probar políticas RLS de `storage.objects` para carga, lectura, reemplazo y eliminación por rol; no habilitar buckets públicos para materiales restringidos.
-- [ ] Validar en servidor tamaño, extensión y tipo real del archivo; establecer cuotas y límites por rol. Recomendación inicial: 50 MB máximo por material médico/documento general, 25 MB máximo para materiales EXANI-II en PDF o documentos, 10 MB para imágenes; los videos se manejan como enlaces de Drive.
+- [ ] Validar en servidor tamaño, extensión y tipo real del archivo; aplicar el límite acordado de 50 MB por archivo. Definir por separado las cuotas totales por curso/proyecto y los formatos permitidos; los videos se manejan como enlaces de Drive.
 - [ ] Definir análisis antimalware y procedimiento para archivos no válidos o sospechosos antes de publicarlos.
 - [ ] Evitar buckets públicos y URLs permanentes; registrar quién publica, edita, elimina o descarga material cuando corresponda.
 - [ ] Guardar metadatos y relaciones de materiales en base de datos; permitir edición, reemplazo, borrado y recuperación conforme a política.
