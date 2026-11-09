@@ -7,6 +7,8 @@ import { useMemo, useState } from 'react';
 import { Search, ChevronRight, ArrowUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { mockStudents } from '../../data/mockData';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import TeacherRoster from './TeacherRoster';
 import {
   aciertosACeneval,
   SIMULADOR_TOTAL_PREGUNTAS,
@@ -206,7 +208,12 @@ function StudentRow({ student }) {
   );
 }
 
+// Los datos mock solo se usan en el modo demo, sin Supabase configurado.
 export default function TeacherDashboard() {
+  return isSupabaseConfigured ? <TeacherRoster /> : <TeacherDashboardDemo />;
+}
+
+function TeacherDashboardDemo() {
   const { user } = useAuth();
   const [query, setQuery] = useState('');
   const [filtro, setFiltro] = useState('todos'); // 'todos' | 'atencion'
