@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, CheckCircle, Users, TrendingUp, ChevronRight } from 'lucide-react';
 import { mockStudents, mockStats } from '../../data/mockData';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import AdminUsers, { AdminOverview } from './AdminUsers';
 import { cn } from '../../lib/utils';
 import { useBreakpoint } from '../../hooks/useBreakpoint';
 import StatCard from '../../components/rediseno/StatCard';
@@ -364,6 +366,10 @@ function StudentsView() {
 }
 
 export default function AdminDashboard({ view = 'overview', onNavigate }) {
+  // Los datos mock solo se usan en el modo demo, sin Supabase configurado.
+  if (isSupabaseConfigured) {
+    return view === 'students' ? <AdminUsers /> : <AdminOverview onNavigate={onNavigate} />;
+  }
   if (view === 'students') return <StudentsView />;
   return <OverviewView onNavigate={onNavigate} />;
 }

@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, GraduationCap, Rocket, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { mockAuthEnabled } from '../../lib/supabaseClient';
+import { isSupabaseConfigured, mockAuthEnabled } from '../../lib/supabaseClient';
+import CodigoContrasena from './CodigoContrasena';
 import PublicNav from '../../components/layout/PublicNav';
 import Boton from '../../components/rediseno/Boton';
 import Input from '../../components/rediseno/Input';
@@ -43,6 +44,14 @@ export default function Login({ onBack }) {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [loading,  setLoading]  = useState(false);
+  const [modo,     setModo]     = useState('login'); // 'login' | 'recovery' | 'invite'
+  const [exito,    setExito]    = useState('');
+
+  function abrirModo(siguiente) {
+    setError('');
+    setExito('');
+    setModo(siguiente);
+  }
 
   // Solo con auth mock: sin Supabase configurado, en dev o con VITE_SHOW_DEMO=true.
   const showQuickLogin = mockAuthEnabled;
@@ -168,6 +177,13 @@ export default function Login({ onBack }) {
           className="relative flex w-full md:w-5/12 flex-col items-center justify-center gap-5 px-5 md:px-12 py-8 md:py-12"
         >
           <div className="w-full max-w-sm rounded-2xl p-8 bg-space-void/60 backdrop-blur-xl border border-white/10">
+            {modo !== 'login' ? (
+              <CodigoContrasena
+                tipo={modo}
+                onVolver={mensaje => { setExito(mensaje); setError(''); setModo('login'); }}
+              />
+            ) : (
+            <>
             {/* Form header */}
             <div className="mb-7">
               <h2 className="font-display text-xl font-bold text-white mb-1.5 tracking-tight">
@@ -224,6 +240,21 @@ export default function Login({ onBack }) {
                 Ingresar
               </Boton>
             </form>
+
+            {exito && <p role="status" className="text-exito text-xs text-center mt-4">{exito}</p>}
+
+            {isSupabaseConfigured && (
+              <div className="flex justify-between gap-3 mt-4">
+                <button type="button" onClick={() => abrirModo('recovery')} className="bg-transparent border-none p-0 text-xs text-white/70 underline cursor-pointer hover:text-white">
+                  Recuperar contraseña
+                </button>
+                <button type="button" onClick={() => abrirModo('invite')} className="bg-transparent border-none p-0 text-xs text-white/70 underline cursor-pointer hover:text-white">
+                  Activar mi cuenta
+                </button>
+              </div>
+            )}
+            </>
+            )}
 
             <p className="text-center text-white/60 text-xs mt-6">
               © {currentYear} Centum Astra · Todos los derechos reservados

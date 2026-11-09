@@ -65,6 +65,10 @@ describe('authErrorMessage', () => {
     expect(authErrorMessage({ code: 'email_not_confirmed' })).toMatch(/confirmar/i);
   });
 
+  it('avisa de cuenta suspendida o eliminada', () => {
+    expect(authErrorMessage({ code: 'user_banned' })).toMatch(/no está activa/i);
+  });
+
   it('avisa de demasiados intentos', () => {
     expect(authErrorMessage({ status: 429 })).toMatch(/intentos/i);
   });

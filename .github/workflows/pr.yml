@@ -32,3 +32,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verificar que el bundle no contenga claves privadas
+        run: node scripts/verificar-bundle.mjs dist
