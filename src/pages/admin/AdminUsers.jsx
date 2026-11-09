@@ -2,8 +2,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ChevronRight, GraduationCap, Layers, Search, UserPlus, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { setGroupModules } from '../../lib/groupModulesService';
 import { filterUsers, listGroups, listUsers, runAdminAction, setUserGroups } from '../../lib/usersService';
 import { cn } from '../../lib/utils';
+import ModalModulosGrupo from './ModalModulosGrupo';
 import { Aviso } from '../../components/rediseno/Aviso';
 import Boton from '../../components/rediseno/Boton';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
@@ -337,6 +339,10 @@ export default function AdminUsers() {
     void ejecutar(() => setUserGroups(dialogo.usuario, ids), 'Grupos actualizados.');
   }
 
+  function guardarModulos(grupo, actuales, nuevos) {
+    void ejecutar(() => setGroupModules(grupo, actuales, nuevos), 'Módulos actualizados.');
+  }
+
   const propsDialogo = { guardando, error: errorDialogo, onCerrar: cerrar };
 
   return (
@@ -344,7 +350,12 @@ export default function AdminUsers() {
       {aviso && <Aviso tipo="exito" mensaje={aviso} onCerrar={() => setAviso('')} />}
       <Tarjeta
         titulo="Usuarios"
-        controles={<Boton size="sm" variant="primario" onClick={() => abrir('cuenta')}><UserPlus size={14} aria-hidden="true" /> Nueva cuenta</Boton>}
+        controles={(
+          <div className="flex gap-2 flex-wrap">
+            <Boton size="sm" variant="secundario" onClick={() => abrir('modulos')}><Layers size={14} aria-hidden="true" /> Módulos por grupo</Boton>
+            <Boton size="sm" variant="primario" onClick={() => abrir('cuenta')}><UserPlus size={14} aria-hidden="true" /> Nueva cuenta</Boton>
+          </div>
+        )}
       >
         <div className="flex items-center gap-2.5 flex-wrap mb-4">
           <div className="relative flex-1 min-w-[200px]">
@@ -396,6 +407,9 @@ export default function AdminUsers() {
       )}
       {dialogo?.tipo === 'grupos' && (
         <ModalGrupos usuario={dialogo.usuario} grupos={grupos} onGuardar={guardarGrupos} {...propsDialogo} />
+      )}
+      {dialogo?.tipo === 'modulos' && (
+        <ModalModulosGrupo grupos={grupos} claseSelect={CLASE_SELECT} onGuardar={guardarModulos} {...propsDialogo} />
       )}
       {dialogo && ACCIONES_ESTADO[dialogo.tipo] && (
         <ModalEstado accion={dialogo.tipo} usuario={dialogo.usuario} onConfirmar={confirmarEstado} {...propsDialogo} />

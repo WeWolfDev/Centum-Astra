@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(35);
+select plan(49);
 
 -- ── Datos de prueba ──────────────────────────────────────────────────────────
 -- 1 admin · 2 y 3 profesores · 4 y 5 alumnos · 6 admin suspendido
@@ -43,14 +43,23 @@ insert into public.modules (id, course_id, title) values
   ('30000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001', 'Módulo 1'),
   ('30000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000002', 'Módulo 2');
 
+insert into public.modules (id, course_id, title, position) values
+  ('30000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000001', 'Módulo 3 sin habilitar', 1);
+
+insert into public.group_modules (group_id, module_id, course_id) values
+  ('a2000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', 'a1000000-0000-0000-0000-000000000001'),
+  ('a2000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000002');
+
 insert into public.sessions (id, module_id, title) values
   ('40000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000001', 'Sesión 1'),
-  ('40000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000002', 'Sesión 2');
+  ('40000000-0000-0000-0000-000000000002', '30000000-0000-0000-0000-000000000002', 'Sesión 2'),
+  ('40000000-0000-0000-0000-000000000003', '30000000-0000-0000-0000-000000000003', 'Sesión 3');
 
 insert into public.materials (session_id, title, kind, external_url, status, created_by) values
   ('40000000-0000-0000-0000-000000000001', 'Publicado 1', 'external_link', 'https://a.test', 'published', '00000000-0000-0000-0000-000000000001'),
   ('40000000-0000-0000-0000-000000000001', 'Borrador 1', 'external_link', 'https://b.test', 'draft', '00000000-0000-0000-0000-000000000001'),
-  ('40000000-0000-0000-0000-000000000002', 'Publicado 2', 'external_link', 'https://c.test', 'published', '00000000-0000-0000-0000-000000000001');
+  ('40000000-0000-0000-0000-000000000002', 'Publicado 2', 'external_link', 'https://c.test', 'published', '00000000-0000-0000-0000-000000000001'),
+  ('40000000-0000-0000-0000-000000000003', 'Publicado 3', 'external_link', 'https://g.test', 'published', '00000000-0000-0000-0000-000000000001');
 
 insert into public.audit_logs (actor_id, action, entity_type) values
   ('00000000-0000-0000-0000-000000000001', 'user.suspended', 'profile');
@@ -91,6 +100,13 @@ select is_empty(
 );
 select is((select count(*) from public.groups), 1::bigint, 'el alumno solo ve su grupo');
 select is((select count(*) from public.courses), 1::bigint, 'el alumno solo ve su curso');
+select is((select count(*) from public.modules), 1::bigint, 'el alumno solo ve módulos habilitados para su grupo');
+select is((select count(*) from public.sessions), 1::bigint, 'el alumno solo ve sesiones de módulos habilitados');
+select throws_ok(
+  $$ insert into public.group_modules (group_id, module_id, course_id) values
+     ('a2000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000001') $$,
+  '42501', null, 'el alumno no habilita módulos'
+);
 select results_eq(
   $$ select title from public.materials $$,
   array['Publicado 1'],
@@ -121,26 +137,54 @@ select is_empty(
 );
 select is((select count(*) from public.groups), 1::bigint, 'el profesor solo ve sus grupos');
 select is((select count(*) from public.group_students), 1::bigint, 'el profesor solo ve inscripciones de sus grupos');
-select is((select count(*) from public.materials), 2::bigint, 'el profesor ve borradores y publicados de su curso');
+select is((select count(*) from public.materials), 3::bigint, 'el profesor ve borradores y publicados de su curso');
+select is((select count(*) from public.group_modules), 1::bigint, 'el profesor solo ve los módulos habilitados en sus grupos');
+select throws_ok(
+  $$ insert into public.group_modules (group_id, module_id, course_id) values
+     ('a2000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000001') $$,
+  '42501', null, 'el profesor no habilita módulos'
+);
 select lives_ok(
   $$ insert into public.materials (session_id, title, kind, external_url, status, created_by) values
      ('40000000-0000-0000-0000-000000000001', 'Nuevo', 'external_link', 'https://d.test', 'draft', '00000000-0000-0000-0000-000000000002') $$,
   'el profesor crea un borrador en su curso'
 );
+select lives_ok(
+  $$ insert into public.materials (session_id, title, kind, external_url, status, created_by, published_by) values
+     ('40000000-0000-0000-0000-000000000001', 'Directo', 'external_link', 'https://e.test', 'published', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000002') $$,
+  'el profesor publica directamente en su curso'
+);
 select throws_ok(
-  $$ insert into public.materials (session_id, title, kind, external_url, status, created_by) values
-     ('40000000-0000-0000-0000-000000000001', 'Directo', 'external_link', 'https://e.test', 'published', '00000000-0000-0000-0000-000000000002') $$,
-  '42501', null, 'el profesor no publica directamente'
+  $$ insert into public.materials (session_id, title, kind, external_url, status, created_by, published_by) values
+     ('40000000-0000-0000-0000-000000000001', 'Falso', 'external_link', 'https://h.test', 'published', '00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001') $$,
+  '42501', null, 'el profesor no publica a nombre de otra persona'
 );
 select throws_ok(
   $$ insert into public.materials (session_id, title, kind, external_url, status, created_by) values
      ('40000000-0000-0000-0000-000000000002', 'Ajeno', 'external_link', 'https://f.test', 'draft', '00000000-0000-0000-0000-000000000002') $$,
   '42501', null, 'el profesor no crea material en un curso ajeno'
 );
-select throws_ok(
-  $$ update public.materials set status = 'published'
+select lives_ok(
+  $$ update public.materials set status = 'published', published_by = '00000000-0000-0000-0000-000000000002'
      where title = 'Nuevo' $$,
-  '42501', null, 'el profesor no publica su propio borrador'
+  'el profesor publica su propio borrador'
+);
+select lives_ok(
+  $$ update public.materials set title = 'Corregido', external_url = 'https://i.test'
+     where title = 'Directo' $$,
+  'el profesor corrige su material publicado'
+);
+select throws_ok(
+  $$ update public.materials set status = 'archived' where title = 'Corregido' $$,
+  '42501', null, 'el profesor no retira material publicado'
+);
+select throws_ok(
+  $$ update public.materials set status = 'draft', published_by = null where title = 'Corregido' $$,
+  '42501', null, 'el profesor no oculta material publicado devolviéndolo a borrador'
+);
+select is_empty(
+  $$ update public.materials set title = 'Ajeno' where title = 'Publicado 1' returning id $$,
+  'el profesor no corrige material publicado de otra persona'
 );
 select is_empty(
   $$ update public.materials set title = 'Editado' where title = 'Borrador 1' returning id $$,
@@ -173,6 +217,25 @@ select throws_ok(
   $$ update public.profiles set full_name = 'Directo' where id = '00000000-0000-0000-0000-000000000004' $$,
   '42501', null, 'los cambios de cuenta pasan por la función admin-users'
 );
+select lives_ok(
+  $$ update public.materials set status = 'archived' where title = 'Corregido' $$,
+  'el administrador retira material publicado'
+);
+select lives_ok(
+  $$ insert into public.group_modules (group_id, module_id, course_id) values
+     ('a2000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000003', 'a1000000-0000-0000-0000-000000000001') $$,
+  'el administrador habilita un módulo para un grupo'
+);
+select throws_ok(
+  $$ insert into public.group_modules (group_id, module_id, course_id) values
+     ('a2000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000002', 'a1000000-0000-0000-0000-000000000001') $$,
+  '23503', null, 'un grupo no habilita módulos de otro curso'
+);
+reset role;
+
+select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-000000000004"}', true);
+set local role authenticated;
+select is((select count(*) from public.modules), 2::bigint, 'el alumno ve el módulo recién habilitado');
 reset role;
 
 -- ── Cuenta suspendida con token aún vigente ──────────────────────────────────
