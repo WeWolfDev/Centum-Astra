@@ -15,11 +15,11 @@ const titlesByRole = {
     exam:      'Simuladores y quizzes',
   },
   admin: {
-    dashboard: 'Mis alumnos',
+    dashboard: 'Cuentas',
     modules:   'Material',
     exam:      'Simuladores y quizzes',
     payments:  'Pagos',
-    students:  'Alumnos',
+    students:  'Cuentas',
     videos:    'Videoteca',
     stats:     'Estadísticas',
   },

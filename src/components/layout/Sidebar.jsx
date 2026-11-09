@@ -9,7 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 // Admin queda sin rediseñar hasta tener mockup; conservamos su nav previo.
 // TODO(rediseno): Pagos (sin mockup — admin pendiente).
 const adminNav = [
-  { id: 'dashboard', label: 'Mis alumnos',             Icon: Users },
+  { id: 'dashboard', label: 'Cuentas',                 Icon: Users },
   { id: 'modules',   label: 'Material',                Icon: FolderOpen },
   { id: 'exam',      label: 'Simuladores y quizzes',   Icon: GraduationCap },
   { id: 'payments',  label: 'Pagos',                   Icon: CreditCard },

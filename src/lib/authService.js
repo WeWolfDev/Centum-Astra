@@ -37,6 +37,7 @@ export function toAppUser(authUser, profile) {
 export function authErrorMessage(error) {
   if (error?.code === 'invalid_credentials') return 'Correo o contraseña incorrectos';
   if (error?.code === 'email_not_confirmed') return 'Debes confirmar tu correo antes de iniciar sesión.';
+  if (error?.code === 'user_banned') return 'Tu cuenta no está activa. Comunícate con el administrador.';
   if (error?.status === HTTP_TOO_MANY_REQUESTS) return 'Demasiados intentos. Espera unos minutos e intenta de nuevo.';
   if (error?.name === 'AuthRetryableFetchError') return 'Sin conexión con el servidor. Revisa tu conexión e intenta de nuevo.';
   return GENERIC_ERROR;
