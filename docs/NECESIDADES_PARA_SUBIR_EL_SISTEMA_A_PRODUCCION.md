@@ -26,7 +26,7 @@ Resolver y documentar antes de cerrar el diseño de datos y los flujos:
 - [ ] Modelo de grupos y asignación de alumnos a profesores; confirmar si se requiere visibilidad por alumno, grupo o curso.
 - [ ] Qué significa “progreso”, cómo se marca una clase como vista y qué métricas se muestran a cada rol.
 - [ ] Reglas de aplicación de exámenes: límite de tiempo, intentos, reanudación, aleatoriedad, revisión y cuándo se publican resultados.
-- [ ] Sistema de puntos: confirmar con el cliente si se mantienen 138 preguntas, la escala de 700–1300 y la conversión lineal actual del prototipo; presentar el resultado como puntaje de práctica o estimación hasta aprobar la fórmula del backend.
+- [ ] Sistema de puntos: obtener la aprobación formal de la fórmula propuesta `700 + (aciertos / total de preguntas) × 600` para cuestionarios grandes y simuladores, usando el total de cada evaluación y no un total fijo de 138; definir qué preguntas cuentan y presentar el resultado como puntaje estimado, no oficial de CENEVAL.
 - [ ] Política de conservación y eliminación de cuentas, pagos, archivos, intentos y datos de auditoría.
 - [ ] Países de operación, requisitos legales/tributarios y tratamiento de datos de menores, si aplica.
 - [ ] Afirmaciones de marketing, testimonios, resultados y cifras que pueden publicarse con evidencia y autorización.
