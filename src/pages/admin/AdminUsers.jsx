@@ -322,19 +322,19 @@ export default function AdminUsers() {
   function guardarCuenta({ fullName, email, role }) {
     const usuario = dialogo.usuario;
     if (usuario) {
-      ejecutar(() => runAdminAction('update', { userId: usuario.id, fullName, role }), 'Cuenta actualizada.');
+      void ejecutar(() => runAdminAction('update', { userId: usuario.id, fullName, role }), 'Cuenta actualizada.');
     } else {
-      ejecutar(() => runAdminAction('invite', { email, fullName, role }), 'Invitación enviada.');
+      void ejecutar(() => runAdminAction('invite', { email, fullName, role }), 'Invitación enviada.');
     }
   }
 
   function confirmarEstado(datos) {
     const { tipo, usuario } = dialogo;
-    ejecutar(() => runAdminAction(tipo, { userId: usuario.id, ...datos }), ACCIONES_ESTADO[tipo].exito);
+    void ejecutar(() => runAdminAction(tipo, { userId: usuario.id, ...datos }), ACCIONES_ESTADO[tipo].exito);
   }
 
   function guardarGrupos(ids) {
-    ejecutar(() => setUserGroups(dialogo.usuario, ids), 'Grupos actualizados.');
+    void ejecutar(() => setUserGroups(dialogo.usuario, ids), 'Grupos actualizados.');
   }
 
   const propsDialogo = { guardando, error: errorDialogo, onCerrar: cerrar };

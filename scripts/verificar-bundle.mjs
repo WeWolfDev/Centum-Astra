@@ -1,5 +1,5 @@
 // Falla si el bundle del navegador contiene una clave privada de Supabase (#38).
-// Uso: node scripts/verificar-bundle.mjs [directorio]  (por defecto, dist)
+// Uso: node scripts/verificar-bundle.mjs [dist]
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -26,7 +26,11 @@ function contieneClavePrivada(contenido) {
   return [...contenido.matchAll(JWT)].some(coincidencia => esJwtServiceRole(coincidencia[1]));
 }
 
-const directorio = process.argv[2] ?? 'dist';
+const directorio = 'dist';
+if (process.argv[2] && process.argv[2] !== directorio) {
+  console.error(`Directorio no permitido. Solo se revisa ${directorio}.`);
+  process.exit(1);
+}
 const lista = archivos(directorio);
 const expuestos = lista.filter(ruta => contieneClavePrivada(readFileSync(ruta, 'utf8')));
 

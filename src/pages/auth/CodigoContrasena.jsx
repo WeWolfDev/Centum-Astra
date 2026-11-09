@@ -42,7 +42,7 @@ export default function CodigoContrasena({ tipo, onVolver }) {
 
   function solicitar(e) {
     e.preventDefault();
-    ejecutar(async () => {
+    void ejecutar(async () => {
       await requestRecoveryCode(email);
       setAviso('Si el correo está registrado, recibirás un código en unos minutos.');
       setPaso('confirmar');
@@ -55,7 +55,7 @@ export default function CodigoContrasena({ tipo, onVolver }) {
       setError('Las contraseñas no coinciden.');
       return;
     }
-    ejecutar(async () => {
+    void ejecutar(async () => {
       await setPasswordWithCode({ email, code: codigo, password, type: tipo });
       onVolver(textos.exito);
     });
