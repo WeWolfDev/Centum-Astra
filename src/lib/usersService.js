@@ -61,11 +61,17 @@ export async function listMyStudents() {
 export async function listGroups() {
   const { data, error } = await supabase
     .from('groups')
-    .select('id, name, code, courses(name)')
+    .select('id, name, code, course_id, courses(name)')
     .eq('status', 'active')
     .order('name');
   if (error) throw new Error(LOAD_ERROR);
-  return data.map(g => ({ id: g.id, name: g.name, code: g.code, course: g.courses?.name ?? '' }));
+  return data.map(g => ({
+    id: g.id,
+    name: g.name,
+    code: g.code,
+    courseId: g.course_id,
+    course: g.courses?.name ?? '',
+  }));
 }
 
 async function mensajeDeFuncion(error) {
