@@ -34,7 +34,9 @@ create table public.group_students (
   group_id uuid not null references public.groups (id) on delete cascade,
   student_id uuid not null references public.profiles (id) on delete restrict,
   created_at timestamptz not null default now(),
-  primary key (group_id, student_id)
+  primary key (group_id, student_id),
+  -- Regla del cliente: un alumno solo puede pertenecer a un grupo.
+  constraint group_students_one_group unique (student_id)
 );
 
 create table public.modules (
@@ -95,25 +97,25 @@ create table public.audit_logs (
 
 create index groups_course_id_idx on public.groups (course_id);
 create index group_teachers_teacher_id_idx on public.group_teachers (teacher_id);
-create index group_students_student_id_idx on public.group_students (student_id);
 create index modules_course_id_idx on public.modules (course_id);
 create index sessions_module_id_idx on public.sessions (module_id);
 create index materials_session_id_idx on public.materials (session_id);
 create index materials_status_idx on public.materials (status);
 create index audit_logs_actor_created_at_idx on public.audit_logs (actor_id, created_at desc);
 
-create function public.require_profile_role(expected_role text)
+create function public.require_teacher_profile_role()
 returns trigger
 language plpgsql
+set search_path = ''
 as $$
 begin
   if not exists (
     select 1
     from public.profiles
     where id = new.teacher_id
-      and role = expected_role
+      and role = 'teacher'
   ) then
-    raise exception 'profile % must have role %', new.teacher_id, expected_role;
+    raise exception 'profile % must have role teacher', new.teacher_id;
   end if;
   return new;
 end;
@@ -121,11 +123,12 @@ $$;
 
 create trigger group_teachers_role_check
 before insert or update on public.group_teachers
-for each row execute function public.require_profile_role('teacher');
+for each row execute function public.require_teacher_profile_role();
 
 create function public.require_student_profile_role()
 returns trigger
 language plpgsql
+set search_path = ''
 as $$
 begin
   if not exists (

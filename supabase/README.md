@@ -36,7 +36,29 @@ publicar un proyecto remoto. El esquema local no contiene datos reales.
 
 ## Usuarios de prueba
 
-Los usuarios se crean desde Supabase Studio local o mediante Auth. Después de
-crear un usuario, se debe insertar su fila correspondiente en `public.profiles`
-con un rol válido (`admin`, `teacher` o `student`). Las credenciales nunca se
-guardan en migraciones ni en `seed.sql`.
+Las credenciales nunca se guardan en migraciones ni en `seed.sql`.
+
+El primer administrador se crea a mano. En Studio, agrega el usuario en
+**Authentication > Users** y después ejecuta:
+
+```sql
+insert into public.profiles (id, email, full_name, role)
+select id, email, 'Nombre del administrador', 'admin'
+from auth.users
+where email = 'correo@ejemplo.mx';
+```
+
+Las demás cuentas se crean desde la aplicación con “Nueva cuenta”. En local, el
+correo con el código de activación se consulta en Mailpit; `supabase status`
+muestra su URL.
+
+## Pruebas y funciones
+
+```bash
+supabase test db                 # Accesos permitidos y denegados por rol
+supabase functions serve         # Sirve admin-users en local
+```
+
+Un cambio de esquema o de políticas debe acompañarse de su prueba en
+`supabase/tests/database/`. Los ambientes remotos se describen en
+`docs/AMBIENTES.md`.
