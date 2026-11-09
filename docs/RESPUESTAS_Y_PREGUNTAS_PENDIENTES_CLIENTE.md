@@ -162,13 +162,75 @@ Este documento consolida las respuestas recibidas, evita volver a preguntar lo q
 - Racha: el alumno la mantiene al hacer sus actividades o volver a practicar cada día; se muestra la semana que lleva, de ser posible con estrellas.
 - Modo claro en blanco y dorado.
 
+### 1.9 Respuestas registradas el 2026-11-09
+
+Estas respuestas actualizan a las de 1.8 cuando tratan el mismo tema.
+
+**Acceso y resultados**
+
+- Un alumno puede recibir acceso a otra área completa, además de la de su grupo.
+- El acceso no se extiende individualmente a ningún alumno.
+- El administrador ve toda la información: alumnos, grupos y maestros.
+- El maestro ve a su grupo y a sus alumnos.
+- El alumno ve sus propias calificaciones y sus áreas a mejorar, y solo su grupo y curso.
+- El periodo de las estadísticas lo determina el administrador.
+
+**Permisos por rol**
+
+- Alumno: ve y resuelve sus exámenes y ejercicios, accede a lecturas y videos, y sube su comprobante de pago si lo necesita.
+- Maestro: sube sus clases, ejercicios, quizzes y videos. No crea simuladores.
+- Administrador: tiene acceso a todo, corrige, quita o ve clases, videos y módulos, y otorga permisos de rol.
+
+**Materiales**
+
+- No hay límite total de espacio por curso.
+- La fecha límite del curso la determina el cliente según la fecha del Exani II.
+- Los administradores determinan cuántos alumnos hay en cada grupo.
+- Se permiten archivos comprimidos y otros formatos, excepto cualquier ejecutable.
+- Los videos serán enlaces de Google Drive.
+- Al reemplazar un archivo, el anterior se borra y el nuevo conserva nombre y ubicación.
+- A quien ya había abierto el archivo se le indica que fue borrado o reemplazado.
+
+**Evaluaciones**
+
+- Todas las preguntas son de opción múltiple.
+- Las explicaciones se muestran después de terminar la prueba.
+- Los intentos son ilimitados y solo se guardan el mejor y el último.
+- El simulador no se puede pausar: tiene un temporizador que fija el administrador y, al terminar el tiempo, se cierra aunque el alumno se haya quedado sin internet.
+- Si el alumno se desconecta y aún le queda tiempo, puede volver a entrar; el reloj no se detiene.
+- Los simuladores usan puntaje, con 700 como mínimo y 1300 con todas las respuestas correctas; los quizzes usan porcentaje.
+
+**Avisos**
+
+- Solo se envían avisos de mensualidades, pagos y cuestionarios.
+
+**Datos y cuentas**
+
+- Desactivar una cuenta solo impide entrar a ella.
+- Los datos se conservan hasta que el administrador indique lo contrario.
+
+**Operación**
+
+- El sistema debe estar disponible a todas horas; las fechas críticas son las de exámenes y simuladores.
+- Los desarrolladores atienden las fallas.
+- Se esperan 300 usuarios al mes y aproximadamente 150 conectados en una misma evaluación.
+- Fuera de horario de clase o de examen, el sistema puede estar caído unas horas; durante clases o exámenes, la falla debe resolverse en minutos.
+- Los respaldos se hacen cada 3 días y se conservan un máximo de 3 semanas.
+- Los 3 clientes son propietarios, tienen acceso y conservan el acceso de recuperación.
+- Hoy no existe una forma de revocar accesos; debe haber líderes de acceso.
+
+**Pagos**
+
+- La inscripción es uno de los pagos.
+- El cliente todavía no define las condiciones de cada descuento.
+
 ## 2. Preguntas pendientes o que requieren aclaración
 
 Estas son las únicas preguntas que deben volver al cliente. Las demás ya no necesitan repetirse.
 
 ### P-01. Acceso por área, curso y grupo
 
-**Estado:** respondida en 1.8. Falta definir cómo se otorga el acceso a más de un área.
+**Estado:** respondida en 1.8 y 1.9. El permiso extra se otorga por área completa.
 
 Se indicó que el alumno accede según el área donde se registró, pero también que pertenece a una generación y un grupo:
 
@@ -179,7 +241,7 @@ Se indicó que el alumno accede según el área donde se registró, pero tambié
 
 ### P-02. Vencimiento del acceso
 
-**Estado:** parcial. Todos los alumnos tienen la misma fecha de inicio y de fin; faltan las extensiones individuales y qué ocurre con los resultados.
+**Estado:** respondida en 1.8 y 1.9.
 
 - ¿El acceso termina en una fecha fija del curso?
 - ¿La fecha depende de la generación?
@@ -200,7 +262,7 @@ Se indicó que maestros y administradores pueden gestionar materiales:
 
 ### P-04. Tipos y límites de archivo
 
-**Estado:** parcial. El límite es de 50 MB por archivo; faltan las demás preguntas.
+**Estado:** respondida en 1.8 y 1.9.
 
 - ¿El “video” se cargará realmente a Supabase Storage o solo se guardará como enlace a Google Drive?
 - ¿Cuál debe ser el límite máximo por archivo?
@@ -211,12 +273,16 @@ Se indicó que maestros y administradores pueden gestionar materiales:
 
 ### P-05. Versiones y reemplazo de materiales
 
+**Estado:** respondida en 1.9.
+
 - Cuando se reemplace un archivo, ¿se elimina físicamente el anterior?
 - ¿Se conserva internamente para auditoría?
 - ¿El alumno que ya lo abrió debe seguir viendo la versión anterior?
 - ¿El reemplazo debe conservar el mismo nombre y ubicación?
 
 ### P-06. Reactivos y formatos de evaluación
+
+**Estado:** parcial (1.9). Falta confirmar si puede haber varias respuestas correctas y si las preguntas llevan imágenes, audio o video.
 
 - ¿Los reactivos serán únicamente de opción múltiple?
 - ¿Se permitirán varias respuestas correctas?
@@ -225,6 +291,8 @@ Se indicó que maestros y administradores pueden gestionar materiales:
 - ¿Se mostrarán explicaciones después de cada pregunta o solo al terminar?
 
 ### P-07. Intentos de simuladores y quizzes
+
+**Estado:** respondida en 1.9.
 
 - ¿La cantidad de intentos es ilimitada para simuladores, quizzes o ambos?
 - ¿Se conserva cada intento en el historial?
@@ -239,7 +307,7 @@ Se indicó que maestros y administradores pueden gestionar materiales:
 
 ### P-08. Sistema de puntos del simulador
 
-**Estado:** parcial. La fórmula propuesta está en 1.8 y debe aprobarse; el total de preguntas ya no es fijo.
+**Estado:** parcial (1.9). Falta aprobar la fórmula lineal de 1.8, confirmar la escala de los cuestionarios grandes y si se muestran aciertos y porcentaje además de los puntos.
 
 - ¿Se mantienen 138 preguntas como total del simulador?
 - ¿Se mantiene el rango de 700 a 1300 puntos?
@@ -251,6 +319,8 @@ Se indicó que maestros y administradores pueden gestionar materiales:
 **Referencia actual del código:** 0 aciertos produce aproximadamente 700 puntos y el total de aciertos produce 1300 puntos. Esta conversión todavía está marcada como supuesto en el frontend y debe aprobarse antes de implementarse en servidor.
 
 ### P-09. Estadísticas del sistema
+
+**Estado:** parcial (1.9). Los permisos por rol están definidos. Falta confirmar qué indicadores concretos se muestran.
 
 La pregunta original sobre indicadores no quedó respondida. Se necesita definir qué verá cada rol.
 
@@ -284,7 +354,7 @@ También se debe confirmar:
 
 ### P-10. Notificaciones
 
-**Estado:** parcial. Por ahora, los alumnos reciben por correo los avisos definidos en 1.8.
+**Estado:** respondida en 1.8 y 1.9.
 
 - ¿Se necesitan correos o avisos dentro del sistema?
 - ¿Qué eventos deben notificar?
@@ -298,12 +368,16 @@ También se debe confirmar:
 
 ### P-11. Menores de edad
 
+**Estado:** pospuesta por decisión del equipo (2026-11-09).
+
 - ¿Habrá alumnos menores de edad?
 - Si los hay, ¿quién proporciona el consentimiento?
 - ¿Se requiere autorización de padres o tutores?
 - ¿El cliente proporcionará los textos legales y el mecanismo de consentimiento?
 
 ### P-12. Derechos de los usuarios sobre sus datos
+
+**Estado:** respondida en 1.9.
 
 Se indicó que no se permitirá solicitar copia o eliminación de datos. Se necesita confirmar:
 
@@ -314,6 +388,8 @@ Se indicó que no se permitirá solicitar copia o eliminación de datos. Se nece
 
 ### P-13. Disponibilidad y soporte
 
+**Estado:** parcial (1.9). Falta confirmar si el administrador recibe alertas de fallas y quién atiende las dudas de alumnos y maestros.
+
 - ¿En qué horarios debe estar disponible el sistema?
 - ¿Existen fechas críticas de alta demanda?
 - ¿Qué significa que el soporte sea “administrativo”?
@@ -322,6 +398,8 @@ Se indicó que no se permitirá solicitar copia o eliminación de datos. Se nece
 - ¿Cuál es el tiempo máximo de atención a un incidente?
 
 ### P-14. Usuarios simultáneos
+
+**Estado:** respondida en 1.9.
 
 La respuesta “80 a 150” necesita dividirse:
 
@@ -332,6 +410,8 @@ La respuesta “80 a 150” necesita dividirse:
 
 ### P-15. Respaldos y recuperación
 
+**Estado:** parcial (1.9). Falta confirmar quién autoriza una restauración. Con respaldos cada 3 días se pueden perder hasta 3 días de información.
+
 Para cerrar producción todavía falta confirmar:
 
 - ¿Cuánto tiempo máximo puede estar fuera de servicio el sistema?
@@ -341,6 +421,8 @@ Para cerrar producción todavía falta confirmar:
 - ¿Durante cuánto tiempo deben conservarse?
 
 ### P-16. Administración de cuentas técnicas
+
+**Estado:** parcial (1.9). Falta definir quiénes son los líderes de acceso y cómo se retira el acceso a quien deje el proyecto.
 
 Se indicó que el cliente será propietario y el equipo administrará las cuentas. Falta precisar:
 
@@ -370,12 +452,11 @@ Con las respuestas actuales, el sistema debe implementarse con estas reglas:
 
 Para reducir más las dudas, el cliente solo necesita responder primero:
 
-1. P-01 y P-02: acceso por área, curso, grupo y vencimiento.
-2. P-03 a P-05: publicación, límites y reemplazo de materiales.
-3. P-06 a P-08: formatos, intentos y sistema de puntos.
-4. P-09 y P-10: estadísticas y notificaciones.
-5. P-11 y P-12: privacidad, menores y retención.
-6. P-13 a P-16: soporte, capacidad, recuperación y cuentas técnicas.
+1. P-06 y P-08: multimedia, varias respuestas correctas y aprobación de la fórmula.
+2. P-09: indicadores de cada rol.
+3. P-13, P-15 y P-16: alertas, restauración y líderes de acceso.
+4. Condiciones de cada descuento.
+5. P-11 queda pospuesta.
 
 Con estas respuestas se podrá actualizar el esquema de Supabase, las políticas RLS, los flujos de frontend y los criterios de aceptación sin volver a revisar las 67 preguntas originales.
 
