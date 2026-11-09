@@ -1,113 +1,100 @@
 # REQUISITOS FUNCIONALES Y NO FUNCIONALES — Centum Astra
 > Plataforma educativa de preparación EXANI-II para carreras de salud
-> Actualizado: 2026-10-17 | Fuente: README y pantallas actuales del frontend
+> Revisado: 2026-10-25 | Fuente: implementación actual de `src/` y configuración del repositorio
 
 ---
 
-## FASE 1 — IMPLEMENTADO (Front-End Design)
+## FASE 1 — PROTOTIPO FRONTEND DISPONIBLE
 
 Este documento distingue entre los flujos visibles en el frontend y su estado real. El frontend sirve como prototipo navegable, pero los datos provienen de mocks o estado en memoria: no hay autenticación real, persistencia, pagos, carga de archivos al servidor ni integración con servicios externos. Por ello, una pantalla o confirmación visual no implica que la operación se haya completado en producción.
 
-Los requisitos de esta fase se extrajeron del README y de las pantallas existentes. La Fase 2 recoge capacidades necesarias para convertir esos flujos en un producto operativo. Los objetivos no funcionales con métricas son una propuesta inicial que debe validarse con negocio antes de usarse como compromiso de servicio.
+Los requisitos de esta fase se contrastaron con los componentes montados en `App.jsx`, no solo con páginas o mockups que siguen en el repositorio. La Fase 2 recoge capacidades necesarias para convertir esos flujos en un producto operativo. Los objetivos no funcionales con métricas son una propuesta inicial que debe validarse con negocio antes de usarse como compromiso de servicio.
+
+### Resultado de la revisión del frontend
+
+- La aplicación es un prototipo navegable: autenticación, alumnos, métricas, publicaciones y progreso usan datos mock o estado en memoria; no hay API ni persistencia.
+- Las rutas que se muestran dependen del rol y del estado de navegación en `App.jsx`. La existencia de un componente no significa que el usuario pueda llegar a él desde la interfaz.
+- `Statistics.jsx`, `VideoLibrary.jsx` y `ExamSimulator.jsx` no son accesibles desde el menú de todos los roles. En concreto, Estadísticas no tiene una entrada visible en el menú actual; Videoteca aparece en el menú de alumno; y la toma de examen de `ExamSimulator.jsx` no es la pantalla montada para los roles de demostración.
+- `FileManager.jsx` es una implementación anterior que no se monta para los roles `admin`, `teacher` o `student`. La experiencia actual de módulos usa `Material.jsx` (admin/profesor) y `Modulos.jsx` (alumno).
+- Los controles de “Ver”, “Aprobar”, subida, creación y reproducción no deben interpretarse como operaciones completadas: varios solo modifican estado local o muestran una interfaz sin persistir/enviar el archivo.
 
 ---
 
 ### RF-01 · Autenticación por Rol (UI)
 
-- **Pantalla de login** (`Login.jsx`) con selector de tres roles: Administrador, Profesor, Alumno.
-- Credenciales de demostración autocompletadas al seleccionar un rol.
-- Video de fondo espacial (`space.mp4`) que se carga diferido post-LCP para no bloquear el primer renderizado.
-- Campo de contraseña con toggle show/hide y animación de borde al foco.
-- Mensaje de error animado cuando las credenciales no coinciden.
+- **Pantalla de login** (`Login.jsx`) con correo y contraseña. En desarrollo ofrece acceso rápido para tres cuentas mock: Administrador, Profesor y Alumno.
+- La validación compara contra `mockUsers` en el cliente; no es autenticación real. La opción de acceso rápido está condicionada a `import.meta.env.DEV`.
+- El formulario incluye validación HTML básica, estado visual de carga y anuncio accesible del error.
 - **Roles disponibles:** `admin`, `teacher`, `student`.
 
 ### RF-02 · Layout Principal y Navegación
 
 - **Sidebar** de 232 px con logotipo, avatar de usuario y badge de rol.
-  - Admin: Dashboard · Alumnos · Módulos · Videoteca · Simulador · Estadísticas.
-  - Profesor: Mi Panel · Módulos · Videoteca · Simulador · Estadísticas.
-  - Alumno: Mi progreso · Módulos · Videoteca · Simulador.
+  - Admin: “Mis alumnos” (resumen; el listado completo se abre desde “Ver todos”), Material, Simuladores y quizzes, Pagos (marcado como pendiente/sin pantalla funcional).
+  - Profesor: Mis alumnos, Material, Simuladores y quizzes.
+  - Alumno: Inicio, Módulos, Videoteca, Simuladores y quizzes.
+- Estadísticas está conectada como sección en `App.jsx`, pero no tiene acceso visible desde los menús actuales ni un enlace desde los dashboards.
 - En **móvil** (< 768 px): sidebar se oculta como drawer con overlay de cierre al tap.
-- **Header** con título de sección (desktop) o logo + hamburger (móvil), chip de bienvenida con avatar inicial, fecha dinámica.
-- Transición animada entre secciones con Framer Motion (`AnimatePresence`).
-- Campo de estrellas animadas (`Stars.jsx`) y blobs de gradiente permanentes como fondo global.
+- **Header** con título de sección, navegación móvil y fecha dinámica.
+- Transición animada entre secciones con Framer Motion (`AnimatePresence`). Los elementos decorativos descritos en mockups no deben contarse como capacidades funcionales.
 
 ### RF-03 · Dashboard Administrador
 
-- **4 stat cards** con KPIs de demostración: total alumnos, activos, progreso promedio, calificación media.
-- **Tabla de alumnos** con columnas: nombre/email, módulo, barra de progreso, quizzes, promedio, estado de pago.
+- **Vista resumen** con 4 tarjetas KPI de demostración y una vista previa de alumnos recientes.
+- **Listado de alumnos** con columnas: nombre/email, módulo, progreso, quizzes, promedio y estado de pago.
 - **Búsqueda en tiempo real** por nombre o email.
 - **Filtro** por estado de pago: Todos · Aprobados · Pendientes.
-- La interfaz presenta botones de acción por fila: Ver / Aprobar (solo si pendiente); su efecto no está conectado a datos persistentes.
+- Los botones por fila “Ver” y “Aprobar” no ejecutan una acción persistente; el filtro actual no incluye la opción “Rechazados”.
 - Fondo de textura dot-grid.
 
 ### RF-04 · Dashboard Profesor
 
-- **3 stat cards** accionables: mis alumnos, promedio del grupo, sesiones esta semana.
-- **Gráfica de evolución semanal** (LineChart): promedio del grupo vs. calificación máxima.
-- **Ranking del grupo** con barra de progreso horizontal y badge de posición (oro/plata).
-- Botón de acceso rápido a Estadísticas.
+- Vista “Mis alumnos” con búsqueda por nombre y filtro “Todos / Requieren atención”.
+- Resumen mock del grupo: cantidad de alumnos, promedio del último simulador y variación; lista con serie histórica sintética, avance de quizzes y señal de atención.
+- Los datos se derivan de `mockStudents`; actualmente no se filtran por profesor o grupo y la serie no es historial real.
+- No hay enlace visible a Estadísticas desde el menú del profesor.
 
 ### RF-05 · Dashboard Alumno
 
-- **Banner de bienvenida** con astronauta decorativo (oculto en móvil), nombre del alumno y subtítulo de puntos faltantes para completar preparación.
-- **Anillo de progreso SVG** con gradiente dorado, marcas de cuartil y puntos de constelación para cada módulo.
-- **3 stats inline** en píldora: Quizzes completados, Racha diaria, Promedio general.
-- **Gráfica de resultados recientes** (BarChart) con últimos 5 quizzes.
-- **Grid de módulos** con tarjetas diferenciadas: azul/dorado para Transversales, teal para Clínicas.
-  - Cada tarjeta muestra: icono emoji, tipo (Transversal/Específico), nombre, contador de recursos/temas, barra de progreso animada.
-  - Clic navega directamente a Módulos con el módulo seleccionado.
+- Saludo personalizado, acceso visual a “Continuar clase” (el destino/contenido mostrado es fijo) y sección de puntaje/progreso estimado.
+- La gráfica/historial y puntaje CENEVAL son derivados de datos mock; no equivalen a intentos reales ni a una conversión oficial.
+- Presenta material/módulos y permite navegar a Módulos o Simuladores y quizzes.
+- La meta mostrada es fija/configurada en el frontend, no una meta guardada por alumno.
 
-### RF-06 · Módulos y Gestión de Sesiones (`FileManager.jsx`)
+### RF-06 · Módulos y material
 
-- **Selector de módulo** con pestañas horizontales (5 módulos: 3 transversales + 2 clínicos) con indicador activo animado.
-- **Vista basada en sesiones**: cada módulo tiene 2-3 sesiones predefinidas, cada sesión contiene recursos y videos.
-- **Toggle de visibilidad por sesión** (Eye/EyeOff, solo staff): controla si la sesión es visible para alumnos.
-- **Upload de recursos** por sesión: modal con selector de archivo PDF/Excel/PPT, auto-detección de tipo, nombre editable.
-- **Videos integrados por sesión**: cada sesión muestra sus clases grabadas con miniatura de gradiente, duración y badge "REC".
-- **Creación de sesiones adicionales** mediante modal "Nueva sección de clase" (solo staff).
-- Alumnos ven únicamente sesiones marcadas como visibles; staff ven todas con indicador de estado.
-- Descarga mock de recursos (UI completa, sin backend real).
+- La vista de alumno (`Modulos.jsx`) y la de admin/profesor (`Material.jsx`) muestran áreas y clases con recursos PDF y videos de ejemplo.
+- El alumno puede expandir las clases y ver el estado de avance derivado de mocks; el personal puede crear clases y agregar recursos desde modales.
+- El selector de archivo solo recoge metadatos/nombre y tamaño; el archivo no se carga ni se almacena. La gestión añadida mediante `MaterialContext` se pierde al recargar.
+- El visor/descarga real de archivos y reproducción de video no están conectados a un proveedor.
+- La visibilidad de sesiones predefinidas depende de `visible` en los datos mock; en la pantalla actual no hay control para cambiar esa propiedad. La administración de visibilidad descrita en el antiguo `FileManager.jsx` no está conectada.
 
 ### RF-07 · Videoteca Global (`VideoLibrary.jsx`)
 
-- Grid responsivo de tarjetas de video (1/2/3 columnas según breakpoint).
-- **Filtros por materia** con chips de color codificado.
-- **Búsqueda** por título o instructor.
-- Cada tarjeta muestra: thumbnail de gradiente temático, título, instructor, duración, vistas.
-- **Modal de reproducción** con placeholder "[Vista previa · Conectar a Zoom/Drive]".
-- Staff puede **subir nuevas sesiones** (modal con picker de video, título, materia, duración).
-- Los videos nuevos se agregan al inicio de la lista en la sesión actual.
+- Está disponible en el menú del alumno; admin y profesor no tienen acceso visible desde su navegación actual.
+- Muestra videos mock con filtros por materia, búsqueda y metadatos.
+- La acción de reproducción no inicia un reproductor. El modal de carga lee nombre/título/datos, pero no envía el archivo; los cambios son locales.
+- El modal de carga no es accesible desde la navegación actual de admin/profesor.
 
 ### RF-08 · Simulador EXANI-II (`ExamSimulator.jsx`)
 
-- **Home**: listado de simuladores disponibles (1 oficial precargado + personalizados). Staff puede crear y eliminar simuladores.
-- **QuizBuilder** (solo staff): creación de simuladores con título, materia, tiempo límite, preguntas ilimitadas.
-  - Por pregunta: enunciado en textarea, 4 opciones, selector de respuesta correcta con radio button, campo de explicación.
-  - **Adjunto de imagen por reactivo**: upload con FileReader, límite de 5 MB, preview con botón de quitar.
-- **Toma de examen**: temporizador regresivo con barra de progreso de color (azul → amarillo → rojo urgente), navegador de preguntas con estados visual (activa/respondida/sin responder), opciones con retroalimentación visual post-respuesta, panel de explicación expandible.
-- **Reporte CENEVAL** al finalizar:
-  - Puntuación en escala 700–1300 con gradiente animado.
-  - Zona de desempeño: Insuficiente (700–849) · Básico (850–999) · Satisfactorio (1000–1149) · Destacado (1150–1300).
-  - Barra de escala nacional con punto indicador animado.
-  - Desglose por área: Transversales (dorado) y Clínicas (teal) con barras de progreso.
-  - Acciones: Repetir / Ver simuladores.
+- Para admin/profesor, `MaestroQuizzes.jsx` permite crear/eliminar evaluaciones por materia; se agregan preguntas con enunciado, cuatro opciones, respuesta correcta y explicación. El estado se conserva solo durante la sesión.
+- Para alumno, `SimuladoresQuizzes.jsx` muestra historial/gráficas y quizzes generados a partir de mocks. El CTA para iniciar simulador está deshabilitado (“Próximamente”).
+- La pantalla de examen (`ExamSimulator.jsx`) no es la que monta `App.jsx` para los tres roles disponibles; temporizador, evaluación cronometrada y reporte de examen no forman hoy un flujo accesible completo.
+- No hay persistencia de preguntas/resultados ni cálculo oficial de puntaje CENEVAL.
 
 ### RF-09 · Estadísticas Admin/Profesor (`Statistics.jsx`)
 
-- **2 KPI cards** accionables: Tasa de aprobación (78%), Alumnos evaluados (312).
+- Existe una página con 2 KPI de demostración: tasa de aprobación (78%) y alumnos evaluados (312).
 - **BarChart "Rendimiento por Materia"** a ancho completo — con subtítulo accionable "Identifica qué área necesita refuerzo urgente".
 - **LineChart "Evolución Semanal"** a ancho completo — con subtítulo "Detecta tendencias y ajusta el plan de estudio" — doble serie: promedio del grupo vs. calificación máxima.
-- Las cifras y gráficas se alimentan de `mockStats`; no son métricas calculadas en tiempo real.
+- Las cifras y gráficas se alimentan de `mockStats`; no son métricas calculadas en tiempo real. La página está conectada en el código, pero actualmente no se alcanza desde la navegación visible por rol.
 
 ### RF-10 · Responsividad
 
-- Breakpoints cubiertos: móvil (< 480 px) · teléfono (480–767 px) · tablet (768–1023 px) · desktop (≥ 1024 px).
-- Sidebar como drawer en móvil; grids de 4 cols → 2 cols → 1 col según viewport.
-- Login: panel izquierdo oculto en móvil (solo formulario visible).
-- Imágenes decorativas ocultas en móvil (`resp-hide-mobile`).
-- Video de fondo: no bloquea interacción (`pointer-events: none`).
-- Tablas con `overflow-x: auto` para scroll horizontal en móvil.
+- La interfaz incluye estilos adaptables, drawer móvil y ajustes de layout en componentes seleccionados.
+- Los anchos de 360, 480, 768, 1024 y 1440 px son objetivos de verificación propuestos; no se encontró evidencia de pruebas automatizadas de viewport para todas las pantallas.
+- La tabla administrativa permite desplazamiento horizontal en su vista de escritorio y la pantalla del profesor presenta una lista adaptable.
 
 ### RF-11 · Diseño y Accesibilidad
 
@@ -153,7 +140,7 @@ Las siguientes metas no pueden inferirse completamente de las pantallas. Se prop
 ### RNF-03 · Rendimiento percibido
 
 - Meta propuesta en producción: LCP de hasta 2.5 s e INP de hasta 200 ms en el percentil 75, medidos en móvil bajo condiciones de red acordadas.
-- La carga de contenido decorativo pesado, como el video de fondo, no debe bloquear el acceso o la interacción con el contenido principal.
+- El contenido principal y los controles críticos deben seguir utilizables mientras cargan recursos no esenciales. Medir el bundle y los Core Web Vitals en el hosting y dispositivos objetivo antes de fijar presupuestos de rendimiento.
 
 ### RNF-04 · Seguridad de cuentas y permisos
 
@@ -260,11 +247,11 @@ Lo que falta para pasar del diseño funcional al sistema operativo real.
 
 ### BE-09 · Infraestructura de Despliegue
 
-- Variables de entorno en `.env` para API keys, DB URL, storage buckets.
-- Revisar y definir CI/CD. En el repositorio inspeccionado existe `.github/workflows/pr.yml`; no se encontró un workflow de despliegue llamado `deploy.yml`.
-- Separar build de frontend (Vite → CDN) del backend (Node/Fastify o Python/FastAPI).
-- CORS configurado correctamente entre dominio de frontend y API.
-- HTTPS obligatorio; cabeceras de seguridad (CSP, HSTS, X-Frame-Options).
+- Mantener secretos (credenciales de DB, claves privadas de API y storage) únicamente en el backend/gestor de secretos. Las variables `VITE_*` son configuración pública que termina en el navegador.
+- El repositorio tiene `.github/workflows/pr.yml` para validar pull requests; no se encontró workflow de despliegue. Añadir pipelines separados para staging y producción, con gates de calidad, aprobación y rollback.
+- Publicar frontend Vite como artefacto estático/CDN y desplegar el backend por separado cuando exista. Resolver API URL por entorno; limitar CORS a orígenes autorizados en el servidor.
+- Habilitar HTTPS y cabeceras CSP, HSTS (cuando corresponda), `X-Content-Type-Options`, `Referrer-Policy` y protección contra framing. Definir configuración de caché y revisar que las rutas de assets funcionen en el dominio/base path final.
+- Antes de abrir a usuarios reales: disponer de autenticación, persistencia, almacenamiento seguro de archivos, respaldos/recuperación y monitoreo; el frontend actual no cubre estas funciones.
 
 ---
 
@@ -272,26 +259,28 @@ Lo que falta para pasar del diseño funcional al sistema operativo real.
 
 ```
 src/
-├── App.jsx                          # Navegación por estado y composición de vistas
-├── context/AuthContext.jsx           # Autenticación local de demostración
-├── data/mockData.js                  # Usuarios, alumnos, módulos, videos y reactivos simulados
+├── App.jsx                          # Navegación por estado y pantallas disponibles por rol
+├── context/AuthContext.jsx           # Login local de demostración
+├── context/MaterialContext.jsx       # Recursos/evaluaciones en memoria
+├── data/mockData.js                  # Usuarios, alumnos, módulos, videos y estadísticas mock
 ├── components/layout/                # Navegación pública, header y sidebar por rol
 ├── pages/
-│   ├── landing/LandingPage.jsx       # Página pública, prueba de muestra y formulario
-│   ├── auth/Login.jsx                # Acceso de demostración
-│   ├── admin/                        # Panel administrativo y estadísticas
-│   ├── teacher/TeacherDashboard.jsx  # Panel del profesor
-│   ├── student/StudentDashboard.jsx  # Panel del alumno
-│   ├── modules/FileManager.jsx       # Módulos, sesiones y recursos
-│   ├── video/VideoLibrary.jsx        # Videoteca
-│   ├── exam/ExamSimulator.jsx        # Simuladores y reporte
+│   ├── landing/LandingPage.jsx       # Página pública, muestras y solicitud visual de acceso
+│   ├── auth/Login.jsx                # Acceso de demostración (mock)
+│   ├── admin/                        # Panel administrativo; Statistics no tiene acceso visible
+│   ├── teacher/TeacherDashboard.jsx  # Lista/resumen de alumnos con datos mock
+│   ├── student/StudentDashboard.jsx  # Progreso estimado y material del alumno
+│   ├── modules/Material.jsx          # Gestión local de material para staff
+│   ├── modules/Modulos.jsx           # Vista de módulos del alumno
+│   ├── video/VideoLibrary.jsx        # Videoteca, accesible desde el menú de alumno
+│   ├── exam/MaestroQuizzes.jsx       # Creación local de evaluaciones para staff
+│   ├── exam/SimuladoresQuizzes.jsx   # Vista mock del alumno; inicio de simulador deshabilitado
+│   └── exam/ExamSimulator.jsx        # Pantalla de examen no conectada al flujo actual por rol
 ├── hooks/useBreakpoint.js            # Detección de viewport
 └── index.css                         # Estilos y reglas responsive
 
 public/
-├── space.mp4                         # Video decorativo de fondo
-├── logo-astra.jpeg                   # Logotipo
-└── imágenes de fondo y materias     # Recursos visuales del prototipo
+└── Recursos estáticos del prototipo (ver nombres reales en el repositorio)
 ```
 
 ## Supuestos y decisiones pendientes
@@ -306,10 +295,22 @@ public/
 
 ## Notas Técnicas para el Equipo Backend
 
-1. **Chunk size warning**: El bundle JS (895 kB minificado) supera el límite recomendado de Vite. Al integrar el backend, implementar **code splitting** con `React.lazy()` para cargar ExamSimulator y VideoLibrary bajo demanda. Recharts y Framer Motion son las principales causas del tamaño.
+1. **Tamaño y carga inicial**: Las páginas se importan estáticamente desde `App.jsx`; generar y revisar el reporte de `npm run build` en CI y aplicar carga diferida (`React.lazy`/`Suspense`) a las páginas pesadas si el bundle medido lo justifica. No asumir un tamaño sin medirlo en la configuración de despliegue final.
 
-2. **Sin react-router-dom**: La navegación actual es 100% por estado (`activeSection`). Si se requieren URLs directas (para compartir un módulo o simulador específico), se debe agregar `react-router-dom` de vuelta e implementar rutas reales.
+2. **Sin react-router-dom**: La navegación actual es por estado (`activeSection`), no hay rutas compartibles ni deep links. Si se requieren URLs directas, adoptar enrutamiento y configurar fallback del hosting para rutas SPA.
 
-3. **Datos mock en mockData.js**: La forma de los objetos (campos, tipos) es la referencia contractual para el equipo de back-end al diseñar el API. Respetar los nombres de campo minimiza refactoring en el front.
+3. **Datos mock en mockData.js**: Úselos como ejemplos para prototipado, no como contrato del API. Definir y versionar el contrato backend (por ejemplo, OpenAPI y esquemas de validación) con el equipo antes de integrar.
 
-4. **Autenticación**: Actualmente `AuthContext.jsx` es 15 líneas. Al integrar JWT, reemplazarlo manteniendo la misma interfaz pública (`user`, `login`, `logout`, `error`, `setError`) para no tocar los demás componentes.
+4. **Autenticación**: `AuthContext.jsx` valida usuarios en memoria. Diseñar primero el contrato de sesión/autorización y sustituir el mock sin exponer secretos en variables `VITE_*`; estas variables se incluyen en el bundle del navegador.
+
+5. **CI/CD de despliegue**: `.github/workflows/pr.yml` ejecuta lint, pruebas y build en pull requests a `main`/`develop`; no se encontró workflow de publicación. A partir del build validado, añadir despliegue separado para staging y producción, con aprobación para producción, secretos en el gestor de environments del proveedor y procedimiento probado de rollback.
+
+6. **Entrega del frontend**: Publicar `dist/` como sitio estático detrás de CDN/HTTPS. Definir `base` de Vite y rutas de assets coherentes con el dominio/base path, configurar fallback a `index.html` si se implementan rutas SPA, y probar el sitio desde el mismo path/subpath que tendrá en producción.
+
+7. **Configuración por entorno**: Usar variables públicas solo para configuración no sensible (por ejemplo, URL base de API); nunca incluir credenciales, tokens privados ni claves de storage en el frontend. Mantener `.env.local` fuera de Git, documentar `.env.example` sin valores secretos y validar configuración requerida al iniciar/build.
+
+8. **Seguridad HTTP y operación**: Configurar HTTPS, CSP compatible con los recursos externos reales, `frame-ancestors`/protección contra framing, `X-Content-Type-Options`, `Referrer-Policy` y HSTS solo cuando HTTPS esté habilitado de forma permanente. Definir límites y CORS en el backend cuando exista API, además de monitoreo de disponibilidad, errores de frontend, alertas y rollback.
+
+9. **Calidad de publicación**: Alinear `.nvmrc`, `engines.node` y la versión usada por CI; automatizar smoke tests de los flujos públicos y de cada rol, pruebas de accesibilidad/responsive y revisión de bundle. Aplicar caché larga a assets con hash y revalidación/no-cache al HTML para que los despliegues no sirvan referencias obsoletas.
+
+10. **Límite de producción actual**: No habilitar registro real, pagos, credenciales reales ni carga de datos personales mientras sigan mockeados autenticación, persistencia y consentimiento. El hosting estático por sí solo no convierte estas operaciones en seguras ni persistentes.
