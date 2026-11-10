@@ -92,7 +92,7 @@ export default function ModalRecurso({
         style={{
           position: 'fixed',
           inset: 0,
-          background: 'rgba(3,10,26,0.82)',
+          background: 'rgb(var(--c-void) / 0.82)',
           zIndex: 199,
         }}
       />
@@ -119,14 +119,14 @@ export default function ModalRecurso({
             maxWidth: 540,
             maxHeight: '90vh',
             overflowY: 'auto',
-            background: '#060c20',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'rgb(var(--c-deep))',
+            border: '1px solid rgb(var(--c-ink) / 0.08)',
             borderRadius: 18,
             padding: 24,
             display: 'flex',
             flexDirection: 'column',
             gap: 20,
-            color: '#e2e8f0',
+            color: 'rgb(var(--c-ink) / 0.9)',
             fontFamily: '"Plus Jakarta Sans", sans-serif',
           }}
         >
@@ -139,14 +139,14 @@ export default function ModalRecurso({
                   fontFamily: '"Bricolage Grotesque", sans-serif',
                   fontWeight: 700,
                   fontSize: 22,
-                  color: '#ffffff',
+                  color: 'rgb(var(--c-ink))',
                   letterSpacing: '-0.02em',
                 }}
               >
                 Subir recurso
               </h2>
               {(nombreClase || nombreMateria) && (
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgb(var(--c-ink) / 0.7)' }}>
                   {nombreMateria && <span>{nombreMateria}</span>}
                   {nombreMateria && nombreClase && <span> · </span>}
                   {nombreClase && <span>{nombreClase}</span>}
@@ -162,9 +162,9 @@ export default function ModalRecurso({
                 width: 36,
                 height: 36,
                 borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.04)',
-                color: 'rgba(255,255,255,0.7)',
+                border: '1px solid rgb(var(--c-ink) / 0.1)',
+                background: 'rgb(var(--c-ink) / 0.04)',
+                color: 'rgb(var(--c-ink) / 0.7)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -197,9 +197,9 @@ export default function ModalRecurso({
                     gap: 8,
                     padding: '10px 14px',
                     borderRadius: 10,
-                    border: active ? '1.5px solid #f5c842' : '1.5px solid rgba(255,255,255,0.13)',
-                    background: active ? 'rgba(245,200,66,0.1)' : 'transparent',
-                    color: active ? '#ffffff' : '#cbd5e1',
+                    border: active ? '1.5px solid rgb(var(--c-gold-bright))' : '1.5px solid rgb(var(--c-ink) / 0.13)',
+                    background: active ? 'rgb(var(--c-gold-bright) / 0.1)' : 'transparent',
+                    color: active ? 'rgb(var(--c-ink))' : 'rgb(var(--c-ink) / 0.8)',
                     fontSize: 14,
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -214,7 +214,7 @@ export default function ModalRecurso({
 
           {/* Título */}
           <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>Título</span>
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'rgb(var(--c-ink) / 0.7)' }}>Título</span>
             <input
               ref={firstInputRef}
               type="text"
@@ -225,9 +225,9 @@ export default function ModalRecurso({
                 minHeight: 44,
                 padding: '10px 14px',
                 borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.13)',
-                background: 'rgba(12,29,69,0.5)',
-                color: '#e2e8f0',
+                border: '1px solid rgb(var(--c-ink) / 0.13)',
+                background: 'rgb(var(--c-navy) / 0.5)',
+                color: 'rgb(var(--c-ink) / 0.9)',
                 font: 'inherit',
                 fontSize: 15,
                 outline: 'none',
@@ -237,7 +237,7 @@ export default function ModalRecurso({
 
           {/* Archivo */}
           <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'rgb(var(--c-ink) / 0.7)' }}>
               Archivo
             </span>
             <div
@@ -247,19 +247,19 @@ export default function ModalRecurso({
                 gap: 12,
                 padding: '10px 14px',
                 borderRadius: 10,
-                border: '1px dashed rgba(255,255,255,0.2)',
-                background: 'rgba(255,255,255,0.03)',
+                border: '1px dashed rgb(var(--c-ink) / 0.2)',
+                background: 'rgb(var(--c-ink) / 0.03)',
               }}
             >
               <input
                 type="file"
                 accept={tipo === 'pdf' ? '.pdf,application/pdf' : 'video/*'}
                 onChange={handleFile}
-                style={{ flex: 1, color: '#cbd5e1', font: 'inherit', fontSize: 13 }}
+                style={{ flex: 1, color: 'rgb(var(--c-ink) / 0.8)', font: 'inherit', fontSize: 13 }}
               />
             </div>
             {archivoNombre && (
-              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+              <span style={{ fontSize: 12, color: 'rgb(var(--c-ink) / 0.6)' }}>
                 {archivoNombre}
                 {archivoSize ? ` · ${archivoSize}` : ''}
               </span>
@@ -270,7 +270,7 @@ export default function ModalRecurso({
             <>
               <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <label style={{ flex: '1 1 180px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: 'rgb(var(--c-ink) / 0.7)' }}>
                     Duración
                   </span>
                   <input
@@ -282,9 +282,9 @@ export default function ModalRecurso({
                       minHeight: 44,
                       padding: '10px 14px',
                       borderRadius: 10,
-                      border: '1px solid rgba(255,255,255,0.13)',
-                      background: 'rgba(12,29,69,0.5)',
-                      color: '#e2e8f0',
+                      border: '1px solid rgb(var(--c-ink) / 0.13)',
+                      background: 'rgb(var(--c-navy) / 0.5)',
+                      color: 'rgb(var(--c-ink) / 0.9)',
                       font: 'inherit',
                       fontSize: 15,
                       outline: 'none',
@@ -292,7 +292,7 @@ export default function ModalRecurso({
                   />
                 </label>
                 <label style={{ flex: '1 1 180px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: 'rgb(var(--c-ink) / 0.7)' }}>
                     Instructor
                   </span>
                   <input
@@ -304,9 +304,9 @@ export default function ModalRecurso({
                       minHeight: 44,
                       padding: '10px 14px',
                       borderRadius: 10,
-                      border: '1px solid rgba(255,255,255,0.13)',
-                      background: 'rgba(12,29,69,0.5)',
-                      color: '#e2e8f0',
+                      border: '1px solid rgb(var(--c-ink) / 0.13)',
+                      background: 'rgb(var(--c-navy) / 0.5)',
+                      color: 'rgb(var(--c-ink) / 0.9)',
                       font: 'inherit',
                       fontSize: 15,
                       outline: 'none',
@@ -322,8 +322,8 @@ export default function ModalRecurso({
                   gap: 12,
                   padding: '12px 14px',
                   borderRadius: 10,
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'rgb(var(--c-ink) / 0.04)',
+                  border: '1px solid rgb(var(--c-ink) / 0.08)',
                   cursor: 'pointer',
                 }}
               >
@@ -331,9 +331,9 @@ export default function ModalRecurso({
                   type="checkbox"
                   checked={enVideoteca}
                   onChange={e => setEnVideoteca(e.target.checked)}
-                  style={{ width: 18, height: 18, accentColor: '#f5c842' }}
+                  style={{ width: 18, height: 18, accentColor: 'rgb(var(--c-gold-bright))' }}
                 />
-                <span style={{ fontSize: 14, color: '#e2e8f0' }}>
+                <span style={{ fontSize: 14, color: 'rgb(var(--c-ink) / 0.9)' }}>
                   Publicar también en la Videoteca general
                 </span>
               </label>
@@ -341,7 +341,7 @@ export default function ModalRecurso({
           )}
 
           {error && (
-            <p style={{ margin: 0, fontSize: 13, color: '#f87171' }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'rgb(var(--c-peligro))' }}>
               {error}
             </p>
           )}

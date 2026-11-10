@@ -25,6 +25,12 @@ const { default: Sidebar } = await import('../components/layout/Sidebar');
 const { default: PublicNav } = await import('../components/layout/PublicNav');
 const { default: StudentDashboard } = await import('../pages/student/StudentDashboard');
 const { default: TeacherDashboard } = await import('../pages/teacher/TeacherDashboard');
+const { default: Modulos } = await import('../pages/modules/Modulos');
+const { default: Material } = await import('../pages/modules/Material');
+const { default: VideoLibrary } = await import('../pages/video/VideoLibrary');
+const { default: SimuladoresQuizzes } = await import('../pages/exam/SimuladoresQuizzes');
+const { default: MaestroQuizzes } = await import('../pages/exam/MaestroQuizzes');
+const { MaterialProvider } = await import('../context/MaterialContext');
 const { ThemeProvider } = await import('../context/ThemeContext');
 
 // jsdom normaliza los hex de `style` a rgb(r, g, b), así que se buscan ambas formas.
@@ -51,7 +57,20 @@ function coloresFijos(contenedor) {
 }
 
 function renderizar(ui) {
-  return render(<ThemeProvider habilitado>{ui}</ThemeProvider>);
+  return render(
+    <ThemeProvider habilitado>
+      <MaterialProvider>{ui}</MaterialProvider>
+    </ThemeProvider>,
+  );
+}
+
+const ALUMNO = { name: 'Ana García', role: 'student', avatar: 'AG' };
+const PROFESOR = { name: 'Sofía Ramírez', role: 'teacher', avatar: 'SR' };
+
+async function expandirClases() {
+  for (const boton of screen.queryAllByRole('button', { expanded: false })) {
+    await userEvent.click(boton);
+  }
 }
 
 beforeAll(() => {
@@ -114,5 +133,56 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
     const { container } = renderizar(<TeacherDashboard />);
     expect(screen.getAllByText('Mis alumnos').length).toBeGreaterThan(0);
     expect(coloresFijos(container)).toEqual([]);
+  });
+
+  test('Módulos del alumno con las clases abiertas', async () => {
+    usuario.current = ALUMNO;
+    const { baseElement } = renderizar(<Modulos />);
+    await expandirClases();
+    expect(screen.getByRole('heading', { name: 'Módulos' })).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Videoteca', () => {
+    usuario.current = ALUMNO;
+    const { baseElement } = renderizar(<VideoLibrary />);
+    expect(screen.getByRole('heading', { name: 'Videoteca' })).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Videoteca del personal con el modal para subir una sesión', async () => {
+    usuario.current = PROFESOR;
+    const { baseElement } = renderizar(<VideoLibrary />);
+    await userEvent.click(screen.getByRole('button', { name: /subir sesión/i }));
+    expect(screen.getByText('Duración')).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Simuladores y quizzes del alumno', () => {
+    usuario.current = ALUMNO;
+    const { baseElement } = renderizar(<SimuladoresQuizzes customQuizzes={[]} onAddQuiz={() => {}} onDeleteQuiz={() => {}} />);
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Material del profesor con sus modales de clase y recurso', async () => {
+    usuario.current = PROFESOR;
+    const { baseElement } = renderizar(<Material />);
+    await expandirClases();
+    expect(coloresFijos(baseElement)).toEqual([]);
+
+    await userEvent.click(screen.getAllByRole('button', { name: /subir recurso/i })[0]);
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Agregar nueva clase' }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Simuladores y quizzes del profesor con el modal de nueva evaluación', async () => {
+    usuario.current = PROFESOR;
+    const { baseElement } = renderizar(<MaestroQuizzes />);
+    await userEvent.click(screen.getAllByRole('button', { name: /crear|nuevo/i })[0]);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
   });
 });

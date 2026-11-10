@@ -8,11 +8,11 @@ import IconSubject from '../../components/rediseno/IconSubject';
 
 // Catálogo de materias en el orden del mockup Alumno-Videoteca.dc.html
 const SUBJECTS = [
-  { id: 'Pensamiento Matemático', icon: 'math',    tono: 'materia-math',    color: '#93c5fd' },
-  { id: 'Comprensión Lectora',    icon: 'reading', tono: 'materia-reading', color: '#d8b4fe' },
-  { id: 'Redacción Indirecta',    icon: 'writing', tono: 'materia-writing', color: '#6ee7b7' },
-  { id: 'Pre-medicina',           icon: 'premed',  tono: 'materia-premed',  color: '#5eead4' },
-  { id: 'Ciencias de la Salud',   icon: 'health',  tono: 'materia-health',  color: '#67e8f9' },
+  { id: 'Pensamiento Matemático', icon: 'math',    tono: 'materia-math',    color: 'rgb(var(--c-info))' },
+  { id: 'Comprensión Lectora',    icon: 'reading', tono: 'materia-reading', color: 'rgb(var(--c-materia-morado))' },
+  { id: 'Redacción Indirecta',    icon: 'writing', tono: 'materia-writing', color: 'rgb(var(--c-materia-verde))' },
+  { id: 'Pre-medicina',           icon: 'premed',  tono: 'materia-premed',  color: 'rgb(var(--c-materia-turquesa))' },
+  { id: 'Ciencias de la Salud',   icon: 'health',  tono: 'materia-health',  color: 'rgb(var(--c-materia-cian))' },
 ];
 
 const SUBJECT_BY_ID = Object.fromEntries(SUBJECTS.map(s => [s.id, s]));
@@ -57,7 +57,7 @@ function UploadVideoModal({ onClose, onUpload }) {
       onClick={onClose}
       style={{
         position: 'fixed', inset: 0, zIndex: 100,
-        background: 'rgba(3,10,26,0.85)',
+        background: 'rgb(var(--c-void) / 0.85)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
       }}
     >
@@ -66,11 +66,11 @@ function UploadVideoModal({ onClose, onUpload }) {
         style={{
           width: '100%',
           maxWidth: 440,
-          background: '#0c1d45',
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgb(var(--c-navy))',
+          border: '1px solid rgb(var(--c-ink) / 0.08)',
           borderRadius: 16,
           padding: '28px 24px',
-          color: '#cbd5e1',
+          color: 'rgb(var(--c-ink) / 0.8)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
@@ -80,10 +80,10 @@ function UploadVideoModal({ onClose, onUpload }) {
               fontFamily: '"Bricolage Grotesque", sans-serif',
               fontWeight: 700,
               fontSize: 20,
-              color: '#ffffff',
+              color: 'rgb(var(--c-ink))',
               lineHeight: 1.2,
             }}>Subir sesión</h3>
-            <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.6)', fontSize: 13 }}>
+            <p style={{ margin: '4px 0 0', color: 'rgb(var(--c-ink) / 0.6)', fontSize: 13 }}>
               Agrega una nueva sesión grabada
             </p>
           </div>
@@ -94,9 +94,9 @@ function UploadVideoModal({ onClose, onUpload }) {
             style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: 44, height: 44, borderRadius: 10,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              color: '#cbd5e1', cursor: 'pointer',
+              background: 'rgb(var(--c-ink) / 0.05)',
+              border: '1px solid rgb(var(--c-ink) / 0.1)',
+              color: 'rgb(var(--c-ink) / 0.8)', cursor: 'pointer',
             }}
           >
             <X size={18} />
@@ -106,8 +106,8 @@ function UploadVideoModal({ onClose, onUpload }) {
         <label style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
           gap: 8, padding: '22px 16px', borderRadius: 12, cursor: 'pointer', marginBottom: 16,
-          border: '1.5px dashed rgba(245,200,66,0.35)',
-          background: 'rgba(255,255,255,0.03)',
+          border: '1.5px dashed rgb(var(--c-gold-bright) / 0.35)',
+          background: 'rgb(var(--c-ink) / 0.03)',
           minHeight: 110,
         }}>
           <input
@@ -117,60 +117,60 @@ function UploadVideoModal({ onClose, onUpload }) {
             accept="video/*,.mp4,.mov,.avi"
             aria-label="Archivo de video"
           />
-          <Upload size={22} aria-hidden="true" style={{ color: '#f5c842' }} />
-          <p style={{ margin: 0, color: '#e2e8f0', fontSize: 13, textAlign: 'center' }}>
+          <Upload size={22} aria-hidden="true" style={{ color: 'rgb(var(--c-gold-bright))' }} />
+          <p style={{ margin: 0, color: 'rgb(var(--c-ink) / 0.9)', fontSize: 13, textAlign: 'center' }}>
             {fileName || 'Selecciona el archivo de video'}
           </p>
-          <p style={{ margin: 0, color: 'rgba(255,255,255,0.6)', fontSize: 11 }}>MP4 · MOV · AVI</p>
+          <p style={{ margin: 0, color: 'rgb(var(--c-ink) / 0.6)', fontSize: 11 }}>MP4 · MOV · AVI</p>
         </label>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 22 }}>
           <label style={{ display: 'block' }}>
-            <span style={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: 12, marginBottom: 6 }}>Título de la sesión *</span>
+            <span style={{ display: 'block', color: 'rgb(var(--c-ink) / 0.6)', fontSize: 12, marginBottom: 6 }}>Título de la sesión *</span>
             <input
               type="text" value={title} onChange={e => setTitle(e.target.value)}
               placeholder="Ej. Clase 5 — Álgebra lineal"
               style={{
                 width: '100%', boxSizing: 'border-box',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.13)',
+                background: 'rgb(var(--c-ink) / 0.05)',
+                border: '1px solid rgb(var(--c-ink) / 0.13)',
                 borderRadius: 10, padding: '12px 14px',
-                color: '#ffffff', fontSize: 14, outline: 'none',
+                color: 'rgb(var(--c-ink))', fontSize: 14, outline: 'none',
                 minHeight: 44,
               }}
             />
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: 12 }}>
             <label>
-              <span style={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: 12, marginBottom: 6 }}>Materia</span>
+              <span style={{ display: 'block', color: 'rgb(var(--c-ink) / 0.6)', fontSize: 12, marginBottom: 6 }}>Materia</span>
               <select
                 value={subject}
                 onChange={e => setSubject(e.target.value)}
                 style={{
                   width: '100%', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.13)',
+                  background: 'rgb(var(--c-ink) / 0.05)',
+                  border: '1px solid rgb(var(--c-ink) / 0.13)',
                   borderRadius: 10, padding: '12px 14px',
-                  color: '#ffffff', fontSize: 14, outline: 'none',
+                  color: 'rgb(var(--c-ink))', fontSize: 14, outline: 'none',
                   minHeight: 44,
                 }}
               >
                 {SUBJECTS.map(s => (
-                  <option key={s.id} value={s.id} style={{ background: '#0c1d45' }}>{s.id}</option>
+                  <option key={s.id} value={s.id} style={{ background: 'rgb(var(--c-navy))' }}>{s.id}</option>
                 ))}
               </select>
             </label>
             <label>
-              <span style={{ display: 'block', color: 'rgba(255,255,255,0.6)', fontSize: 12, marginBottom: 6 }}>Duración</span>
+              <span style={{ display: 'block', color: 'rgb(var(--c-ink) / 0.6)', fontSize: 12, marginBottom: 6 }}>Duración</span>
               <input
                 type="text" value={duration} onChange={e => setDuration(e.target.value)}
                 placeholder="45:00"
                 style={{
                   width: '100%', boxSizing: 'border-box',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.13)',
+                  background: 'rgb(var(--c-ink) / 0.05)',
+                  border: '1px solid rgb(var(--c-ink) / 0.13)',
                   borderRadius: 10, padding: '12px 14px',
-                  color: '#ffffff', fontSize: 14, outline: 'none',
+                  color: 'rgb(var(--c-ink))', fontSize: 14, outline: 'none',
                   minHeight: 44,
                 }}
               />
@@ -216,7 +216,7 @@ function VideoCard({ video, onClick }) {
         background: 'transparent',
         border: 'none',
         padding: 0,
-        color: '#cbd5e1',
+        color: 'rgb(var(--c-ink) / 0.8)',
         cursor: 'pointer',
         minWidth: 0,
       }}
@@ -227,7 +227,7 @@ function VideoCard({ video, onClick }) {
           width: '100%',
           aspectRatio: '16 / 9',
           borderRadius: 16,
-          background: '#0c1d45',
+          background: 'rgb(var(--c-navy))',
           overflow: 'hidden',
         }}
       >
@@ -236,7 +236,7 @@ function VideoCard({ video, onClick }) {
             name={meta.icon}
             size={undefined}
             strokeWidth={0.7}
-            color="rgba(255,255,255,0.16)"
+            color="rgb(var(--c-ink) / 0.16)"
             style={{
               position: 'absolute',
               right: '4%',
@@ -254,12 +254,12 @@ function VideoCard({ video, onClick }) {
             width: 60, height: 60,
             marginLeft: -30, marginTop: -30,
             borderRadius: 999,
-            background: '#f5c842',
+            background: 'rgb(var(--c-gold-fill))',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
           <svg width="22" height="22" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M5 2.5v11l9-5.5z" fill="#030a1a" />
+            <path d="M5 2.5v11l9-5.5z" fill="rgb(var(--c-on-gold))" />
           </svg>
         </span>
         <span
@@ -268,8 +268,8 @@ function VideoCard({ video, onClick }) {
             right: 12, bottom: 12,
             padding: '3px 9px',
             borderRadius: 6,
-            background: 'rgba(3,10,26,0.85)',
-            color: '#ffffff',
+            background: 'rgb(var(--c-void) / 0.85)',
+            color: 'rgb(var(--c-ink))',
             fontSize: 13, fontWeight: 600,
           }}
         >
@@ -282,7 +282,7 @@ function VideoCard({ video, onClick }) {
           marginTop: 12,
           fontFamily: '"Bricolage Grotesque", sans-serif',
           fontSize: 17, fontWeight: 600, lineHeight: 1.3,
-          color: '#ffffff',
+          color: 'rgb(var(--c-ink))',
         }}
       >
         {video.title}
@@ -294,7 +294,7 @@ function VideoCard({ video, onClick }) {
           display: 'flex', flexWrap: 'wrap',
           alignItems: 'center', gap: '6px 10px',
           fontSize: 13,
-          color: 'rgba(255,255,255,0.6)',
+          color: 'rgb(var(--c-ink) / 0.6)',
         }}
       >
         {meta ? (
@@ -381,7 +381,7 @@ export default function VideoLibrary() {
             fontSize: 36,
             lineHeight: 1.1,
             letterSpacing: '-0.03em',
-            color: '#ffffff',
+            color: 'rgb(var(--c-ink))',
           }}
         >
           Videoteca
@@ -398,12 +398,12 @@ export default function VideoLibrary() {
               boxSizing: 'border-box',
               minHeight: 48,
               padding: '0 16px',
-              border: '1px solid rgba(255,255,255,0.2)',
+              border: '1px solid rgb(var(--c-ink) / 0.2)',
               borderRadius: 999,
-              background: 'rgba(12,29,69,0.5)',
+              background: 'rgb(var(--c-navy) / 0.5)',
             }}
           >
-            <Search size={20} strokeWidth={1.8} aria-hidden="true" style={{ color: '#cbd5e1', flexShrink: 0 }} />
+            <Search size={20} strokeWidth={1.8} aria-hidden="true" style={{ color: 'rgb(var(--c-ink) / 0.8)', flexShrink: 0 }} />
             <input
               type="search"
               aria-label="Buscar sesión"
@@ -416,7 +416,7 @@ export default function VideoLibrary() {
                 height: 44,
                 border: 0,
                 background: 'transparent',
-                color: '#e2e8f0',
+                color: 'rgb(var(--c-ink) / 0.9)',
                 font: 'inherit',
                 fontSize: 15,
                 outline: 'none',
@@ -461,9 +461,9 @@ export default function VideoLibrary() {
                 minHeight: 48,
                 padding: '8px 16px',
                 borderRadius: 999,
-                border: `1.5px solid ${on ? '#f5c842' : 'rgba(255,255,255,0.13)'}`,
-                background: on ? 'rgba(245,200,66,0.1)' : 'rgba(255,255,255,0.04)',
-                color: on ? '#ffffff' : '#cbd5e1',
+                border: `1.5px solid ${on ? 'rgb(var(--c-gold-bright))' : 'rgb(var(--c-ink) / 0.13)'}`,
+                background: on ? 'rgb(var(--c-gold-bright) / 0.1)' : 'rgb(var(--c-ink) / 0.04)',
+                color: on ? 'rgb(var(--c-ink))' : 'rgb(var(--c-ink) / 0.8)',
                 fontSize: 14,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -472,7 +472,7 @@ export default function VideoLibrary() {
               {c.iconPath ? (
                 <svg
                   width="20" height="20" viewBox="0 0 24 24"
-                  fill="none" stroke={on ? '#f5c842' : '#cbd5e1'}
+                  fill="none" stroke={on ? 'rgb(var(--c-gold-bright))' : 'rgb(var(--c-ink) / 0.8)'}
                   strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"
                   aria-hidden="true"
                 >
@@ -482,7 +482,7 @@ export default function VideoLibrary() {
                 <IconSubject
                   name={c.icon}
                   size={20}
-                  color={on ? '#f5c842' : '#cbd5e1'}
+                  color={on ? 'rgb(var(--c-gold-bright))' : 'rgb(var(--c-ink) / 0.8)'}
                 />
               )}
               {c.label}
@@ -492,7 +492,7 @@ export default function VideoLibrary() {
       </div>
 
       {/* Conteo */}
-      <div style={{ fontSize: 14, color: '#cbd5e1' }}>{conteo}</div>
+      <div style={{ fontSize: 14, color: 'rgb(var(--c-ink) / 0.8)' }}>{conteo}</div>
 
       {/* Grid */}
       <div
@@ -512,7 +512,7 @@ export default function VideoLibrary() {
           style={{
             textAlign: 'center',
             padding: '48px 16px',
-            color: 'rgba(255,255,255,0.6)',
+            color: 'rgb(var(--c-ink) / 0.6)',
             fontSize: 15,
           }}
         >

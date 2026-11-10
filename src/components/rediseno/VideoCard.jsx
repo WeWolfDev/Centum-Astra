@@ -20,8 +20,8 @@ export default function VideoCard({
         alignItems: 'center',
         gap: 14,
         padding: '14px 16px',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        background: 'rgb(var(--c-ink) / 0.05)',
+        border: '1px solid rgb(var(--c-ink) / 0.08)',
         borderRadius: 12,
       }}
     >
@@ -33,8 +33,8 @@ export default function VideoCard({
           width: 40,
           height: 40,
           borderRadius: 10,
-          background: 'rgba(147,197,253,0.14)',
-          color: '#93c5fd',
+          background: 'rgb(var(--c-info) / 0.14)',
+          color: 'rgb(var(--c-info))',
           flexShrink: 0,
         }}
       >
@@ -47,7 +47,7 @@ export default function VideoCard({
             margin: 0,
             fontSize: 14,
             fontWeight: 600,
-            color: '#e2e8f0',
+            color: 'rgb(var(--c-ink) / 0.9)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -56,7 +56,7 @@ export default function VideoCard({
           {titulo}
         </p>
         {(duracion || instructor) && (
-          <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgb(var(--c-ink) / 0.6)' }}>
             Video
             {duracion ? ` · ${duracion}` : ''}
             {instructor ? ` · ${instructor}` : ''}

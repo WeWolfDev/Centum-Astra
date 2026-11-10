@@ -43,7 +43,7 @@ export default function ModalClase({ abierto, onCerrar, onSubmit, nombreMateria 
       <div
         onClick={onCerrar}
         role="presentation"
-        style={{ position: 'fixed', inset: 0, background: 'rgba(3,10,26,0.82)', zIndex: 199 }}
+        style={{ position: 'fixed', inset: 0, background: 'rgb(var(--c-void) / 0.82)', zIndex: 199 }}
       />
       <div
         role="dialog"
@@ -66,14 +66,14 @@ export default function ModalClase({ abierto, onCerrar, onSubmit, nombreMateria 
             pointerEvents: 'auto',
             width: '100%',
             maxWidth: 440,
-            background: '#060c20',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'rgb(var(--c-deep))',
+            border: '1px solid rgb(var(--c-ink) / 0.08)',
             borderRadius: 18,
             padding: 24,
             display: 'flex',
             flexDirection: 'column',
             gap: 18,
-            color: '#e2e8f0',
+            color: 'rgb(var(--c-ink) / 0.9)',
             fontFamily: '"Plus Jakarta Sans", sans-serif',
           }}
         >
@@ -86,14 +86,14 @@ export default function ModalClase({ abierto, onCerrar, onSubmit, nombreMateria 
                   fontFamily: '"Bricolage Grotesque", sans-serif',
                   fontWeight: 700,
                   fontSize: 22,
-                  color: '#ffffff',
+                  color: 'rgb(var(--c-ink))',
                   letterSpacing: '-0.02em',
                 }}
               >
                 Nueva clase
               </h2>
               {nombreMateria && (
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgb(var(--c-ink) / 0.7)' }}>
                   {nombreMateria}
                 </p>
               )}
@@ -107,9 +107,9 @@ export default function ModalClase({ abierto, onCerrar, onSubmit, nombreMateria 
                 width: 36,
                 height: 36,
                 borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.04)',
-                color: 'rgba(255,255,255,0.7)',
+                border: '1px solid rgb(var(--c-ink) / 0.1)',
+                background: 'rgb(var(--c-ink) / 0.04)',
+                color: 'rgb(var(--c-ink) / 0.7)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -121,7 +121,7 @@ export default function ModalClase({ abierto, onCerrar, onSubmit, nombreMateria 
           </header>
 
           <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: 'rgb(var(--c-ink) / 0.7)' }}>
               Nombre de la clase
             </span>
             <input
@@ -134,9 +134,9 @@ export default function ModalClase({ abierto, onCerrar, onSubmit, nombreMateria 
                 minHeight: 44,
                 padding: '10px 14px',
                 borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.13)',
-                background: 'rgba(12,29,69,0.5)',
-                color: '#e2e8f0',
+                border: '1px solid rgb(var(--c-ink) / 0.13)',
+                background: 'rgb(var(--c-navy) / 0.5)',
+                color: 'rgb(var(--c-ink) / 0.9)',
                 font: 'inherit',
                 fontSize: 15,
                 outline: 'none',
@@ -145,7 +145,7 @@ export default function ModalClase({ abierto, onCerrar, onSubmit, nombreMateria 
           </label>
 
           {error && (
-            <p style={{ margin: 0, fontSize: 13, color: '#f87171' }}>{error}</p>
+            <p style={{ margin: 0, fontSize: 13, color: 'rgb(var(--c-peligro))' }}>{error}</p>
           )}
 
           <footer style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>

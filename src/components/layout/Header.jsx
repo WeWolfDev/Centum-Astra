@@ -56,7 +56,9 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
         {isMobile && (
           <button
+            type="button"
             onClick={onMenuToggle}
+            aria-label="Abrir menú"
             style={{
               background: 'rgb(var(--c-ink) / 0.05)', border: '1px solid rgb(var(--c-ink) / 0.08)',
               borderRadius: 7, padding: '5px', cursor: 'pointer', flexShrink: 0,

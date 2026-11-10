@@ -4,7 +4,7 @@
 // Reglas del HANDOFF que aplican:
 //  - Simulador = da puntaje Ceneval y alimenta la gráfica del alumno.
 //  - Quiz = aciertos sobre total. Nunca puntaje Ceneval.
-//  - Visualmente: cards con acento azul claro #93c5fd, pastilla por tipo.
+//  - Visualmente: cards con acento azul claro rgb(var(--c-info)), pastilla por tipo.
 //  - Sin degradado dorado, sin emojis.
 import { useMemo, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
@@ -28,7 +28,7 @@ function EvaluacionCreadaCard({ evaluacion, onEliminar }) {
         padding: 18,
         borderRadius: 14,
         background: 'transparent',
-        border: '1px solid rgba(147,197,253,0.3)',
+        border: '1px solid rgb(var(--c-info) / 0.3)',
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
@@ -39,16 +39,16 @@ function EvaluacionCreadaCard({ evaluacion, onEliminar }) {
         style={{
           flex: '0 0 44px', height: 44, borderRadius: 10,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(147,197,253,0.14)', color: '#93c5fd',
+          background: 'rgb(var(--c-info) / 0.14)', color: 'rgb(var(--c-info))',
         }}
       >
         {key ? <IconSubject name={key} size={22} /> : null}
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#ffffff' }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'rgb(var(--c-ink))' }}>
           {evaluacion.tema}
         </h3>
-        <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 12px', fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+        <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 12px', fontSize: 13, color: 'rgb(var(--c-ink) / 0.65)' }}>
           <Pastilla tono={copy.tono}>{copy.singularMay}</Pastilla>
           <Pastilla tono="neutral">{materia?.title ?? 'Materia'}</Pastilla>
           <span>{evaluacion.preguntas.length} pregunta{evaluacion.preguntas.length === 1 ? '' : 's'}</span>
@@ -60,8 +60,8 @@ function EvaluacionCreadaCard({ evaluacion, onEliminar }) {
         aria-label={`Eliminar ${copy.singular} ${evaluacion.tema}`}
         style={{
           flex: '0 0 44px', width: 44, height: 44, borderRadius: 10,
-          border: '1px solid rgba(255,255,255,0.1)',
-          background: 'transparent', color: '#cbd5e1',
+          border: '1px solid rgb(var(--c-ink) / 0.1)',
+          background: 'transparent', color: 'rgb(var(--c-ink) / 0.8)',
           cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}
       >
@@ -94,7 +94,7 @@ function ListadoPorMateria({ items, onEliminar }) {
                 fontFamily: '"Bricolage Grotesque", sans-serif',
                 fontWeight: 700,
                 fontSize: 20,
-                color: '#ffffff',
+                color: 'rgb(var(--c-ink))',
                 letterSpacing: '-0.02em',
               }}
             >
@@ -117,8 +117,8 @@ function EstadoVacioPanel({ tipo, onCrear }) {
       style={{
         padding: '48px 24px',
         borderRadius: 16,
-        border: '1px dashed rgba(255,255,255,0.13)',
-        background: 'rgba(255,255,255,0.03)',
+        border: '1px dashed rgb(var(--c-ink) / 0.13)',
+        background: 'rgb(var(--c-ink) / 0.03)',
         textAlign: 'center',
       }}
     >
@@ -128,13 +128,13 @@ function EstadoVacioPanel({ tipo, onCrear }) {
           fontFamily: '"Bricolage Grotesque", sans-serif',
           fontWeight: 700,
           fontSize: 22,
-          color: '#ffffff',
+          color: 'rgb(var(--c-ink))',
           letterSpacing: '-0.02em',
         }}
       >
         {copy.vacioTitulo}
       </h2>
-      <p style={{ margin: '8px 0 20px', fontSize: 14, color: 'rgba(255,255,255,0.65)' }}>
+      <p style={{ margin: '8px 0 20px', fontSize: 14, color: 'rgb(var(--c-ink) / 0.65)' }}>
         {copy.vacioDescripcion}
       </p>
       <BotonPrimario onClick={onCrear} aria-label={copy.vacioCta}>
@@ -170,7 +170,7 @@ export default function MaestroQuizzes() {
         display: 'flex',
         flexDirection: 'column',
         gap: 28,
-        color: '#cbd5e1',
+        color: 'rgb(var(--c-ink) / 0.8)',
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         maxHeight: 'calc(100vh - 4rem)',
         overflowY: 'auto',
@@ -194,12 +194,12 @@ export default function MaestroQuizzes() {
               fontSize: 'clamp(28px, 5vw, 36px)',
               lineHeight: 1.1,
               letterSpacing: '-0.03em',
-              color: '#ffffff',
+              color: 'rgb(var(--c-ink))',
             }}
           >
             Simuladores y quizzes
           </h1>
-          <p style={{ margin: '6px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>
+          <p style={{ margin: '6px 0 0', fontSize: 14, color: 'rgb(var(--c-ink) / 0.7)' }}>
             Arma simuladores con puntaje Ceneval y quizzes cortos por tema. Los verán tus alumnos.
           </p>
         </div>
@@ -225,8 +225,8 @@ export default function MaestroQuizzes() {
                   marginLeft: 8,
                   padding: '2px 8px',
                   borderRadius: 999,
-                  background: 'rgba(245,200,66,0.14)',
-                  color: '#f5c842',
+                  background: 'rgb(var(--c-gold-bright) / 0.14)',
+                  color: 'rgb(var(--c-gold-bright))',
                   fontSize: 12,
                   fontWeight: 700,
                 }}
@@ -244,8 +244,8 @@ export default function MaestroQuizzes() {
                   marginLeft: 8,
                   padding: '2px 8px',
                   borderRadius: 999,
-                  background: 'rgba(147,197,253,0.14)',
-                  color: '#93c5fd',
+                  background: 'rgb(var(--c-info) / 0.14)',
+                  color: 'rgb(var(--c-info))',
                   fontSize: 12,
                   fontWeight: 700,
                 }}

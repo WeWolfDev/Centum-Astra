@@ -40,6 +40,12 @@ colors:
     success: "#047857"
     warning: "#b45309"
     info: "#1d4ed8"
+  subjects:
+    turquesa: { dark: "#5eead4", light: "#0f766e" }
+    morado:   { dark: "#d8b4fe", light: "#7e22ce" }
+    verde:    { dark: "#6ee7b7", light: "#047857" }
+    cian:     { dark: "#67e8f9", light: "#0e7490" }
+    clinico:  { dark: "#1de9b6", light: "#0f766e" }
   both:
     gold-fill: "#f5c842"
     on-gold: "#030a1a"
@@ -112,6 +118,19 @@ En ambos modos se conserva el **bloque navy** (`{colors.both.block}`) como super
 | Información | `#93c5fd` | `#1d4ed8` (6.3:1) |
 
 Los estados siempre llevan icono o texto además del color (RNF-U-20).
+
+### Materias y área médica
+Los colores por materia van **solo en etiquetas de texto** (`Pastilla`), nunca en miniaturas ni fondos grandes.
+
+| Token | Oscuro | Claro (contraste sobre blanco) |
+|---|---|---|
+| `materia-turquesa` | `#5eead4` | `#0f766e` (5.5:1) |
+| `materia-morado` | `#d8b4fe` | `#7e22ce` (7.0:1) |
+| `materia-verde` | `#6ee7b7` | `#047857` (5.5:1) |
+| `materia-cian` | `#67e8f9` | `#0e7490` (5.4:1) |
+| `clinico` (Pre-medicina) | `#1de9b6` | `#0f766e` (5.5:1) |
+
+En el área médica, `clinico-tinta` es el texto (`#e0faf6` / `#042f2e`) y `clinico-fondo` el panel (`#041e1b` / `#f0fdfa`).
 
 ### Implementación
 Los colores viven como variables CSS en `src/index.css` (`--c-*`, canales RGB) y Tailwind las lee. `white` en Tailwind es la tinta del tema, así que `text-white/70` se adapta solo. **Nunca escribas colores hex o `rgba()` en `style={{}}`**: usa clases de Tailwind o `rgb(var(--c-…))`. En gráficas SVG o Recharts, lee los colores del tema con el hook de colores, no con hex.

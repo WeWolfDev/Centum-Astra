@@ -11,9 +11,9 @@ const COURSES = [
     icon: '📐',
     type: 'transversal',
     desc: 'Álgebra, geometría y razonamiento numérico',
-    color: '#60a5fa',
-    bg: 'rgba(59,130,246,0.08)',
-    border: 'rgba(96,165,250,0.22)',
+    color: 'rgb(var(--c-info))',
+    bg: 'rgb(var(--c-info) / 0.08)',
+    border: 'rgb(var(--c-info) / 0.22)',
   },
   {
     id: 'red',
@@ -22,7 +22,7 @@ const COURSES = [
     type: 'transversal',
     desc: 'Coherencia textual y sintaxis avanzada',
     color: 'rgb(var(--c-violeta))',
-    bg: 'rgba(168,85,247,0.08)',
+    bg: 'rgb(var(--c-violeta) / 0.08)',
     border: 'rgb(var(--c-violeta) / 0.22)',
   },
   {
@@ -41,9 +41,9 @@ const COURSES = [
     icon: '🩺',
     type: 'specific',
     desc: 'Biología, química y ciencias de la salud',
-    color: '#1de9b6',
-    bg: 'rgba(29,233,182,0.08)',
-    border: 'rgba(29,233,182,0.28)',
+    color: 'rgb(var(--c-clinico))',
+    bg: 'rgb(var(--c-clinico) / 0.08)',
+    border: 'rgb(var(--c-clinico) / 0.28)',
     clinical: true,
   },
 ];
@@ -182,8 +182,8 @@ function MiniOption({ letter, text, state, onClick, disabled, clinical }) {
     incorrect: { bg: 'rgb(var(--c-peligro) / 0.09)',    border: 'rgb(var(--c-peligro) / 0.42)', color: 'rgb(var(--c-peligro))',              lb: 'rgb(var(--c-peligro) / 0.16)' },
   };
   const teal = {
-    default:   { bg: 'rgba(4,30,27,0.55)',        border: 'rgba(29,233,182,0.1)',  color: 'rgba(224,250,246,0.82)', lb: 'rgba(29,233,182,0.08)' },
-    selected:  { bg: 'rgba(29,233,182,0.1)',      border: 'rgba(29,233,182,0.45)', color: '#1de9b6',               lb: 'rgba(29,233,182,0.18)' },
+    default:   { bg: 'rgb(var(--c-clinico-fondo) / 0.55)',        border: 'rgb(var(--c-clinico) / 0.1)',  color: 'rgb(var(--c-clinico-tinta) / 0.82)', lb: 'rgb(var(--c-clinico) / 0.08)' },
+    selected:  { bg: 'rgb(var(--c-clinico) / 0.1)',      border: 'rgb(var(--c-clinico) / 0.45)', color: 'rgb(var(--c-clinico))',               lb: 'rgb(var(--c-clinico) / 0.18)' },
     correct:   { bg: 'rgb(var(--c-exito) / 0.09)',     border: 'rgb(var(--c-exito) / 0.42)', color: 'rgb(var(--c-exito))',               lb: 'rgb(var(--c-exito) / 0.16)' },
     incorrect: { bg: 'rgb(var(--c-peligro) / 0.09)',    border: 'rgb(var(--c-peligro) / 0.42)', color: 'rgb(var(--c-peligro))',              lb: 'rgb(var(--c-peligro) / 0.16)' },
   };
@@ -247,10 +247,10 @@ function MiniSimulator({ courseId, onBack }) {
   const urgent     = timeLeft < 60;
 
   const barColor = urgent
-    ? 'linear-gradient(90deg,#dc2626,rgb(var(--c-peligro)))'
+    ? 'linear-gradient(90deg,rgb(var(--c-peligro)),rgb(var(--c-peligro)))'
     : clinical
-      ? 'linear-gradient(90deg,#0d9488,#1de9b6)'
-      : 'linear-gradient(90deg,#b8880f,rgb(var(--c-gold-bright)))';
+      ? 'linear-gradient(90deg,rgb(var(--c-clinico)),rgb(var(--c-clinico)))'
+      : 'linear-gradient(90deg,rgb(var(--c-gold-muted)),rgb(var(--c-gold-bright)))';
 
   function handleAnswer(i) {
     if (isAnswered || done) return;
@@ -281,8 +281,8 @@ function MiniSimulator({ courseId, onBack }) {
       >
         <div style={{
           width: 72, height: 72, borderRadius: '50%',
-          background: clinical ? 'rgba(29,233,182,0.12)' : 'rgb(var(--c-gold-bright) / 0.12)',
-          border: `2px solid ${clinical ? 'rgba(29,233,182,0.35)' : 'rgb(var(--c-gold-bright) / 0.35)'}`,
+          background: clinical ? 'rgb(var(--c-clinico) / 0.12)' : 'rgb(var(--c-gold-bright) / 0.12)',
+          border: `2px solid ${clinical ? 'rgb(var(--c-clinico) / 0.35)' : 'rgb(var(--c-gold-bright) / 0.35)'}`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 28,
         }}>
@@ -297,7 +297,7 @@ function MiniSimulator({ courseId, onBack }) {
             style={{
               fontFamily: 'Orbitron, sans-serif', fontSize: 56, fontWeight: 900, lineHeight: 1,
               background: clinical
-                ? 'linear-gradient(135deg,#1de9b6,#b2f5e8)'
+                ? 'linear-gradient(135deg,rgb(var(--c-clinico)),rgb(var(--c-clinico-tinta)))'
                 : 'linear-gradient(135deg,rgb(var(--c-gold-bright)),rgb(var(--c-gold-glow)))',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
             }}
@@ -320,8 +320,8 @@ function MiniSimulator({ courseId, onBack }) {
           ))}
         </div>
 
-        <div style={{ background: clinical ? 'rgba(29,233,182,0.06)' : 'rgb(var(--c-gold-bright) / 0.06)', border: `1px solid ${clinical ? 'rgba(29,233,182,0.18)' : 'rgb(var(--c-gold-bright) / 0.18)'}`, borderRadius: 12, padding: '16px 20px', width: '100%' }}>
-          <p style={{ color: clinical ? '#1de9b6' : 'rgb(var(--c-gold-bright))', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+        <div style={{ background: clinical ? 'rgb(var(--c-clinico) / 0.06)' : 'rgb(var(--c-gold-bright) / 0.06)', border: `1px solid ${clinical ? 'rgb(var(--c-clinico) / 0.18)' : 'rgb(var(--c-gold-bright) / 0.18)'}`, borderRadius: 12, padding: '16px 20px', width: '100%' }}>
+          <p style={{ color: clinical ? 'rgb(var(--c-clinico))' : 'rgb(var(--c-gold-bright))', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
             {score >= 80 ? '¡Excelente nivel!' : score >= 60 ? 'Buen inicio, sigue practicando.' : 'Hay área de mejora. ¡Nosotros te ayudamos!'}
           </p>
           <p style={{ color: 'rgb(var(--c-ink) / 0.5)', fontSize: 12, lineHeight: 1.6 }}>
@@ -356,11 +356,11 @@ function MiniSimulator({ courseId, onBack }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 11, color: 'rgb(var(--c-ink) / 0.3)' }}>MUESTRA GRATUITA</span>
             <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'rgb(var(--c-ink) / 0.2)', display: 'inline-block' }} />
-            <span style={{ fontSize: 11, color: clinical ? '#1de9b6' : 'rgb(var(--c-gold-bright))', fontWeight: 600 }}>{course?.label}</span>
+            <span style={{ fontSize: 11, color: clinical ? 'rgb(var(--c-clinico))' : 'rgb(var(--c-gold-bright))', fontWeight: 600 }}>{course?.label}</span>
           </div>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 999,
-            background: urgent ? 'rgba(220,38,38,0.12)' : 'rgb(var(--c-ink) / 0.05)',
+            background: urgent ? 'rgb(var(--c-peligro) / 0.12)' : 'rgb(var(--c-ink) / 0.05)',
             border: `1px solid ${urgent ? 'rgb(var(--c-peligro) / 0.3)' : 'rgb(var(--c-ink) / 0.1)'}`,
           }}>
             <Clock size={11} style={{ color: urgent ? 'rgb(var(--c-peligro))' : 'rgb(var(--c-ink) / 0.4)' }} />
@@ -386,10 +386,10 @@ function MiniSimulator({ courseId, onBack }) {
                 width: 32, height: 32, borderRadius: 8, fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', border: '1px solid',
                 transition: 'color 0.12s ease, background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease',
-                background: active ? (clinical ? '#1de9b6' : 'rgb(var(--c-gold-fill))') : answered ? 'rgb(var(--c-exito) / 0.12)' : 'rgb(var(--c-ink) / 0.04)',
+                background: active ? (clinical ? 'rgb(var(--c-clinico))' : 'rgb(var(--c-gold-fill))') : answered ? 'rgb(var(--c-exito) / 0.12)' : 'rgb(var(--c-ink) / 0.04)',
                 color:      active ? 'rgb(var(--c-on-gold))' : answered ? 'rgb(var(--c-exito))' : 'rgb(var(--c-ink) / 0.4)',
-                borderColor:active ? (clinical ? '#1de9b6' : 'rgb(var(--c-gold-bright))') : answered ? 'rgb(var(--c-exito) / 0.3)' : 'rgb(var(--c-ink) / 0.08)',
-                boxShadow:  active ? `0 0 14px ${clinical ? 'rgba(29,233,182,0.4)' : 'rgb(var(--c-gold-bright) / 0.35)'}` : 'none',
+                borderColor:active ? (clinical ? 'rgb(var(--c-clinico))' : 'rgb(var(--c-gold-bright))') : answered ? 'rgb(var(--c-exito) / 0.3)' : 'rgb(var(--c-ink) / 0.08)',
+                boxShadow:  active ? `0 0 14px ${clinical ? 'rgb(var(--c-clinico) / 0.4)' : 'rgb(var(--c-gold-bright) / 0.35)'}` : 'none',
               }}
             >
               {i + 1}
@@ -412,9 +412,9 @@ function MiniSimulator({ courseId, onBack }) {
               <span style={{ color: 'rgb(var(--c-ink) / 0.25)', fontSize: 12 }}>{current + 1} / {questions.length}</span>
               <span style={{
                 fontSize: 10.5, fontWeight: 600, borderRadius: 999, padding: '2px 8px',
-                background: clinical ? 'rgba(29,233,182,0.1)' : 'rgba(96,165,250,0.1)',
-                color: clinical ? '#1de9b6' : 'rgb(var(--c-info))',
-                border: `1px solid ${clinical ? 'rgba(29,233,182,0.22)' : 'rgba(96,165,250,0.22)'}`,
+                background: clinical ? 'rgb(var(--c-clinico) / 0.1)' : 'rgb(var(--c-info) / 0.1)',
+                color: clinical ? 'rgb(var(--c-clinico))' : 'rgb(var(--c-info))',
+                border: `1px solid ${clinical ? 'rgb(var(--c-clinico) / 0.22)' : 'rgb(var(--c-info) / 0.22)'}`,
               }}>
                 {q?.subject}
               </span>
@@ -424,7 +424,7 @@ function MiniSimulator({ courseId, onBack }) {
               className={clinical ? 'glass-clinical' : 'glass'}
               style={{ padding: '18px 20px', marginBottom: 14 }}
             >
-              <p style={{ color: clinical ? '#e0faf6' : 'rgb(var(--c-ink))', fontSize: 14.5, lineHeight: 1.75 }}>{q?.question}</p>
+              <p style={{ color: clinical ? 'rgb(var(--c-clinico-tinta))' : 'rgb(var(--c-ink))', fontSize: 14.5, lineHeight: 1.75 }}>{q?.question}</p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
@@ -451,8 +451,8 @@ function MiniSimulator({ courseId, onBack }) {
                   style={{ padding: '14px 18px', marginBottom: 14, overflow: 'hidden' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                    <Lightbulb size={13} style={{ color: clinical ? '#1de9b6' : 'rgb(var(--c-gold-bright))' }} />
-                    <span style={{ color: clinical ? '#1de9b6' : 'rgb(var(--c-gold-bright))', fontSize: 11.5, fontWeight: 600 }}>Explicación</span>
+                    <Lightbulb size={13} style={{ color: clinical ? 'rgb(var(--c-clinico))' : 'rgb(var(--c-gold-bright))' }} />
+                    <span style={{ color: clinical ? 'rgb(var(--c-clinico))' : 'rgb(var(--c-gold-bright))', fontSize: 11.5, fontWeight: 600 }}>Explicación</span>
                   </div>
                   <p style={{ color: 'rgb(var(--c-ink) / 0.65)', fontSize: 13, lineHeight: 1.65 }}>{q.explanation}</p>
                 </motion.div>
@@ -706,7 +706,7 @@ function CourseCard({ course, index, onSelect }) {
       <div className={cn(
         'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none',
         isMed
-          ? 'bg-[radial-gradient(ellipse_at_top_left,rgba(29,233,182,0.11)_0%,transparent_62%)]'
+          ? 'bg-[radial-gradient(ellipse_at_top_left,rgb(var(--c-clinico)_/_0.11)_0%,transparent_62%)]'
           : 'bg-[radial-gradient(ellipse_at_top_left,rgb(var(--c-gold-bright)_/_0.09)_0%,transparent_62%)]',
       )} />
 

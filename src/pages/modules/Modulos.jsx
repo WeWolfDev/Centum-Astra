@@ -86,8 +86,8 @@ function StatusIndicator({ status, index }) {
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: 999,
-          background: 'rgba(52,211,153,0.16)',
-          color: '#34d399',
+          background: 'rgb(var(--c-exito) / 0.16)',
+          color: 'rgb(var(--c-exito))',
         }}
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -108,8 +108,8 @@ function StatusIndicator({ status, index }) {
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: 999,
-          background: '#f5c842',
-          color: '#030a1a',
+          background: 'rgb(var(--c-gold-fill))',
+          color: 'rgb(var(--c-on-gold))',
           fontFamily: '"Bricolage Grotesque", sans-serif',
           fontWeight: 800,
           fontSize: 20,
@@ -131,8 +131,8 @@ function StatusIndicator({ status, index }) {
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 999,
-        border: '1.5px solid rgba(255,255,255,0.3)',
-        color: '#cbd5e1',
+        border: '1.5px solid rgb(var(--c-ink) / 0.3)',
+        color: 'rgb(var(--c-ink) / 0.8)',
         fontFamily: '"Bricolage Grotesque", sans-serif',
         fontWeight: 700,
         fontSize: 20,
@@ -155,7 +155,7 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
   const pdfResources = [...pdfBase, ...pdfsExtra];
   const videosTodos = [...videos, ...videosExtra];
   const quiz = deriveQuizScore(session.id, status);
-  const borderColor = status === 'en-curso' ? 'rgba(245,200,66,0.55)' : 'transparent';
+  const borderColor = status === 'en-curso' ? 'rgb(var(--c-gold-bright) / 0.55)' : 'transparent';
 
   const nPdfs = pdfResources.length;
   const nVideos = videosTodos.length;
@@ -175,7 +175,7 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
         padding: 0,
         borderRadius: 16,
         border: `1.5px solid ${borderColor}`,
-        background: 'rgba(255,255,255,0.05)',
+        background: 'rgb(var(--c-ink) / 0.05)',
         overflow: 'hidden',
       }}
     >
@@ -209,7 +209,7 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
                 fontSize: 18,
                 fontWeight: 600,
                 lineHeight: 1.3,
-                color: '#ffffff',
+                color: 'rgb(var(--c-ink))',
               }}
             >
               {session.label}
@@ -218,7 +218,7 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
               <Pastilla tono={statusPastillaTono(status)}>
                 {STATUS_LABEL[status]}
               </Pastilla>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+              <span style={{ fontSize: 13, color: 'rgb(var(--c-ink) / 0.6)' }}>
                 {resumen}
               </span>
             </div>
@@ -231,7 +231,7 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
           aria-hidden="true"
           style={{
             flexShrink: 0,
-            color: 'rgba(255,255,255,0.6)',
+            color: 'rgb(var(--c-ink) / 0.6)',
             transition: 'transform 0.2s ease',
             transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
           }}
@@ -249,7 +249,7 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
           }}
         >
           {totalRecursos === 0 && (
-            <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'rgb(var(--c-ink) / 0.6)' }}>
               Sin material publicado en esta clase.
             </p>
           )}
@@ -344,7 +344,7 @@ function ContenidoDeArea({ mod }) {
               fontSize: 26,
               lineHeight: 1.15,
               letterSpacing: '-0.02em',
-              color: '#ffffff',
+              color: 'rgb(var(--c-ink))',
             }}
           >
             {mod.title}
@@ -360,7 +360,7 @@ function ContenidoDeArea({ mod }) {
           }}
         >
           {teacher && (
-            <span style={{ color: '#e2e8f0' }}>Material de {teacher}</span>
+            <span style={{ color: 'rgb(var(--c-ink) / 0.9)' }}>Material de {teacher}</span>
           )}
           <span
             style={{
@@ -369,12 +369,12 @@ function ContenidoDeArea({ mod }) {
               gap: 8,
               padding: '6px 14px',
               borderRadius: 999,
-              background: 'rgba(255,255,255,0.08)',
-              color: '#e2e8f0',
+              background: 'rgb(var(--c-ink) / 0.08)',
+              color: 'rgb(var(--c-ink) / 0.9)',
               fontSize: 13,
             }}
           >
-            <Lock size={14} strokeWidth={1.9} color="#f5c842" aria-hidden="true" />
+            <Lock size={14} strokeWidth={1.9} color="rgb(var(--c-gold-bright))" aria-hidden="true" />
             Solo lectura · sin descarga · exclusivo de Centum Astra
           </span>
         </div>
@@ -404,7 +404,7 @@ function ContenidoDeArea({ mod }) {
               margin: 0,
               padding: '32px 0',
               textAlign: 'center',
-              color: 'rgba(255,255,255,0.6)',
+              color: 'rgb(var(--c-ink) / 0.6)',
               fontSize: 14,
             }}
           >
@@ -432,7 +432,7 @@ export default function Modulos({ defaultModuleId = null }) {
         display: 'flex',
         flexDirection: 'column',
         gap: 28,
-        color: '#cbd5e1',
+        color: 'rgb(var(--c-ink) / 0.8)',
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         maxHeight: 'calc(100vh - 4rem)',
         overflowY: 'auto',
@@ -447,7 +447,7 @@ export default function Modulos({ defaultModuleId = null }) {
           fontSize: 36,
           lineHeight: 1.1,
           letterSpacing: '-0.03em',
-          color: '#ffffff',
+          color: 'rgb(var(--c-ink))',
         }}
       >
         Módulos

@@ -74,7 +74,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
       <div
         onClick={handleCerrar}
         role="presentation"
-        style={{ position: 'fixed', inset: 0, background: 'rgba(3,10,26,0.82)', zIndex: 199 }}
+        style={{ position: 'fixed', inset: 0, background: 'rgb(var(--c-void) / 0.82)', zIndex: 199 }}
       />
       <div
         role="dialog"
@@ -99,14 +99,14 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
             maxWidth: 720,
             maxHeight: '92vh',
             overflowY: 'auto',
-            background: '#060c20',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'rgb(var(--c-deep))',
+            border: '1px solid rgb(var(--c-ink) / 0.08)',
             borderRadius: 18,
             padding: 24,
             display: 'flex',
             flexDirection: 'column',
             gap: 20,
-            color: '#e2e8f0',
+            color: 'rgb(var(--c-ink) / 0.9)',
             fontFamily: '"Plus Jakarta Sans", sans-serif',
           }}
         >
@@ -118,7 +118,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                 fontFamily: '"Bricolage Grotesque", sans-serif',
                 fontWeight: 700,
                 fontSize: 22,
-                color: '#ffffff',
+                color: 'rgb(var(--c-ink))',
                 letterSpacing: '-0.02em',
               }}
             >
@@ -133,9 +133,9 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                 width: 36,
                 height: 36,
                 borderRadius: 10,
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.04)',
-                color: 'rgba(255,255,255,0.7)',
+                border: '1px solid rgb(var(--c-ink) / 0.1)',
+                background: 'rgb(var(--c-ink) / 0.04)',
+                color: 'rgb(var(--c-ink) / 0.7)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -148,7 +148,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
 
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <label style={{ flex: '2 1 240px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>Nombre del {copy.singular}</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'rgb(var(--c-ink) / 0.7)' }}>Nombre del {copy.singular}</span>
               <input
                 type="text"
                 value={tema}
@@ -156,26 +156,26 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                 placeholder={copy.nombrePh}
                 style={{
                   minHeight: 44, padding: '10px 14px', borderRadius: 10,
-                  border: '1px solid rgba(255,255,255,0.13)',
-                  background: 'rgba(12,29,69,0.5)', color: '#e2e8f0',
+                  border: '1px solid rgb(var(--c-ink) / 0.13)',
+                  background: 'rgb(var(--c-navy) / 0.5)', color: 'rgb(var(--c-ink) / 0.9)',
                   font: 'inherit', fontSize: 15, outline: 'none',
                 }}
               />
             </label>
             <label style={{ flex: '1 1 180px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>Materia</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: 'rgb(var(--c-ink) / 0.7)' }}>Materia</span>
               <select
                 value={moduleId ?? ''}
                 onChange={e => setModuleId(Number(e.target.value))}
                 style={{
                   minHeight: 44, padding: '10px 14px', borderRadius: 10,
-                  border: '1px solid rgba(255,255,255,0.13)',
-                  background: 'rgba(12,29,69,0.5)', color: '#e2e8f0',
+                  border: '1px solid rgb(var(--c-ink) / 0.13)',
+                  background: 'rgb(var(--c-navy) / 0.5)', color: 'rgb(var(--c-ink) / 0.9)',
                   font: 'inherit', fontSize: 15, outline: 'none',
                 }}
               >
                 {mockModules.map(m => (
-                  <option key={m.id} value={m.id} style={{ background: '#0c1d45' }}>{m.title}</option>
+                  <option key={m.id} value={m.id} style={{ background: 'rgb(var(--c-navy))' }}>{m.title}</option>
                 ))}
               </select>
             </label>
@@ -188,15 +188,15 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                 style={{
                   padding: 16,
                   borderRadius: 14,
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(147,197,253,0.22)',
+                  background: 'rgb(var(--c-ink) / 0.04)',
+                  border: '1px solid rgb(var(--c-info) / 0.22)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 10,
                 }}
               >
                 <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#93c5fd' }}>Pregunta {i + 1}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'rgb(var(--c-info))' }}>Pregunta {i + 1}</span>
                   {preguntas.length > 1 && (
                     <button
                       type="button"
@@ -204,8 +204,8 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                       aria-label={`Quitar pregunta ${i + 1}`}
                       style={{
                         width: 32, height: 32, borderRadius: 8,
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        background: 'transparent', color: '#cbd5e1',
+                        border: '1px solid rgb(var(--c-ink) / 0.1)',
+                        background: 'transparent', color: 'rgb(var(--c-ink) / 0.8)',
                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}
                     >
@@ -220,8 +220,8 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                   rows={2}
                   style={{
                     minHeight: 60, padding: '10px 14px', borderRadius: 10,
-                    border: '1px solid rgba(255,255,255,0.13)',
-                    background: 'rgba(12,29,69,0.5)', color: '#e2e8f0',
+                    border: '1px solid rgb(var(--c-ink) / 0.13)',
+                    background: 'rgb(var(--c-navy) / 0.5)', color: 'rgb(var(--c-ink) / 0.9)',
                     font: 'inherit', fontSize: 15, outline: 'none', resize: 'vertical',
                   }}
                 />
@@ -232,10 +232,10 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                       style={{
                         display: 'flex', alignItems: 'center', gap: 10,
                         padding: '8px 12px', borderRadius: 10,
-                        background: p.correcta === j ? 'rgba(52,211,153,0.08)' : 'rgba(255,255,255,0.03)',
+                        background: p.correcta === j ? 'rgb(var(--c-exito) / 0.08)' : 'rgb(var(--c-ink) / 0.03)',
                         border: p.correcta === j
-                          ? '1px solid rgba(52,211,153,0.5)'
-                          : '1px solid rgba(255,255,255,0.08)',
+                          ? '1px solid rgb(var(--c-exito) / 0.5)'
+                          : '1px solid rgb(var(--c-ink) / 0.08)',
                       }}
                     >
                       <input
@@ -244,14 +244,14 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                         checked={p.correcta === j}
                         onChange={() => actualizarPregunta(i, { correcta: j })}
                         aria-label={`Marcar opción ${String.fromCharCode(65 + j)} como correcta`}
-                        style={{ accentColor: '#34d399' }}
+                        style={{ accentColor: 'rgb(var(--c-exito))' }}
                       />
                       <span
                         style={{
                           width: 24, height: 24, borderRadius: 6, flexShrink: 0,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          background: 'rgba(255,255,255,0.05)',
-                          color: p.correcta === j ? '#34d399' : '#cbd5e1',
+                          background: 'rgb(var(--c-ink) / 0.05)',
+                          color: p.correcta === j ? 'rgb(var(--c-exito))' : 'rgb(var(--c-ink) / 0.8)',
                           fontWeight: 700, fontSize: 12,
                         }}
                       >
@@ -265,7 +265,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                         style={{
                           flex: 1, minWidth: 0, minHeight: 36, padding: '6px 10px',
                           borderRadius: 8, border: 0,
-                          background: 'transparent', color: '#e2e8f0',
+                          background: 'transparent', color: 'rgb(var(--c-ink) / 0.9)',
                           font: 'inherit', fontSize: 14, outline: 'none',
                         }}
                       />
@@ -279,8 +279,8 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                   placeholder="Explicación (opcional)"
                   style={{
                     minHeight: 40, padding: '8px 14px', borderRadius: 10,
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    background: 'rgba(255,255,255,0.03)', color: '#cbd5e1',
+                    border: '1px solid rgb(var(--c-ink) / 0.08)',
+                    background: 'rgb(var(--c-ink) / 0.03)', color: 'rgb(var(--c-ink) / 0.8)',
                     font: 'inherit', fontSize: 13, outline: 'none',
                   }}
                 />
@@ -292,12 +292,12 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
           </div>
 
           {materia && (
-            <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'rgb(var(--c-ink) / 0.6)' }}>
               {copy.aparecera} ({materia.title})
             </p>
           )}
 
-          {error && <p style={{ margin: 0, fontSize: 13, color: '#f87171' }}>{error}</p>}
+          {error && <p style={{ margin: 0, fontSize: 13, color: 'rgb(var(--c-peligro))' }}>{error}</p>}
 
           <footer style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             <BotonSecundario type="button" onClick={handleCerrar}>Cancelar</BotonSecundario>

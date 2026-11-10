@@ -11,12 +11,12 @@ const TONOS = {
   peligro:       { bg: 'rgb(var(--c-peligro) / 0.1)',   color: 'rgb(var(--c-peligro))',  border: 'rgb(var(--c-peligro) / 0.3)' },
   'rol-admin':   { bg: 'rgb(var(--c-gold-bright) / 0.1)',    color: 'rgb(var(--c-gold-bright))',  border: 'rgb(var(--c-gold-bright) / 0.3)'  },
   'rol-maestro': { bg: 'rgb(var(--c-info) / 0.1)',   color: 'rgb(var(--c-info))',  border: 'rgb(var(--c-info) / 0.3)' },
-  'rol-alumno':  { bg: 'rgba(94,234,212,0.1)',    color: '#5eead4',  border: 'rgba(94,234,212,0.3)'  },
+  'rol-alumno':  { bg: 'rgb(var(--c-materia-turquesa) / 0.1)',    color: 'rgb(var(--c-materia-turquesa))',  border: 'rgb(var(--c-materia-turquesa) / 0.3)'  },
   'materia-math':    { bg: 'rgb(var(--c-info) / 0.1)', color: 'rgb(var(--c-info))', border: 'rgb(var(--c-info) / 0.3)' },
-  'materia-reading': { bg: 'rgba(216,180,254,0.1)', color: '#d8b4fe', border: 'rgba(216,180,254,0.3)' },
-  'materia-writing': { bg: 'rgba(110,231,183,0.1)', color: '#6ee7b7', border: 'rgba(110,231,183,0.3)' },
-  'materia-premed':  { bg: 'rgba(94,234,212,0.1)',  color: '#5eead4', border: 'rgba(94,234,212,0.3)'  },
-  'materia-health':  { bg: 'rgba(103,232,249,0.1)', color: '#67e8f9', border: 'rgba(103,232,249,0.3)' },
+  'materia-reading': { bg: 'rgb(var(--c-materia-morado) / 0.1)', color: 'rgb(var(--c-materia-morado))', border: 'rgb(var(--c-materia-morado) / 0.3)' },
+  'materia-writing': { bg: 'rgb(var(--c-materia-verde) / 0.1)', color: 'rgb(var(--c-materia-verde))', border: 'rgb(var(--c-materia-verde) / 0.3)' },
+  'materia-premed':  { bg: 'rgb(var(--c-materia-turquesa) / 0.1)',  color: 'rgb(var(--c-materia-turquesa))', border: 'rgb(var(--c-materia-turquesa) / 0.3)'  },
+  'materia-health':  { bg: 'rgb(var(--c-materia-cian) / 0.1)', color: 'rgb(var(--c-materia-cian))', border: 'rgb(var(--c-materia-cian) / 0.3)' },
   // tipo-* identifica el tipo de evaluación en listados mixtos.
   // Mismo patrón hex+opacidades que usamos para advertencia / peligro:
   //   tipo-simulador → token gold-bright (rgb(var(--c-gold-bright)) = rgb 245,200,66)
