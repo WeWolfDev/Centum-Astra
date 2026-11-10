@@ -9,11 +9,10 @@ export default defineConfig({
     include: ['src/**/*.test.{js,jsx}', 'supabase/functions/**/*.test.ts'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'html'],
-      include: [
-        'src/lib/examScoring.js',
-        'src/config/rediseno.js',
-      ],
+      // lcov lo lee SonarCloud desde CI
+      reporter: ['text', 'html', 'lcov'],
+      include: ['src/**/*.{js,jsx}', 'supabase/functions/**/*.ts'],
+      exclude: ['**/*.test.{js,jsx,ts}'],
       thresholds: {
         'src/lib/examScoring.js': {
           lines: 80,
