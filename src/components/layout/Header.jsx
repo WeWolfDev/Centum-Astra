@@ -17,6 +17,7 @@ const titlesByRole = {
   },
   admin: {
     dashboard: 'Cuentas',
+    courses:   'Cursos',
     modules:   'Material',
     exam:      'Simuladores y quizzes',
     payments:  'Pagos',

@@ -19,6 +19,17 @@ vi.mock('./supabaseClient', () => ({
   isSupabaseConfigured: false,
   mockAuthEnabled: true,
 }));
+vi.mock('./catalogoService', async () => {
+  const real = await vi.importActual('./catalogoService');
+  return {
+    ...real,
+    listCatalog: vi.fn(async () => [{
+      id: 'c1', name: 'Curso', description: 'Desc', status: 'active', startsOn: '2027-01-11', endsOn: '',
+      groups: [{ id: 'g1', name: 'Grupo A', code: 'A', schedule: 'Sabatino', status: 'archived' }],
+      modules: [{ id: 'm1', title: 'Módulo', description: '', position: 0, status: 'active' }],
+    }]),
+  };
+});
 
 const { default: Header } = await import('../components/layout/Header');
 const { default: Sidebar } = await import('../components/layout/Sidebar');
@@ -31,6 +42,7 @@ const { default: VideoLibrary } = await import('../pages/video/VideoLibrary');
 const { default: SimuladoresQuizzes } = await import('../pages/exam/SimuladoresQuizzes');
 const { default: MaestroQuizzes } = await import('../pages/exam/MaestroQuizzes');
 const { MaterialProvider } = await import('../context/MaterialContext');
+const { CatalogoConectado } = await import('../pages/admin/AdminCursos');
 const { ThemeProvider } = await import('../context/ThemeContext');
 
 // jsdom normaliza los hex de `style` a rgb(r, g, b), así que se buscan ambas formas.
@@ -182,6 +194,20 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
     usuario.current = PROFESOR;
     const { baseElement } = renderizar(<MaestroQuizzes />);
     await userEvent.click(screen.getAllByRole('button', { name: /crear|nuevo/i })[0]);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Cursos del administrador con sus diálogos', async () => {
+    const { baseElement } = renderizar(<CatalogoConectado />);
+    await screen.findByRole('heading', { name: /Curso/, level: 3 });
+    expect(coloresFijos(baseElement)).toEqual([]);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Agregar grupo a Curso' }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Archivar módulo Módulo' }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(coloresFijos(baseElement)).toEqual([]);
   });

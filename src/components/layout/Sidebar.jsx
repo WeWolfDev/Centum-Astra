@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Home, FolderOpen, Video, GraduationCap,
-  Users, CreditCard, LogOut, X,
+  Users, CreditCard, LogOut, X, BookOpen,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -10,6 +10,7 @@ import { useAuth } from '../../context/AuthContext';
 // TODO(rediseno): Pagos (sin mockup — admin pendiente).
 const adminNav = [
   { id: 'dashboard', label: 'Cuentas',                 Icon: Users },
+  { id: 'courses',   label: 'Cursos',                  Icon: BookOpen },
   { id: 'modules',   label: 'Material',                Icon: FolderOpen },
   { id: 'exam',      label: 'Simuladores y quizzes',   Icon: GraduationCap },
   { id: 'payments',  label: 'Pagos',                   Icon: CreditCard },
