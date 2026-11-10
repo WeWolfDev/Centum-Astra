@@ -9,7 +9,7 @@ const TONOS = {
   negativo:      { bg: 'rgb(var(--c-ink) / 0.05)',  color: 'rgb(var(--c-ink) / 0.8)',  border: 'rgb(var(--c-ink) / 0.18)' }, // HANDOFF: baja en gris, no en rojo
   advertencia:   { bg: 'rgb(var(--c-advertencia) / 0.1)',    color: 'rgb(var(--c-advertencia))',  border: 'rgb(var(--c-advertencia) / 0.3)'  },
   peligro:       { bg: 'rgb(var(--c-peligro) / 0.1)',   color: 'rgb(var(--c-peligro))',  border: 'rgb(var(--c-peligro) / 0.3)' },
-  'rol-admin':   { bg: 'rgb(var(--c-gold-bright) / 0.1)',    color: 'rgb(var(--c-gold-fill))',  border: 'rgb(var(--c-gold-bright) / 0.3)'  },
+  'rol-admin':   { bg: 'rgb(var(--c-gold-bright) / 0.1)',    color: 'rgb(var(--c-gold-bright))',  border: 'rgb(var(--c-gold-bright) / 0.3)'  },
   'rol-maestro': { bg: 'rgb(var(--c-info) / 0.1)',   color: 'rgb(var(--c-info))',  border: 'rgb(var(--c-info) / 0.3)' },
   'rol-alumno':  { bg: 'rgba(94,234,212,0.1)',    color: '#5eead4',  border: 'rgba(94,234,212,0.3)'  },
   'materia-math':    { bg: 'rgb(var(--c-info) / 0.1)', color: 'rgb(var(--c-info))', border: 'rgb(var(--c-info) / 0.3)' },
@@ -21,7 +21,7 @@ const TONOS = {
   // Mismo patrón hex+opacidades que usamos para advertencia / peligro:
   //   tipo-simulador → token gold-bright (rgb(var(--c-gold-bright)) = rgb 245,200,66)
   //   tipo-quiz      → token info        (rgb(var(--c-info)) = rgb 147,197,253)
-  'tipo-simulador': { bg: 'rgb(var(--c-gold-bright) / 0.1)',  color: 'rgb(var(--c-gold-fill))',  border: 'rgb(var(--c-gold-bright) / 0.3)'  },
+  'tipo-simulador': { bg: 'rgb(var(--c-gold-bright) / 0.1)',  color: 'rgb(var(--c-gold-bright))',  border: 'rgb(var(--c-gold-bright) / 0.3)'  },
   'tipo-quiz':      { bg: 'rgb(var(--c-info) / 0.1)', color: 'rgb(var(--c-info))',  border: 'rgb(var(--c-info) / 0.3)' },
 };
 

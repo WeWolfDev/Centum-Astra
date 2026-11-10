@@ -177,7 +177,7 @@ const SAMPLE_QUESTIONS = {
 function MiniOption({ letter, text, state, onClick, disabled, clinical }) {
   const gold = {
     default:   { bg: 'rgb(var(--c-mid) / 0.5)',       border: 'rgb(var(--c-ink) / 0.08)', color: 'rgb(var(--c-ink) / 0.82)', lb: 'rgb(var(--c-ink) / 0.07)' },
-    selected:  { bg: 'rgb(var(--c-gold-bright) / 0.09)',     border: 'rgb(var(--c-gold-bright) / 0.42)', color: 'rgb(var(--c-gold-fill))',               lb: 'rgb(var(--c-gold-bright) / 0.16)' },
+    selected:  { bg: 'rgb(var(--c-gold-bright) / 0.09)',     border: 'rgb(var(--c-gold-bright) / 0.42)', color: 'rgb(var(--c-gold-bright))',               lb: 'rgb(var(--c-gold-bright) / 0.16)' },
     correct:   { bg: 'rgb(var(--c-exito) / 0.09)',     border: 'rgb(var(--c-exito) / 0.42)', color: 'rgb(var(--c-exito))',               lb: 'rgb(var(--c-exito) / 0.16)' },
     incorrect: { bg: 'rgb(var(--c-peligro) / 0.09)',    border: 'rgb(var(--c-peligro) / 0.42)', color: 'rgb(var(--c-peligro))',              lb: 'rgb(var(--c-peligro) / 0.16)' },
   };
