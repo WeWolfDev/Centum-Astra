@@ -1,5 +1,5 @@
 // Recuperación de contraseña y activación de cuentas invitadas con código por correo.
-import { supabase } from './supabaseClient';
+import { createCodeClient, supabase } from './supabaseClient';
 
 const HTTP_TOO_MANY_REQUESTS = 429;
 const RATE_LIMIT = 'Demasiados intentos. Espera unos minutos e intenta de nuevo.';
@@ -34,14 +34,25 @@ export async function requestRecoveryCode(email) {
   if (error && (esLimite(error) || esRed(error))) throw new Error(mensajeDeError(error));
 }
 
+// Sesión del código: solo en memoria, nunca en localStorage (ver createCodeClient).
+let clienteCodigo = null;
+
+function soltarClienteCodigo() {
+  clienteCodigo = null;
+}
+
 /**
- * Valida el código. Su sesión queda abierta para que, si la contraseña se
- * rechaza, se pueda reintentar el guardado sin gastar otro código.
+ * Valida el código. Su sesión queda abierta solo en memoria para que, si la
+ * contraseña se rechaza, se pueda reintentar el guardado sin gastar otro código.
  * @param {{ email: string, code: string, type: 'recovery' | 'invite' }} datos
  */
 export async function verifyCode({ email, code, type }) {
-  const { error } = await supabase.auth.verifyOtp({ email, token: code.trim(), type });
-  if (error) throw new Error(mensajeDeError(error));
+  clienteCodigo = createCodeClient();
+  const { error } = await clienteCodigo.auth.verifyOtp({ email, token: code.trim(), type });
+  if (error) {
+    soltarClienteCodigo();
+    throw new Error(mensajeDeError(error));
+  }
 }
 
 /**
@@ -50,12 +61,15 @@ export async function verifyCode({ email, code, type }) {
  * @param {string} password
  */
 export async function savePassword(password) {
-  const { error } = await supabase.auth.updateUser({ password });
+  const { error } = await clienteCodigo.auth.updateUser({ password });
   if (error) throw new Error(mensajeDeError(error));
-  await supabase.auth.signOut({ scope: 'global' });
+  await clienteCodigo.auth.signOut({ scope: 'global' });
+  soltarClienteCodigo();
 }
 
 /** Cierra la sesión del código cuando se abandona el flujo sin guardar. */
 export async function cancelPasswordFlow() {
-  await supabase.auth.signOut({ scope: 'local' });
+  const cliente = clienteCodigo;
+  soltarClienteCodigo();
+  await cliente?.auth.signOut({ scope: 'local' });
 }
