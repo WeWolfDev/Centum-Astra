@@ -290,7 +290,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                       alignItems: 'center',
                       gap: 14,
                       minHeight: 52,
-                      borderTop: '1px solid rgb(var(--c-ink) / 0.1)',
+                      borderTop: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))',
                       color: 'rgb(var(--c-ink) / 0.9)',
                       textDecoration: 'none',
                     }}
@@ -414,7 +414,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                           color: 'rgb(var(--c-ink) / 0.6)',
                           padding: '4px 10px',
                           borderRadius: 999,
-                          border: '1px solid rgb(var(--c-ink) / 0.15)',
+                          border: '1px solid rgb(var(--c-ink) / calc(0.15 * var(--borde-k)))',
                         }}
                       >
                         Próximamente
@@ -437,7 +437,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
             boxSizing: 'border-box',
             padding: 28,
             borderRadius: 18,
-            border: '1px solid rgb(var(--c-ink) / 0.13)',
+            border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
             display: 'flex',
             flexDirection: 'column',
             gap: 24,
@@ -536,7 +536,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                             borderRadius: 4,
                             background: done ? 'rgb(var(--c-info))' : 'transparent',
                             boxSizing: 'border-box',
-                            border: done ? 'none' : '1.5px solid rgb(var(--c-ink) / 0.3)',
+                            border: done ? 'none' : '1.5px solid rgb(var(--c-ink) / calc(0.3 * var(--borde-k)))',
                           }}
                         />
                       );

@@ -62,7 +62,9 @@ function ClaseCard({
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 16,
-        background: 'rgb(var(--c-ink) / 0.05)',
+        background: 'var(--superficie)',
+        border: '1px solid var(--contorno)',
+        boxShadow: 'var(--sombra-superficie)',
         overflow: 'hidden',
       }}
     >
@@ -106,6 +108,7 @@ function ClaseCard({
               justifyContent: 'center',
               borderRadius: 999,
               background: 'rgb(var(--c-navy))',
+              border: '1px solid var(--contorno)',
               fontFamily: '"Bricolage Grotesque", sans-serif',
               fontWeight: 700,
               fontSize: 18,

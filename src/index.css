@@ -45,10 +45,14 @@
     --superficie: rgb(255 255 255 / 0.05);
     --borde-superficie: rgb(255 255 255 / 0.10);
     --sombra-superficie: none;
+    /* Multiplica la opacidad de los bordes inline (ver .border-* abajo) */
+    --borde-k: 1;
+    /* Contorno que solo existe en claro (en oscuro la separación la da el fondo) */
+    --contorno: transparent;
   }
 
-  /* Blanco cálido y dorado. Contraste verificado contra WCAG 2.1 AA (#58):
-     tinta 15.5:1, dorado de texto 5.3:1, estados ≥ 5:1. */
+  /* Blanco cálido, azul y dorado. Contraste verificado contra WCAG 2.1 AA (#58):
+     tinta 15.5:1, acento azul 6.3:1, estados ≥ 5:1. */
   :root[data-theme='light'] {
     color-scheme: light;
     --c-void: 250 248 243;
@@ -57,9 +61,11 @@
     --c-mid: 240 236 224;
     --c-light: 230 223 204;
     --c-ink: 12 29 69;
-    --c-gold-dim: 110 82 8;
-    --c-gold-bright: 138 101 8;
-    --c-gold-glow: 138 101 8;
+    /* En claro el acento de texto es azul: un dorado legible sobre blanco
+       se ve café. El dorado queda como relleno (gold-fill). */
+    --c-gold-dim: 30 64 175;
+    --c-gold-bright: 29 78 216;
+    --c-gold-glow: 30 64 175;
     --c-on-peligro: 255 255 255;
     --c-peligro: 185 28 28;
     --c-exito: 4 120 87;
@@ -78,7 +84,9 @@
     --halo-alpha: 0.14;
     --shadow-alpha: 0.08;
     --superficie: #ffffff;
-    --borde-superficie: #e5dfcf;
+    --borde-superficie: rgb(12 29 69 / 0.22);
+    --borde-k: 2.4;
+    --contorno: rgb(12 29 69 / 0.22);
     --sombra-superficie: 0 1px 2px rgb(12 29 69 / 0.06), 0 4px 16px rgb(12 29 69 / 0.06);
   }
 
@@ -196,6 +204,55 @@
     border: 1px solid var(--borde-superficie);
     box-shadow: var(--sombra-superficie);
   }
+
+  /* ── Modo claro: contornos definidos (DESIGN.md › Elevation) ──
+     Los bordes sutiles del modo oscuro casi desaparecen sobre blanco. */
+  :root[data-theme='light'] .border-white\/5,
+  :root[data-theme='light'] .border-white\/10,
+  :root[data-theme='light'] .border-white\/15,
+  :root[data-theme='light'] .ring-white\/10,
+  :root[data-theme='light'] .ring-white\/15 {
+    border-color: rgb(var(--c-ink) / 0.22);
+    --tw-ring-color: rgb(var(--c-ink) / 0.22);
+  }
+  :root[data-theme='light'] .border-white\/20,
+  :root[data-theme='light'] .border-white\/25 {
+    border-color: rgb(var(--c-ink) / 0.35);
+  }
+
+  /* Bloque de firma: navy en oscuro; tarjeta blanca con borde en claro */
+  :root[data-theme='light'] .bloque {
+    border: 1px solid var(--borde-superficie);
+    box-shadow: var(--sombra-superficie);
+  }
+
+  /* Tarjeta de materia con foto: en claro, foto limpia y etiqueta en franja blanca */
+  :root[data-theme='light'] .tarjeta-area { border: 1px solid var(--borde-superficie); }
+  :root[data-theme='light'] .tarjeta-area-velo { display: none; }
+  :root[data-theme='light'] .tarjeta-area-etiqueta {
+    left: 0; right: 0; bottom: 0;
+    padding: 10px 16px;
+    background: rgb(var(--c-navy));
+    border-top: 1px solid var(--borde-superficie);
+  }
+  :root[data-theme='light'] .tarjeta-area-icono {
+    background: rgb(var(--c-navy) / 0.92);
+  }
+
+  /* Pestañas de materia con foto (SelectorAreas): igual, foto limpia y franja blanca */
+  :root[data-theme='light'] .selector-area-velo { display: none; }
+  :root[data-theme='light'] .selector-area-foto { filter: none; }
+  :root[data-theme='light'] .selector-area-etiqueta {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: auto;
+    flex-direction: row;
+    gap: 6px;
+    padding: 6px 8px;
+    background: rgb(var(--c-navy));
+    border-top: 1px solid var(--borde-superficie);
+  }
+  :root[data-theme='light'] .selector-area-etiqueta svg { width: 16px; height: 16px; flex-shrink: 0; }
 
   /* ── Rediseño: semantic surfaces ────────────────── */
   .bg-page    { background-color: rgb(var(--c-void)); }

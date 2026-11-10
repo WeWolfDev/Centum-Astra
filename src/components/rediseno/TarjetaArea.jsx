@@ -38,7 +38,7 @@ export default function TarjetaArea({
       onClick={onClick}
       aria-label={ariaLabel ?? `Abrir área ${titulo}`}
       className={
-        'group relative isolate flex aspect-[4/3] w-full overflow-hidden ' +
+        'tarjeta-area group relative isolate flex aspect-[4/3] w-full overflow-hidden ' +
         'rounded-2xl text-left ' +
         FOCUS_RING
       }
@@ -68,17 +68,17 @@ export default function TarjetaArea({
       {/* Tinte azul marino uniforme — configurable */}
       <span
         aria-hidden="true"
-        className={`absolute inset-0 ${tinte} mix-blend-multiply`}
+        className={`tarjeta-area-velo absolute inset-0 ${tinte} mix-blend-multiply`}
       />
 
       {/* Degradado inferior fijo para contraste de la etiqueta */}
       <span
         aria-hidden="true"
-        className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-space-void/95 via-space-void/70 to-transparent"
+        className="tarjeta-area-velo absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-space-void/95 via-space-void/70 to-transparent"
       />
 
       {/* Insignia de icono */}
-      <span className="absolute left-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur-sm text-white">
+      <span className="tarjeta-area-icono absolute left-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15 backdrop-blur-sm text-white">
         <IconSubject name={icono} size={20} />
       </span>
 
@@ -94,7 +94,7 @@ export default function TarjetaArea({
       />
 
       {/* Etiqueta — permite hasta 2 líneas */}
-      <span className="absolute inset-x-4 bottom-3 font-display font-semibold text-base leading-tight text-white line-clamp-2">
+      <span className="tarjeta-area-etiqueta absolute inset-x-4 bottom-3 font-display font-semibold text-base leading-tight text-white line-clamp-2">
         {titulo}
       </span>
     </button>

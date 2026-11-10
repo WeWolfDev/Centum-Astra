@@ -42,7 +42,7 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 20px',
-        borderBottom: '1px solid rgb(var(--c-ink) / 0.05)',
+        borderBottom: '1px solid rgb(var(--c-ink) / calc(0.05 * var(--borde-k)))',
         background: 'rgb(var(--c-void) / 0.72)',
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
@@ -60,7 +60,7 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
             onClick={onMenuToggle}
             aria-label="Abrir menú"
             style={{
-              background: 'rgb(var(--c-ink) / 0.05)', border: '1px solid rgb(var(--c-ink) / 0.08)',
+              background: 'rgb(var(--c-ink) / 0.05)', border: '1px solid rgb(var(--c-ink) / calc(0.08 * var(--borde-k)))',
               borderRadius: 7, padding: '5px', cursor: 'pointer', flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: 'rgb(var(--c-ink) / 0.5)',
@@ -116,7 +116,7 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
           padding: '4px 10px 4px 6px',
           borderRadius: 999,
           background: 'rgb(var(--c-ink) / 0.04)',
-          border: '1px solid rgb(var(--c-ink) / 0.07)',
+          border: '1px solid rgb(var(--c-ink) / calc(0.07 * var(--borde-k)))',
           minWidth: 0, maxWidth: isMobile ? 160 : 220,
           overflow: 'hidden',
         }}>

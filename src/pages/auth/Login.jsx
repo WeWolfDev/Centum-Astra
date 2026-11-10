@@ -7,7 +7,7 @@ import CodigoContrasena from './CodigoContrasena';
 import PublicNav from '../../components/layout/PublicNav';
 import Boton from '../../components/rediseno/Boton';
 import Input from '../../components/rediseno/Input';
-import BotonTema from '../../components/rediseno/BotonTema';
+import { useModoOscuroForzado } from '../../context/ThemeContext';
 import { cn } from '../../lib/utils';
 
 const roles = [
@@ -41,6 +41,8 @@ const STATS = [
 ];
 
 export default function Login({ onBack }) {
+  // El inicio de sesión es público: siempre en oscuro, como la landing (DESIGN.md › modes).
+  useModoOscuroForzado();
   const { login, error, setError } = useAuth();
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
@@ -100,8 +102,6 @@ export default function Login({ onBack }) {
           Volver
         </button>
       )}
-
-      <BotonTema className="fixed top-[72px] right-4 md:right-6 z-20 backdrop-blur" />
 
       {/* pt-[60px] se mantiene arbitrario: depende de la altura real
           (60px) de PublicNav fija en la parte superior. */}

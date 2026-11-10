@@ -18,7 +18,7 @@ export default function SimuladorBlock({
   return (
     <section
       aria-label={titulo}
-      data-theme="dark"
+      className="bloque"
       style={{
         background: 'rgb(var(--c-navy))',
         borderRadius: 18,

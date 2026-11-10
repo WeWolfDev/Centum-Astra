@@ -313,7 +313,7 @@ function MiniSimulator({ courseId, onBack }) {
             { val: questions.length - correct,       label: 'Errores',    color: 'rgb(var(--c-peligro))' },
             { val: questions.length - Object.keys(answers).length, label: 'Omitidas', color: 'rgb(var(--c-gold-bright))' },
           ].map(s => (
-            <div key={s.label} style={{ padding: '12px 6px', borderRadius: 10, textAlign: 'center', background: 'rgb(var(--c-ink) / 0.03)', border: '1px solid rgb(var(--c-ink) / 0.07)' }}>
+            <div key={s.label} style={{ padding: '12px 6px', borderRadius: 10, textAlign: 'center', background: 'rgb(var(--c-ink) / 0.03)', border: '1px solid rgb(var(--c-ink) / calc(0.07 * var(--borde-k)))' }}>
               <p style={{ fontFamily: 'Orbitron,sans-serif', fontSize: 22, fontWeight: 700, color: s.color, lineHeight: 1, marginBottom: 4 }}>{s.val}</p>
               <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.06em', color: 'rgb(var(--c-ink) / 0.35)', textTransform: 'uppercase' }}>{s.label}</p>
             </div>
@@ -372,7 +372,7 @@ function MiniSimulator({ courseId, onBack }) {
       </div>
 
       {/* Question nav dots */}
-      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', padding: '12px 20px', borderBottom: '1px solid rgb(var(--c-ink) / 0.05)' }}>
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'center', padding: '12px 20px', borderBottom: '1px solid rgb(var(--c-ink) / calc(0.05 * var(--borde-k)))' }}>
         {questions.map((_, i) => {
           const answered = answers[questions[i].id] !== undefined;
           const active   = i === current;
@@ -551,7 +551,7 @@ function CourseSelector({ onClose }) {
           maxWidth: selected ? 600 : 700,
           maxHeight: '88vh',
           background: 'rgb(var(--c-deep))',
-          border: '1px solid rgb(var(--c-ink) / 0.08)',
+          border: '1px solid rgb(var(--c-ink) / calc(0.08 * var(--borde-k)))',
           borderRadius: 18,
           overflow: 'hidden',
           boxShadow: '0 24px 64px rgba(0,0,0,0.7)',
@@ -562,7 +562,7 @@ function CourseSelector({ onClose }) {
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '20px 24px',
-          borderBottom: '1px solid rgb(var(--c-ink) / 0.07)',
+          borderBottom: '1px solid rgb(var(--c-ink) / calc(0.07 * var(--borde-k)))',
           flexShrink: 0,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -583,7 +583,7 @@ function CourseSelector({ onClose }) {
           </div>
           <button
             onClick={onClose}
-            style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgb(var(--c-ink) / 0.1)', background: 'rgb(var(--c-ink) / 0.04)', color: 'rgb(var(--c-ink) / 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'color 0.12s ease, background 0.12s ease, border-color 0.12s ease' }}
+            style={{ width: 32, height: 32, borderRadius: 8, border: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))', background: 'rgb(var(--c-ink) / 0.04)', color: 'rgb(var(--c-ink) / 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'color 0.12s ease, background 0.12s ease, border-color 0.12s ease' }}
             onMouseEnter={e => { e.currentTarget.style.color = 'rgb(var(--c-ink))'; e.currentTarget.style.background = 'rgb(var(--c-ink) / 0.08)'; }}
             onMouseLeave={e => { e.currentTarget.style.color = 'rgb(var(--c-ink) / 0.5)'; e.currentTarget.style.background = 'rgb(var(--c-ink) / 0.04)'; }}
           >
@@ -824,7 +824,7 @@ export default function PublicNav({ onLoginClick }) {
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '7px 16px', borderRadius: 8,
               background: 'transparent',
-              border: '1px solid rgb(var(--c-ink) / 0.1)',
+              border: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))',
               color: 'rgb(var(--c-ink) / 0.7)',
               fontSize: 13.5, fontWeight: 500, cursor: 'pointer',
               transition: 'color 0.15s ease, background 0.15s ease, border-color 0.15s ease',
