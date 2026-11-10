@@ -32,6 +32,13 @@
     --c-advertencia: 251 191 36;
     --c-info: 147 197 253;
     --c-violeta: 192 132 252;
+    --c-materia-turquesa: 94 234 212;
+    --c-materia-morado: 216 180 254;
+    --c-materia-verde: 110 231 183;
+    --c-materia-cian: 103 232 249;
+    --c-clinico: 29 233 182;
+    --c-clinico-tinta: 224 250 246;
+    --c-clinico-fondo: 4 30 27;
     --c-halo: 12 29 69;
     --halo-alpha: 1;
     --shadow-alpha: 0.38;
@@ -59,6 +66,14 @@
     --c-advertencia: 180 83 9;
     --c-info: 29 78 216;
     --c-violeta: 126 34 206;
+    /* Materias y área médica: ≥ 5:1 sobre blanco y marfil */
+    --c-materia-turquesa: 15 118 110;
+    --c-materia-morado: 126 34 206;
+    --c-materia-verde: 4 120 87;
+    --c-materia-cian: 14 116 144;
+    --c-clinico: 15 118 110;
+    --c-clinico-tinta: 4 47 46;
+    --c-clinico-fondo: 240 253 250;
     --c-halo: 245 200 66;
     --halo-alpha: 0.14;
     --shadow-alpha: 0.08;

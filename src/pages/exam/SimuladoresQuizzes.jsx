@@ -121,7 +121,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
         display: 'flex',
         flexDirection: 'column',
         gap: 32,
-        color: '#cbd5e1',
+        color: 'rgb(var(--c-ink) / 0.8)',
         maxHeight: 'calc(100vh - 4rem)',
         overflowY: 'auto',
       }}
@@ -134,7 +134,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
           fontSize: 36,
           lineHeight: 1.1,
           letterSpacing: '-0.03em',
-          color: '#ffffff',
+          color: 'rgb(var(--c-ink))',
         }}
       >
         Simuladores y quizzes
@@ -161,16 +161,16 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
             aria-label={`Puntaje de tus ${simuladores.length} simuladores`}
             style={{ display: 'block', width: '100%', height: 'auto', fontFamily: '"Plus Jakarta Sans", sans-serif' }}
           >
-            <path d={areaD} fill="#f5c842" fillOpacity="0.12" />
+            <path d={areaD} fill="rgb(var(--c-gold-bright))" fillOpacity="0.12" />
             {metaVisible && (
               <g>
-                <line x1="12" x2={chartW - 12} y1={my} y2={my} stroke="#93c5fd" strokeWidth="2" strokeDasharray="6 5" />
-                <text x="12" y={myLabel} fontSize="13" fontWeight="600" fill="#93c5fd">
+                <line x1="12" x2={chartW - 12} y1={my} y2={my} stroke="rgb(var(--c-info))" strokeWidth="2" strokeDasharray="6 5" />
+                <text x="12" y={myLabel} fontSize="13" fontWeight="600" fill="rgb(var(--c-info))">
                   Meta · {metaCeneval.toLocaleString('es-MX')}
                 </text>
               </g>
             )}
-            <path d={lineD} fill="none" stroke="#f5c842" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+            <path d={lineD} fill="none" stroke="rgb(var(--c-gold-bright))" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
             {simuladores.map((s, i) => {
               const isLast = i === simuladores.length - 1;
               const y = Y(s.puntaje);
@@ -180,8 +180,8 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                     cx={xs[i]}
                     cy={y}
                     r={isLast ? 7 : 5}
-                    fill={isLast ? '#f5c842' : '#0c1d45'}
-                    stroke="#f5c842"
+                    fill={isLast ? 'rgb(var(--c-gold-bright))' : 'rgb(var(--c-navy))'}
+                    stroke="rgb(var(--c-gold-bright))"
                     strokeWidth="2.5"
                   />
                   <text
@@ -190,11 +190,11 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                     textAnchor="middle"
                     fontSize={isLast ? 15 : 13}
                     fontWeight={isLast ? 700 : 600}
-                    fill={isLast ? '#ffffff' : '#e2e8f0'}
+                    fill={isLast ? 'rgb(var(--c-ink))' : 'rgb(var(--c-ink) / 0.9)'}
                   >
                     {s.puntaje.toLocaleString('es-MX')}
                   </text>
-                  <text x={xs[i]} y={190} textAnchor="middle" fontSize="13" fill="#cbd5e1">
+                  <text x={xs[i]} y={190} textAnchor="middle" fontSize="13" fill="rgb(var(--c-ink) / 0.8)">
                     {s.n}
                   </text>
                 </g>
@@ -212,7 +212,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
               gap: '10px 16px',
             }}
           >
-            <div style={{ fontSize: 16, color: '#e2e8f0' }}>
+            <div style={{ fontSize: 16, color: 'rgb(var(--c-ink) / 0.9)' }}>
               Has subido{' '}
               <strong
                 style={{
@@ -220,7 +220,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                   fontWeight: 700,
                   fontSize: 24,
                   letterSpacing: '-0.02em',
-                  color: subidaPositiva ? '#34d399' : '#cbd5e1',
+                  color: subidaPositiva ? 'rgb(var(--c-exito))' : 'rgb(var(--c-ink) / 0.8)',
                 }}
               >
                 {Math.abs(subida)} puntos
@@ -237,10 +237,10 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                 gap: 8,
                 minHeight: 44,
                 padding: '8px 16px',
-                border: '1px solid rgba(147,197,253,0.5)',
+                border: '1px solid rgb(var(--c-info) / 0.5)',
                 borderRadius: 999,
-                background: metaVisible ? 'rgba(147,197,253,0.14)' : 'transparent',
-                color: '#93c5fd',
+                background: metaVisible ? 'rgb(var(--c-info) / 0.14)' : 'transparent',
+                color: 'rgb(var(--c-info))',
                 fontSize: 14,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -256,7 +256,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
             style={{
               margin: 0,
               fontSize: 12,
-              color: 'rgba(255,255,255,0.6)',
+              color: 'rgb(var(--c-ink) / 0.6)',
             }}
           >
             {NOTA_ESTIMACION} Puntaje en escala {SIMULADOR_RANGO_CENEVAL.min}–{SIMULADOR_RANGO_CENEVAL.max}.
@@ -269,7 +269,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                 margin: '0 0 10px',
                 fontSize: 14,
                 fontWeight: 600,
-                color: '#e2e8f0',
+                color: 'rgb(var(--c-ink) / 0.9)',
               }}
             >
               Tus simuladores
@@ -290,8 +290,8 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                       alignItems: 'center',
                       gap: 14,
                       minHeight: 52,
-                      borderTop: '1px solid rgba(255,255,255,0.1)',
-                      color: '#e2e8f0',
+                      borderTop: '1px solid rgb(var(--c-ink) / 0.1)',
+                      color: 'rgb(var(--c-ink) / 0.9)',
                       textDecoration: 'none',
                     }}
                   >
@@ -303,16 +303,16 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: 999,
-                        background: 'rgba(245,200,66,0.14)',
+                        background: 'rgb(var(--c-gold-bright) / 0.14)',
                         fontFamily: '"Bricolage Grotesque", sans-serif',
                         fontWeight: 700,
                         fontSize: 15,
-                        color: '#f5c842',
+                        color: 'rgb(var(--c-gold-bright))',
                       }}
                     >
                       {s.n}
                     </span>
-                    <span style={{ flex: '1 1 auto', minWidth: 0, fontSize: 14, color: '#cbd5e1' }}>
+                    <span style={{ flex: '1 1 auto', minWidth: 0, fontSize: 14, color: 'rgb(var(--c-ink) / 0.8)' }}>
                       {s.fecha}
                     </span>
                     <span style={{ flex: '0 0 auto', fontSize: 14, whiteSpace: 'nowrap' }}>
@@ -325,13 +325,13 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                         fontFamily: '"Bricolage Grotesque", sans-serif',
                         fontWeight: 700,
                         fontSize: 20,
-                        color: '#ffffff',
+                        color: 'rgb(var(--c-ink))',
                       }}
                     >
                       {s.puntaje.toLocaleString('es-MX')}
                     </span>
                     {esInicio ? (
-                      <span style={{ flex: '0 0 64px', textAlign: 'right', fontSize: 13, color: '#cbd5e1' }}>
+                      <span style={{ flex: '0 0 64px', textAlign: 'right', fontSize: 13, color: 'rgb(var(--c-ink) / 0.8)' }}>
                         Inicio
                       </span>
                     ) : hasDelta ? (
@@ -345,7 +345,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                           fontSize: 14,
                           fontWeight: 600,
                           // Baja en gris, no en rojo (HANDOFF).
-                          color: sube ? '#34d399' : '#cbd5e1',
+                          color: sube ? 'rgb(var(--c-exito))' : 'rgb(var(--c-ink) / 0.8)',
                         }}
                       >
                         {sube ? (
@@ -374,7 +374,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                   margin: '0 0 10px',
                   fontSize: 14,
                   fontWeight: 600,
-                  color: '#e2e8f0',
+                  color: 'rgb(var(--c-ink) / 0.9)',
                 }}
               >
                 Simuladores de tus profesores
@@ -389,8 +389,8 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                       style={{
                         padding: 14,
                         borderRadius: 12,
-                        border: '1px solid rgba(245,200,66,0.3)',
-                        background: 'rgba(245,200,66,0.06)',
+                        border: '1px solid rgb(var(--c-gold-bright) / 0.3)',
+                        background: 'rgb(var(--c-gold-bright) / 0.06)',
                         display: 'flex',
                         flexWrap: 'wrap',
                         alignItems: 'center',
@@ -398,10 +398,10 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                       }}
                     >
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <h4 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#ffffff' }}>
+                        <h4 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'rgb(var(--c-ink))' }}>
                           {s.tema}
                         </h4>
-                        <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+                        <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 13, color: 'rgb(var(--c-ink) / 0.65)' }}>
                           <Pastilla tono="tipo-simulador">Simulador</Pastilla>
                           <span>{materia?.title ?? 'Materia'}</span>
                           <span>· {s.preguntas.length} pregunta{s.preguntas.length === 1 ? '' : 's'}</span>
@@ -411,10 +411,10 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                         style={{
                           fontSize: 12,
                           fontWeight: 600,
-                          color: 'rgba(255,255,255,0.6)',
+                          color: 'rgb(var(--c-ink) / 0.6)',
                           padding: '4px 10px',
                           borderRadius: 999,
-                          border: '1px solid rgba(255,255,255,0.15)',
+                          border: '1px solid rgb(var(--c-ink) / 0.15)',
                         }}
                       >
                         Próximamente
@@ -437,7 +437,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
             boxSizing: 'border-box',
             padding: 28,
             borderRadius: 18,
-            border: '1px solid rgba(255,255,255,0.13)',
+            border: '1px solid rgb(var(--c-ink) / 0.13)',
             display: 'flex',
             flexDirection: 'column',
             gap: 24,
@@ -452,11 +452,11 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                 width: 48,
                 height: 48,
                 borderRadius: 12,
-                background: 'rgba(147,197,253,0.14)',
+                background: 'rgb(var(--c-info) / 0.14)',
                 flexShrink: 0,
               }}
             >
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#93c5fd" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgb(var(--c-info))" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M4 7l2 2 3-4M4 16l2 2 3-4M13 7h7M13 16h7" />
               </svg>
             </span>
@@ -469,12 +469,12 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                   fontSize: 22,
                   lineHeight: 1.2,
                   letterSpacing: '-0.02em',
-                  color: '#ffffff',
+                  color: 'rgb(var(--c-ink))',
                 }}
               >
                 Quizzes por tema
               </h2>
-              <div style={{ fontSize: 14, color: '#cbd5e1' }}>Solo cuentan aciertos</div>
+              <div style={{ fontSize: 14, color: 'rgb(var(--c-ink) / 0.8)' }}>Solo cuentan aciertos</div>
             </div>
           </div>
 
@@ -485,7 +485,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                 margin: '0 0 10px',
                 fontSize: 14,
                 fontWeight: 600,
-                color: '#e2e8f0',
+                color: 'rgb(var(--c-ink) / 0.9)',
               }}
             >
               Elige una materia
@@ -503,12 +503,12 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                     minHeight: 56,
                     padding: '0 12px',
                     borderRadius: 12,
-                    background: 'rgba(255,255,255,0.05)',
-                    color: '#ffffff',
+                    background: 'rgb(var(--c-ink) / 0.05)',
+                    color: 'rgb(var(--c-ink))',
                     textDecoration: 'none',
                   }}
                 >
-                  <IconSubject name={m.iconName} size={22} color="#93c5fd" />
+                  <IconSubject name={m.iconName} size={22} color="rgb(var(--c-info))" />
                   <span
                     style={{
                       flex: '1 1 auto',
@@ -534,9 +534,9 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                             width: 12,
                             height: 12,
                             borderRadius: 4,
-                            background: done ? '#93c5fd' : 'transparent',
+                            background: done ? 'rgb(var(--c-info))' : 'transparent',
                             boxSizing: 'border-box',
-                            border: done ? 'none' : '1.5px solid rgba(255,255,255,0.3)',
+                            border: done ? 'none' : '1.5px solid rgb(var(--c-ink) / 0.3)',
                           }}
                         />
                       );
@@ -554,7 +554,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                 margin: '0 0 10px',
                 fontSize: 14,
                 fontWeight: 600,
-                color: '#e2e8f0',
+                color: 'rgb(var(--c-ink) / 0.9)',
               }}
             >
               Últimos resultados
@@ -572,7 +572,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                       marginTop: 10,
                       height: 6,
                       borderRadius: 999,
-                      background: 'rgba(255,255,255,0.1)',
+                      background: 'rgb(var(--c-ink) / 0.1)',
                       overflow: 'hidden',
                     }}
                   >
@@ -581,7 +581,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                         width: `${Math.round((q.aciertos / q.total) * 100)}%`,
                         height: '100%',
                         borderRadius: 999,
-                        background: '#93c5fd',
+                        background: 'rgb(var(--c-info))',
                       }}
                     />
                   </div>
@@ -598,7 +598,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                   fontFamily: '"Bricolage Grotesque", sans-serif',
                   fontWeight: 700,
                   fontSize: 18,
-                  color: '#ffffff',
+                  color: 'rgb(var(--c-ink))',
                   letterSpacing: '-0.02em',
                 }}
               >
@@ -614,7 +614,7 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
                       aciertos={null}
                       total={q.preguntas.length}
                     >
-                      <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 13, color: 'rgba(255,255,255,0.65)' }}>
+                      <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 13, color: 'rgb(var(--c-ink) / 0.65)' }}>
                         <Pastilla tono="tipo-quiz">Quiz</Pastilla>
                         <span>{materia?.title ?? 'Materia'}</span>
                         <span>· {q.preguntas.length} pregunta{q.preguntas.length === 1 ? '' : 's'}</span>

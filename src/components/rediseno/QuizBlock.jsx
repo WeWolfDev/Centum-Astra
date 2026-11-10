@@ -1,6 +1,6 @@
 import { ChevronRight } from 'lucide-react';
 
-// Bloque de contorno con acento azul claro (#93c5fd) para quizzes por tema.
+// Bloque de contorno con acento azul claro (rgb(var(--c-info))) para quizzes por tema.
 // Quiz = aciertos / total. Nunca puntaje Ceneval.
 export default function QuizBlock({ tema, aciertos, total, onEntrar, children }) {
   const hasScore = typeof aciertos === 'number' && typeof total === 'number';
@@ -16,18 +16,18 @@ export default function QuizBlock({ tema, aciertos, total, onEntrar, children })
               fontWeight: 700,
               fontSize: 16,
               lineHeight: 1.3,
-              color: '#ffffff',
+              color: 'rgb(var(--c-ink))',
             }}
           >
             {tema}
           </h3>
           {hasScore && (
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#93c5fd', fontWeight: 600 }}>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgb(var(--c-info))', fontWeight: 600 }}>
               {aciertos} / {total}
             </p>
           )}
         </div>
-        {onEntrar && <ChevronRight size={16} color="#93c5fd" aria-hidden="true" />}
+        {onEntrar && <ChevronRight size={16} color="rgb(var(--c-info))" aria-hidden="true" />}
       </div>
       {children}
     </>
@@ -38,10 +38,10 @@ export default function QuizBlock({ tema, aciertos, total, onEntrar, children })
     width: '100%',
     textAlign: 'left',
     background: 'transparent',
-    border: '1px solid rgba(147,197,253,0.3)',
+    border: '1px solid rgb(var(--c-info) / 0.3)',
     borderRadius: 14,
     padding: '16px 18px',
-    color: '#e2e8f0',
+    color: 'rgb(var(--c-ink) / 0.9)',
     cursor: onEntrar ? 'pointer' : 'default',
     transition: 'border-color 0.15s ease, background 0.15s ease',
   };

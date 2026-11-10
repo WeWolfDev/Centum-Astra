@@ -62,7 +62,7 @@ function ClaseCard({
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 16,
-        background: 'rgba(255,255,255,0.05)',
+        background: 'rgb(var(--c-ink) / 0.05)',
         overflow: 'hidden',
       }}
     >
@@ -105,11 +105,11 @@ function ClaseCard({
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 999,
-              background: '#0c1d45',
+              background: 'rgb(var(--c-navy))',
               fontFamily: '"Bricolage Grotesque", sans-serif',
               fontWeight: 700,
               fontSize: 18,
-              color: '#ffffff',
+              color: 'rgb(var(--c-ink))',
             }}
           >
             {index + 1}
@@ -121,12 +121,12 @@ function ClaseCard({
                 fontSize: 18,
                 fontWeight: 600,
                 lineHeight: 1.3,
-                color: '#ffffff',
+                color: 'rgb(var(--c-ink))',
               }}
             >
               {session.label}
             </h2>
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgb(var(--c-ink) / 0.6)' }}>
               {resumen}
             </p>
           </div>
@@ -136,7 +136,7 @@ function ClaseCard({
             aria-hidden="true"
             style={{
               flexShrink: 0,
-              color: 'rgba(255,255,255,0.6)',
+              color: 'rgb(var(--c-ink) / 0.6)',
               transition: 'transform 0.2s ease',
               transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
             }}
@@ -155,7 +155,7 @@ function ClaseCard({
             border: 0,
             borderRadius: 10,
             background: 'transparent',
-            color: '#cbd5e1',
+            color: 'rgb(var(--c-ink) / 0.8)',
             cursor: 'pointer',
           }}
         >
@@ -174,7 +174,7 @@ function ClaseCard({
           }}
         >
           {totalRecursos === 0 && (
-            <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+            <p style={{ margin: 0, fontSize: 13, color: 'rgb(var(--c-ink) / 0.6)' }}>
               Esta clase todavía no tiene material.
             </p>
           )}
@@ -299,12 +299,12 @@ function ContenidoDeArea({ mod }) {
           gap: 8,
           padding: '6px 14px',
           borderRadius: 999,
-          background: 'rgba(255,255,255,0.08)',
+          background: 'rgb(var(--c-ink) / 0.08)',
           fontSize: 14,
-          color: '#e2e8f0',
+          color: 'rgb(var(--c-ink) / 0.9)',
         }}
       >
-        <Eye size={16} strokeWidth={1.8} color="#f5c842" aria-hidden="true" />
+        <Eye size={16} strokeWidth={1.8} color="rgb(var(--c-gold-bright))" aria-hidden="true" />
         Tus alumnos lo ven en solo lectura, sin descarga.
       </div>
 
@@ -336,7 +336,7 @@ function ContenidoDeArea({ mod }) {
               margin: 0,
               padding: '32px 0',
               textAlign: 'center',
-              color: 'rgba(255,255,255,0.6)',
+              color: 'rgb(var(--c-ink) / 0.6)',
               fontSize: 14,
             }}
           >
@@ -382,7 +382,7 @@ export default function Material({ defaultModuleId = null }) {
         display: 'flex',
         flexDirection: 'column',
         gap: 28,
-        color: '#cbd5e1',
+        color: 'rgb(var(--c-ink) / 0.8)',
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         maxHeight: 'calc(100vh - 4rem)',
         overflowY: 'auto',
@@ -406,7 +406,7 @@ export default function Material({ defaultModuleId = null }) {
             fontSize: 'clamp(28px, 5vw, 36px)',
             lineHeight: 1.1,
             letterSpacing: '-0.03em',
-            color: '#ffffff',
+            color: 'rgb(var(--c-ink))',
           }}
         >
           Material

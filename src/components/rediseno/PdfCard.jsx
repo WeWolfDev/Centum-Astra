@@ -19,8 +19,8 @@ export default function PdfCard({
         alignItems: 'center',
         gap: 14,
         padding: '14px 16px',
-        background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        background: 'rgb(var(--c-ink) / 0.05)',
+        border: '1px solid rgb(var(--c-ink) / 0.08)',
         borderRadius: 12,
       }}
     >
@@ -32,8 +32,8 @@ export default function PdfCard({
           width: 40,
           height: 40,
           borderRadius: 10,
-          background: 'rgba(245,200,66,0.1)',
-          color: '#f5c842',
+          background: 'rgb(var(--c-gold-bright) / 0.1)',
+          color: 'rgb(var(--c-gold-bright))',
           flexShrink: 0,
         }}
       >
@@ -46,7 +46,7 @@ export default function PdfCard({
             margin: 0,
             fontSize: 14,
             fontWeight: 600,
-            color: '#e2e8f0',
+            color: 'rgb(var(--c-ink) / 0.9)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
@@ -55,7 +55,7 @@ export default function PdfCard({
           {nombre}
         </p>
         {tamano && (
-          <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgb(var(--c-ink) / 0.6)' }}>
             PDF · {tamano}
           </p>
         )}
