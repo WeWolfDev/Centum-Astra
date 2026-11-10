@@ -154,7 +154,7 @@ function HeaderSaludo({ nombre, onContinuar }) {
           minHeight: 56,
           padding: '6px 20px 6px 8px',
           borderRadius: 999,
-          border: '1px solid rgb(var(--c-ink) / 0.13)',
+          border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
           background: 'transparent',
           color: 'rgb(var(--c-ink) / 0.9)',
           cursor: 'pointer',
@@ -495,7 +495,7 @@ function EvolucionBlock({
       }}
     >
       <div
-        data-theme="dark"
+        className="bloque"
         style={{
           flex: '1 1 100%',
           minWidth: 0,
@@ -609,7 +609,7 @@ function EvolucionBlock({
                 <Tooltip
                   contentStyle={{
                     background: 'rgb(var(--c-void))',
-                    border: '1px solid rgb(var(--c-ink) / 0.1)',
+                    border: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))',
                     borderRadius: 10,
                     color: 'rgb(var(--c-ink))',
                     fontSize: 13,

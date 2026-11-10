@@ -21,7 +21,7 @@ export default function VideoCard({
         gap: 14,
         padding: '14px 16px',
         background: 'rgb(var(--c-ink) / 0.05)',
-        border: '1px solid rgb(var(--c-ink) / 0.08)',
+        border: '1px solid rgb(var(--c-ink) / calc(0.08 * var(--borde-k)))',
         borderRadius: 12,
       }}
     >

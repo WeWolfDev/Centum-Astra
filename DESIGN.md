@@ -1,11 +1,11 @@
 ---
 version: 1
 name: Centum Astra
-description: Plataforma de preparación para el EXANI-II. Marca de navy profundo y dorado plano, con modo oscuro ("Espacio") y modo claro ("Marfil y oro"). Títulos en Bricolage Grotesque, cuerpo en Plus Jakarta Sans y logotipo en Orbitron. Superficies sólidas, sin vidrio ni degradados dorados en texto.
+description: Plataforma de preparación para el EXANI-II. Marca de navy profundo y dorado plano, con modo oscuro ("Espacio") y modo claro ("Marfil, azul y oro"). Títulos en Bricolage Grotesque, cuerpo en Plus Jakarta Sans y logotipo en Orbitron. Superficies sólidas, sin vidrio ni degradados dorados en texto.
 
 modes:
-  dark: Espacio (predeterminado). Landing y páginas públicas siempre usan este modo.
-  light: Marfil y oro. Solo dentro de la plataforma y en el inicio de sesión.
+  dark: Espacio (predeterminado). Landing, inicio de sesión y páginas públicas siempre usan este modo.
+  light: Marfil, azul y oro. Solo dentro de la plataforma (alumnos, profesores y administradores).
 
 colors:
   dark:
@@ -29,13 +29,13 @@ colors:
     canvas-raised: "#f4f1e8"
     surface: "#ffffff"
     surface-subtle: "rgba(12,29,69,0.04)"
-    hairline: "#e5dfcf"
+    hairline: "rgba(12,29,69,0.22)"
     border-input: "#8c8470"
     ink: "#0c1d45"
     ink-secondary: "#3b4766"
     ink-mute: "#5c6680"
-    gold: "#8a6508"
-    gold-soft: "#fbefc4"
+    gold: "#1d4ed8"
+    gold-soft: "rgba(29,78,216,0.10)"
     danger: "#b91c1c"
     success: "#047857"
     warning: "#b45309"
@@ -74,9 +74,9 @@ Centum Astra prepara a aspirantes a carreras de salud para el EXANI-II. La inter
 La marca vive en dos modos:
 
 - **Espacio (oscuro):** fondo navy casi negro, texto blanco y dorado `#f5c842`. Es el modo original y el único de la landing y las páginas públicas.
-- **Marfil y oro (claro):** fondo blanco cálido, texto navy y un dorado oscurecido para que se lea sobre blanco. Lo pidió el cliente el 2026-11-08 (#58) y aplica solo dentro de la plataforma y en el inicio de sesión.
+- **Marfil, azul y oro (claro):** fondo blanco cálido, texto navy, acento de texto **azul** `#1d4ed8` y dorado solo como relleno. Lo pidió el cliente el 2026-11-08 (#58) y aplica solo dentro de la plataforma. El inicio de sesión y la landing son públicos y siempre van en oscuro.
 
-En ambos modos se conserva el **bloque navy** (`{colors.both.block}`) como superficie de firma: el simulador EXANI-II y las cifras principales viven ahí, con texto blanco y dorado brillante. En modo claro ese bloque es el único elemento oscuro de la pantalla y concentra la atención.
+El **bloque de firma** (simulador EXANI-II y cifras principales) es navy en oscuro y, en claro, una tarjeta blanca con contorno definido; la gráfica pasa a azul con puntos rellenos. Un bloque navy sobre marfil choca visualmente (revisión del 2026-11-09).
 
 **Rasgos clave:**
 - Un solo acento: dorado. Relleno `#f5c842` en botones; como texto, `{colors.<modo>.gold}`.
@@ -88,8 +88,8 @@ En ambos modos se conserva el **bloque navy** (`{colors.both.block}`) como super
 
 ### Acento
 - **Dorado de relleno** (`{colors.both.gold-fill}` — `#f5c842`): botón primario, indicador de navegación activa, punto final de gráficas. Siempre con texto `{colors.both.on-gold}` (12.5:1).
-- **Dorado de texto** (`{colors.<modo>.gold}`): `#f5c842` en oscuro (12:1 sobre `#030a1a`) y `#8a6508` en claro (5.0:1 sobre `#faf8f3`). Para cifras, enlaces destacados, iconos de marca y bordes activos.
-- **Dorado suave** (`{colors.<modo>.gold-soft}`): fondo de insignias y del ítem de navegación activo. En claro va con texto `#6e5208` (6.4:1).
+- **Acento de texto** (`{colors.<modo>.gold}`): dorado `#f5c842` en oscuro (12:1 sobre `#030a1a`) y **azul `#1d4ed8` en claro** (6.3:1 sobre `#faf8f3`). Para cifras, enlaces destacados, iconos y bordes activos. Un dorado con contraste AA sobre blanco se ve café, por eso en claro el acento es azul.
+- **Acento suave** (`{colors.<modo>.gold-soft}`): fondo de insignias y del ítem activo: dorado al 10 % en oscuro y azul al 10 % en claro.
 
 ### Superficies
 | Rol | Oscuro | Claro | Uso |
@@ -98,7 +98,7 @@ En ambos modos se conserva el **bloque navy** (`{colors.both.block}`) como super
 | `canvas-raised` | `#04091f` | `#f4f1e8` | Sidebar y header |
 | `surface` | `#0c1d45` | `#ffffff` | Tarjetas, modales, inputs |
 | `surface-subtle` | blanco 5 % | navy 4 % | Filas, chips, botón secundario |
-| `block` | `#0c1d45` | `#0c1d45` | Bloque de firma (simulador, cifra principal) |
+| `block` | `#0c1d45` | `#ffffff` con contorno | Bloque de firma (simulador, cifra principal) |
 
 ### Texto
 | Rol | Oscuro | Claro | Contraste mínimo |
@@ -155,7 +155,7 @@ Reglas:
 ## Elevation & Depth
 
 - **Oscuro:** la profundidad sale del contraste entre `canvas` y `surface`. Sombras negras suaves solo en modales y menús.
-- **Claro:** tarjetas blancas sobre marfil con borde `hairline` y sombra `0 1px 2px rgba(12,29,69,0.06), 0 4px 16px rgba(12,29,69,0.06)`. Nunca sombras negras intensas.
+- **Claro:** tarjetas blancas sobre marfil con **contorno navy al 22 %** (`--contorno`, `--borde-superficie`) y sombra `0 1px 2px rgba(12,29,69,0.06), 0 4px 16px rgba(12,29,69,0.06)`. Los bordes sutiles del oscuro se refuerzan en claro: `border-white/10` y los bordes inline usan `--borde-k` (×2.4). Nunca sombras negras intensas.
 - El halo de fondo es una sola capa radial arriba: navy en oscuro y dorado al 14 % en claro.
 
 ## Shapes
@@ -173,7 +173,8 @@ Reglas:
 
 ### Tarjetas
 - `surface` con borde `hairline` y radio 16 px. En claro, con la sombra suave.
-- El **bloque navy** (`block`) no cambia con el modo: texto `on-block`, cifras en `#f5c842`.
+- El **bloque de firma** lleva la clase `.bloque`: navy en oscuro, tarjeta blanca con contorno en claro.
+- **Fotos de materia** (`TarjetaArea`, `SelectorAreas`): en oscuro, foto con velo navy y texto encima; en claro, **foto limpia sin velo** y el nombre en una franja blanca debajo.
 
 ### Inputs
 - Fondo `surface`, borde `border-input` (≥ 3:1 sobre el fondo), placeholder `ink-mute`, etiqueta `ink-secondary`.
@@ -184,7 +185,7 @@ Reglas:
 - Header en `canvas-raised` al 72 % con borde inferior `hairline`. Ahí vive el botón de modo claro u oscuro.
 
 ### Gráficas
-- Línea y puntos en `gold`. Área bajo la línea en `gold` del 28 % al 2 %.
+- Línea y puntos en `gold` (dorado en oscuro, azul en claro). Área bajo la línea en `gold` del 28 % al 2 %.
 - Ejes y etiquetas en `ink-mute`. Dentro del bloque navy usan los valores del modo oscuro.
 
 ## Do's and Don'ts
@@ -196,12 +197,12 @@ Reglas:
 - Acompaña el color con icono o texto en cualquier estado.
 
 ### Don't
-- No uses `#f5c842` como texto sobre fondos claros: da 1.6:1.
+- No uses dorado como texto en modo claro: `#f5c842` da 1.6:1 y los dorados oscuros se ven café. En claro el dorado es solo relleno.
 - No pongas degradados dorados en titulares ni cifras (`text-gradient-gold`, `bg-clip-text`).
 - No escribas `#ffffff`, `#030a1a` ni `rgba(255,255,255,…)` en estilos inline: en modo claro quedan blanco sobre blanco o navy sobre navy.
 - No uses texto con menos de 60 % de opacidad en oscuro, ni más claro que `ink-mute` en claro.
 - No agregues colores de acento nuevos. Los colores por materia van solo en etiquetas de texto.
-- No apliques el modo claro a la landing ni a las páginas públicas.
+- No apliques el modo claro a la landing, al inicio de sesión ni a las páginas públicas (`useModoOscuroForzado`).
 
 ## Responsive Behavior
 

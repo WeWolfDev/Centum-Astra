@@ -100,7 +100,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
             maxHeight: '92vh',
             overflowY: 'auto',
             background: 'rgb(var(--c-deep))',
-            border: '1px solid rgb(var(--c-ink) / 0.08)',
+            border: '1px solid rgb(var(--c-ink) / calc(0.08 * var(--borde-k)))',
             borderRadius: 18,
             padding: 24,
             display: 'flex',
@@ -133,7 +133,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                 width: 36,
                 height: 36,
                 borderRadius: 10,
-                border: '1px solid rgb(var(--c-ink) / 0.1)',
+                border: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))',
                 background: 'rgb(var(--c-ink) / 0.04)',
                 color: 'rgb(var(--c-ink) / 0.7)',
                 cursor: 'pointer',
@@ -156,7 +156,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                 placeholder={copy.nombrePh}
                 style={{
                   minHeight: 44, padding: '10px 14px', borderRadius: 10,
-                  border: '1px solid rgb(var(--c-ink) / 0.13)',
+                  border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
                   background: 'rgb(var(--c-navy) / 0.5)', color: 'rgb(var(--c-ink) / 0.9)',
                   font: 'inherit', fontSize: 15, outline: 'none',
                 }}
@@ -169,7 +169,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                 onChange={e => setModuleId(Number(e.target.value))}
                 style={{
                   minHeight: 44, padding: '10px 14px', borderRadius: 10,
-                  border: '1px solid rgb(var(--c-ink) / 0.13)',
+                  border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
                   background: 'rgb(var(--c-navy) / 0.5)', color: 'rgb(var(--c-ink) / 0.9)',
                   font: 'inherit', fontSize: 15, outline: 'none',
                 }}
@@ -204,7 +204,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                       aria-label={`Quitar pregunta ${i + 1}`}
                       style={{
                         width: 32, height: 32, borderRadius: 8,
-                        border: '1px solid rgb(var(--c-ink) / 0.1)',
+                        border: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))',
                         background: 'transparent', color: 'rgb(var(--c-ink) / 0.8)',
                         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}
@@ -220,7 +220,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                   rows={2}
                   style={{
                     minHeight: 60, padding: '10px 14px', borderRadius: 10,
-                    border: '1px solid rgb(var(--c-ink) / 0.13)',
+                    border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
                     background: 'rgb(var(--c-navy) / 0.5)', color: 'rgb(var(--c-ink) / 0.9)',
                     font: 'inherit', fontSize: 15, outline: 'none', resize: 'vertical',
                   }}
@@ -279,7 +279,7 @@ export default function ModalNuevaEvaluacion({ tipo, abierto, onCerrar, onGuarda
                   placeholder="Explicación (opcional)"
                   style={{
                     minHeight: 40, padding: '8px 14px', borderRadius: 10,
-                    border: '1px solid rgb(var(--c-ink) / 0.08)',
+                    border: '1px solid rgb(var(--c-ink) / calc(0.08 * var(--borde-k)))',
                     background: 'rgb(var(--c-ink) / 0.03)', color: 'rgb(var(--c-ink) / 0.8)',
                     font: 'inherit', fontSize: 13, outline: 'none',
                   }}

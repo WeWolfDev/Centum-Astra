@@ -51,7 +51,7 @@ export default function SelectorAreas({ modulos }) {
                 width={800}
                 height={533}
                 className={
-                  'absolute inset-0 h-full w-full object-cover ' +
+                  'selector-area-foto absolute inset-0 h-full w-full object-cover ' +
                   'grayscale group-data-[activa=true]:grayscale-0 ' +
                   'transition-[filter] duration-300 ease-out ' +
                   'motion-reduce:transition-none'
@@ -68,7 +68,7 @@ export default function SelectorAreas({ modulos }) {
             <span
               aria-hidden="true"
               className={
-                `absolute inset-0 ${TINTE_INACTIVO} ${TINTE_ACTIVO} ` +
+                `selector-area-velo absolute inset-0 ${TINTE_INACTIVO} ${TINTE_ACTIVO} ` +
                 'mix-blend-multiply transition-colors duration-300 ' +
                 'motion-reduce:transition-none'
               }
@@ -77,11 +77,11 @@ export default function SelectorAreas({ modulos }) {
             {/* Capa de legibilidad fija para contraste ≥ 4.5:1 */}
             <span
               aria-hidden="true"
-              className="absolute inset-0 bg-space-void/40"
+              className="selector-area-velo absolute inset-0 bg-space-void/40"
             />
 
             {/* Icono + etiqueta centrados */}
-            <span className="relative z-10 flex h-full flex-col items-center justify-center gap-1.5 px-2 py-2 text-white">
+            <span className="selector-area-etiqueta relative z-10 flex h-full flex-col items-center justify-center gap-1.5 px-2 py-2 text-white">
               <IconSubject name={area?.icono ?? 'math'} size={26} />
               <span className="font-display font-semibold text-xs leading-tight text-center line-clamp-2">
                 {mod.title}

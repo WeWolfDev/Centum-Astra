@@ -60,7 +60,7 @@ function EvaluacionCreadaCard({ evaluacion, onEliminar }) {
         aria-label={`Eliminar ${copy.singular} ${evaluacion.tema}`}
         style={{
           flex: '0 0 44px', width: 44, height: 44, borderRadius: 10,
-          border: '1px solid rgb(var(--c-ink) / 0.1)',
+          border: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))',
           background: 'transparent', color: 'rgb(var(--c-ink) / 0.8)',
           cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}

@@ -131,7 +131,7 @@ function StatusIndicator({ status, index }) {
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 999,
-        border: '1.5px solid rgb(var(--c-ink) / 0.3)',
+        border: '1.5px solid rgb(var(--c-ink) / calc(0.3 * var(--borde-k)))',
         color: 'rgb(var(--c-ink) / 0.8)',
         fontFamily: '"Bricolage Grotesque", sans-serif',
         fontWeight: 700,
@@ -155,7 +155,7 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
   const pdfResources = [...pdfBase, ...pdfsExtra];
   const videosTodos = [...videos, ...videosExtra];
   const quiz = deriveQuizScore(session.id, status);
-  const borderColor = status === 'en-curso' ? 'rgb(var(--c-gold-bright) / 0.55)' : 'transparent';
+  const borderColor = status === 'en-curso' ? 'rgb(var(--c-gold-bright) / 0.55)' : 'var(--contorno)';
 
   const nPdfs = pdfResources.length;
   const nVideos = videosTodos.length;
@@ -175,7 +175,8 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
         padding: 0,
         borderRadius: 16,
         border: `1.5px solid ${borderColor}`,
-        background: 'rgb(var(--c-ink) / 0.05)',
+        background: 'var(--superficie)',
+        boxShadow: 'var(--sombra-superficie)',
         overflow: 'hidden',
       }}
     >

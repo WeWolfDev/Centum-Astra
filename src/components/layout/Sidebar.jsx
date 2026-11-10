@@ -48,7 +48,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
         display: 'flex',
         flexDirection: 'column',
         background: 'rgb(var(--c-deep))',
-        borderRight: '1px solid rgb(var(--c-ink) / 0.05)',
+        borderRight: '1px solid rgb(var(--c-ink) / calc(0.05 * var(--borde-k)))',
         position: isMobile ? 'fixed' : 'relative',
         top: 0,
         left: 0,
@@ -64,7 +64,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
       }} />
 
       {/* Logotype + close button (mobile) */}
-      <div style={{ padding: '20px 20px 18px', borderBottom: '1px solid rgb(var(--c-ink) / 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: '20px 20px 18px', borderBottom: '1px solid rgb(var(--c-ink) / calc(0.05 * var(--borde-k)))', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <img
             src={`${import.meta.env.BASE_URL}logo-astra-sm.png`}
@@ -92,7 +92,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
           <button
             onClick={onClose}
             style={{
-              background: 'rgb(var(--c-ink) / 0.06)', border: '1px solid rgb(var(--c-ink) / 0.1)',
+              background: 'rgb(var(--c-ink) / 0.06)', border: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))',
               borderRadius: 8, padding: '6px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               color: 'rgb(var(--c-ink) / 0.5)',
@@ -104,7 +104,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
       </div>
 
       {/* User */}
-      <div style={{ padding: '14px 20px 16px', borderBottom: '1px solid rgb(var(--c-ink) / 0.05)' }}>
+      <div style={{ padding: '14px 20px 16px', borderBottom: '1px solid rgb(var(--c-ink) / calc(0.05 * var(--borde-k)))' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
           <div style={{
             width: 32, height: 32, borderRadius: '50%',
@@ -145,7 +145,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
       </nav>
 
       {/* Logout */}
-      <div style={{ padding: '12px', borderTop: '1px solid rgb(var(--c-ink) / 0.05)' }}>
+      <div style={{ padding: '12px', borderTop: '1px solid rgb(var(--c-ink) / calc(0.05 * var(--borde-k)))' }}>
         <button
           onClick={logout}
           onMouseEnter={() => setLogoutHover(true)}

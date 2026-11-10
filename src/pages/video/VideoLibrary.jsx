@@ -67,7 +67,7 @@ function UploadVideoModal({ onClose, onUpload }) {
           width: '100%',
           maxWidth: 440,
           background: 'rgb(var(--c-navy))',
-          border: '1px solid rgb(var(--c-ink) / 0.08)',
+          border: '1px solid rgb(var(--c-ink) / calc(0.08 * var(--borde-k)))',
           borderRadius: 16,
           padding: '28px 24px',
           color: 'rgb(var(--c-ink) / 0.8)',
@@ -95,7 +95,7 @@ function UploadVideoModal({ onClose, onUpload }) {
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               width: 44, height: 44, borderRadius: 10,
               background: 'rgb(var(--c-ink) / 0.05)',
-              border: '1px solid rgb(var(--c-ink) / 0.1)',
+              border: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))',
               color: 'rgb(var(--c-ink) / 0.8)', cursor: 'pointer',
             }}
           >
@@ -133,7 +133,7 @@ function UploadVideoModal({ onClose, onUpload }) {
               style={{
                 width: '100%', boxSizing: 'border-box',
                 background: 'rgb(var(--c-ink) / 0.05)',
-                border: '1px solid rgb(var(--c-ink) / 0.13)',
+                border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
                 borderRadius: 10, padding: '12px 14px',
                 color: 'rgb(var(--c-ink))', fontSize: 14, outline: 'none',
                 minHeight: 44,
@@ -149,7 +149,7 @@ function UploadVideoModal({ onClose, onUpload }) {
                 style={{
                   width: '100%', boxSizing: 'border-box',
                   background: 'rgb(var(--c-ink) / 0.05)',
-                  border: '1px solid rgb(var(--c-ink) / 0.13)',
+                  border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
                   borderRadius: 10, padding: '12px 14px',
                   color: 'rgb(var(--c-ink))', fontSize: 14, outline: 'none',
                   minHeight: 44,
@@ -168,7 +168,7 @@ function UploadVideoModal({ onClose, onUpload }) {
                 style={{
                   width: '100%', boxSizing: 'border-box',
                   background: 'rgb(var(--c-ink) / 0.05)',
-                  border: '1px solid rgb(var(--c-ink) / 0.13)',
+                  border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
                   borderRadius: 10, padding: '12px 14px',
                   color: 'rgb(var(--c-ink))', fontSize: 14, outline: 'none',
                   minHeight: 44,
@@ -228,6 +228,8 @@ function VideoCard({ video, onClick }) {
           aspectRatio: '16 / 9',
           borderRadius: 16,
           background: 'rgb(var(--c-navy))',
+          border: '1px solid var(--contorno)',
+          boxShadow: 'var(--sombra-superficie)',
           overflow: 'hidden',
         }}
       >
@@ -398,7 +400,7 @@ export default function VideoLibrary() {
               boxSizing: 'border-box',
               minHeight: 48,
               padding: '0 16px',
-              border: '1px solid rgb(var(--c-ink) / 0.2)',
+              border: '1px solid rgb(var(--c-ink) / calc(0.2 * var(--borde-k)))',
               borderRadius: 999,
               background: 'rgb(var(--c-navy) / 0.5)',
             }}

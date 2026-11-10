@@ -100,7 +100,7 @@ function StudentRow({ student }) {
         alignItems: 'center',
         minHeight: 64,
         padding: '6px 12px',
-        borderTop: '1px solid rgb(var(--c-ink) / 0.08)',
+        borderTop: '1px solid rgb(var(--c-ink) / calc(0.08 * var(--borde-k)))',
         color: 'rgb(var(--c-ink) / 0.9)',
         textDecoration: 'none',
       }}
@@ -115,6 +115,7 @@ function StudentRow({ student }) {
             justifyContent: 'center',
             borderRadius: 999,
             background: 'rgb(var(--c-navy))',
+            border: '1px solid var(--contorno)',
             fontSize: 14,
             fontWeight: 600,
             color: 'rgb(var(--c-ink))',
@@ -286,7 +287,7 @@ function TeacherDashboardDemo() {
             minWidth: 0,
             minHeight: 48,
             padding: '0 16px',
-            border: '1px solid rgb(var(--c-ink) / 0.2)',
+            border: '1px solid rgb(var(--c-ink) / calc(0.2 * var(--borde-k)))',
             borderRadius: 999,
             background: 'rgb(var(--c-navy) / 0.5)',
           }}
@@ -419,7 +420,7 @@ function TeacherDashboardDemo() {
             style={{
               minHeight: 44,
               padding: '8px 18px',
-              border: filtro === 'todos' ? '1.5px solid rgb(var(--c-gold-bright))' : '1.5px solid rgb(var(--c-ink) / 0.13)',
+              border: filtro === 'todos' ? '1.5px solid rgb(var(--c-gold-bright))' : '1.5px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
               borderRadius: 999,
               background: filtro === 'todos' ? 'rgb(var(--c-gold-bright) / 0.1)' : 'transparent',
               color: filtro === 'todos' ? 'rgb(var(--c-ink))' : 'rgb(var(--c-ink) / 0.8)',
@@ -440,7 +441,7 @@ function TeacherDashboardDemo() {
               gap: 8,
               minHeight: 44,
               padding: '8px 18px',
-              border: filtro === 'atencion' ? '1.5px solid rgb(var(--c-gold-bright))' : '1.5px solid rgb(var(--c-ink) / 0.13)',
+              border: filtro === 'atencion' ? '1.5px solid rgb(var(--c-gold-bright))' : '1.5px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
               borderRadius: 999,
               background: filtro === 'atencion' ? 'rgb(var(--c-gold-bright) / 0.1)' : 'transparent',
               color: filtro === 'atencion' ? 'rgb(var(--c-ink))' : 'rgb(var(--c-ink) / 0.8)',
@@ -483,7 +484,7 @@ function TeacherDashboardDemo() {
                   padding: '24px 12px',
                   fontSize: 14,
                   color: 'rgb(var(--c-ink) / 0.6)',
-                  borderTop: '1px solid rgb(var(--c-ink) / 0.08)',
+                  borderTop: '1px solid rgb(var(--c-ink) / calc(0.08 * var(--borde-k)))',
                 }}
               >
                 No hay alumnos que coincidan con el filtro.
