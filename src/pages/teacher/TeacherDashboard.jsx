@@ -37,7 +37,7 @@ function serieCenevalDeAlumno(student) {
   return puntos;
 }
 
-function Sparkline({ data, color = '#f5c842', width = 104, height = 32 }) {
+function Sparkline({ data, color = 'rgb(var(--c-gold-bright))', width = 104, height = 32 }) {
   if (!data || data.length < 2) return null;
   const min = Math.min(...data);
   const max = Math.max(...data);
@@ -100,8 +100,8 @@ function StudentRow({ student }) {
         alignItems: 'center',
         minHeight: 64,
         padding: '6px 12px',
-        borderTop: '1px solid rgba(255,255,255,0.08)',
-        color: '#e2e8f0',
+        borderTop: '1px solid rgb(var(--c-ink) / 0.08)',
+        color: 'rgb(var(--c-ink) / 0.9)',
         textDecoration: 'none',
       }}
     >
@@ -114,16 +114,16 @@ function StudentRow({ student }) {
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: 999,
-            background: '#0c1d45',
+            background: 'rgb(var(--c-navy))',
             fontSize: 14,
             fontWeight: 600,
-            color: '#ffffff',
+            color: 'rgb(var(--c-ink))',
           }}
         >
           {initialsOf(student.name)}
         </span>
         <span style={{ minWidth: 0 }}>
-          <span style={{ display: 'block', fontSize: 15, fontWeight: 600, color: '#ffffff' }}>
+          <span style={{ display: 'block', fontSize: 15, fontWeight: 600, color: 'rgb(var(--c-ink))' }}>
             {student.name}
           </span>
           {requiereAtencion && (
@@ -134,11 +134,11 @@ function StudentRow({ student }) {
                 gap: 6,
                 fontSize: 13,
                 fontWeight: 600,
-                color: '#fca5a5',
+                color: 'rgb(var(--c-peligro))',
                 marginTop: 2,
               }}
             >
-              <span style={{ width: 8, height: 8, borderRadius: 999, background: '#f87171' }} />
+              <span style={{ width: 8, height: 8, borderRadius: 999, background: 'rgb(var(--c-peligro))' }} />
               Va a la baja
             </span>
           )}
@@ -154,7 +154,7 @@ function StudentRow({ student }) {
           fontFamily: '"Bricolage Grotesque", sans-serif',
           fontWeight: 700,
           fontSize: 20,
-          color: '#ffffff',
+          color: 'rgb(var(--c-ink))',
         }}
       >
         {puntajeActual.toLocaleString('es-MX')}
@@ -167,7 +167,7 @@ function StudentRow({ student }) {
           gap: 4,
           fontSize: 15,
           fontWeight: 600,
-          color: subio ? '#34d399' : 'rgba(255,255,255,0.6)',
+          color: subio ? 'rgb(var(--c-exito))' : 'rgb(var(--c-ink) / 0.6)',
         }}
       >
         <ArrowUp
@@ -188,7 +188,7 @@ function StudentRow({ student }) {
             flex: '1 1 auto',
             height: 6,
             borderRadius: 999,
-            background: 'rgba(255,255,255,0.1)',
+            background: 'rgb(var(--c-ink) / 0.1)',
             overflow: 'hidden',
           }}
         >
@@ -197,13 +197,13 @@ function StudentRow({ student }) {
               display: 'block',
               width: `${(quizzesHechos / quizzesTotal) * 100}%`,
               height: '100%',
-              background: '#93c5fd',
+              background: 'rgb(var(--c-info))',
             }}
           />
         </span>
       </span>
 
-      <ChevronRight size={18} strokeWidth={2} aria-hidden="true" color="#cbd5e1" />
+      <ChevronRight size={18} strokeWidth={2} aria-hidden="true" color="rgb(var(--c-ink) / 0.8)" />
     </a>
   );
 }
@@ -256,7 +256,7 @@ function TeacherDashboardDemo() {
         display: 'flex',
         flexDirection: 'column',
         gap: 28,
-        color: '#cbd5e1',
+        color: 'rgb(var(--c-ink) / 0.8)',
         fontFamily: '"Plus Jakarta Sans", sans-serif',
         maxHeight: 'calc(100vh - 4rem)',
         overflowY: 'auto',
@@ -272,7 +272,7 @@ function TeacherDashboardDemo() {
             fontSize: 'clamp(28px, 5vw, 36px)',
             lineHeight: 1.1,
             letterSpacing: '-0.03em',
-            color: '#ffffff',
+            color: 'rgb(var(--c-ink))',
           }}
         >
           Mis alumnos
@@ -286,12 +286,12 @@ function TeacherDashboardDemo() {
             minWidth: 0,
             minHeight: 48,
             padding: '0 16px',
-            border: '1px solid rgba(255,255,255,0.2)',
+            border: '1px solid rgb(var(--c-ink) / 0.2)',
             borderRadius: 999,
-            background: 'rgba(12,29,69,0.5)',
+            background: 'rgb(var(--c-navy) / 0.5)',
           }}
         >
-          <Search size={20} strokeWidth={1.8} color="#cbd5e1" aria-hidden="true" />
+          <Search size={20} strokeWidth={1.8} color="rgb(var(--c-ink) / 0.8)" aria-hidden="true" />
           <input
             type="search"
             aria-label="Buscar alumno"
@@ -304,7 +304,7 @@ function TeacherDashboardDemo() {
               height: 44,
               border: 0,
               background: 'transparent',
-              color: '#e2e8f0',
+              color: 'rgb(var(--c-ink) / 0.9)',
               font: 'inherit',
               fontSize: 15,
               outline: 'none',
@@ -326,12 +326,12 @@ function TeacherDashboardDemo() {
               fontSize: 'clamp(44px, 7vw, 60px)',
               lineHeight: 0.95,
               letterSpacing: '-0.03em',
-              color: '#ffffff',
+              color: 'rgb(var(--c-ink))',
             }}
           >
             {totalAlumnos}
           </div>
-          <div style={{ marginTop: 8, fontSize: 14, color: '#e2e8f0' }}>
+          <div style={{ marginTop: 8, fontSize: 14, color: 'rgb(var(--c-ink) / 0.9)' }}>
             {totalAlumnos === 1 ? 'alumno' : 'alumnos'}
           </div>
         </div>
@@ -344,12 +344,12 @@ function TeacherDashboardDemo() {
               fontSize: 'clamp(44px, 7vw, 60px)',
               lineHeight: 0.95,
               letterSpacing: '-0.03em',
-              color: '#f5c842',
+              color: 'rgb(var(--c-gold-bright))',
             }}
           >
             {promedioGrupo.toLocaleString('es-MX')}
           </div>
-          <div style={{ marginTop: 8, fontSize: 14, color: '#e2e8f0' }}>
+          <div style={{ marginTop: 8, fontSize: 14, color: 'rgb(var(--c-ink) / 0.9)' }}>
             promedio del grupo en el último simulador
           </div>
           <div
@@ -360,7 +360,7 @@ function TeacherDashboardDemo() {
               gap: 6,
               fontSize: 14,
               fontWeight: 600,
-              color: deltaGrupo >= 0 ? '#34d399' : 'rgba(255,255,255,0.6)',
+              color: deltaGrupo >= 0 ? 'rgb(var(--c-exito))' : 'rgb(var(--c-ink) / 0.6)',
             }}
           >
             <ArrowUp
@@ -381,12 +381,12 @@ function TeacherDashboardDemo() {
               fontSize: 'clamp(44px, 7vw, 60px)',
               lineHeight: 0.95,
               letterSpacing: '-0.03em',
-              color: '#ffffff',
+              color: 'rgb(var(--c-ink))',
             }}
           >
             {nAtencion}
           </div>
-          <div style={{ marginTop: 8, fontSize: 14, color: '#e2e8f0' }}>
+          <div style={{ marginTop: 8, fontSize: 14, color: 'rgb(var(--c-ink) / 0.9)' }}>
             {nAtencion === 1 ? 'requiere atención' : 'requieren atención'}
           </div>
           <div
@@ -396,10 +396,10 @@ function TeacherDashboardDemo() {
               alignItems: 'center',
               gap: 6,
               fontSize: 14,
-              color: '#fca5a5',
+              color: 'rgb(var(--c-peligro))',
             }}
           >
-            <span style={{ width: 8, height: 8, borderRadius: 999, background: '#f87171' }} />
+            <span style={{ width: 8, height: 8, borderRadius: 999, background: 'rgb(var(--c-peligro))' }} />
             bajan o llevan semanas sin entrar
           </div>
         </div>
@@ -419,10 +419,10 @@ function TeacherDashboardDemo() {
             style={{
               minHeight: 44,
               padding: '8px 18px',
-              border: filtro === 'todos' ? '1.5px solid #f5c842' : '1.5px solid rgba(255,255,255,0.13)',
+              border: filtro === 'todos' ? '1.5px solid rgb(var(--c-gold-bright))' : '1.5px solid rgb(var(--c-ink) / 0.13)',
               borderRadius: 999,
-              background: filtro === 'todos' ? 'rgba(245,200,66,0.1)' : 'transparent',
-              color: filtro === 'todos' ? '#ffffff' : '#cbd5e1',
+              background: filtro === 'todos' ? 'rgb(var(--c-gold-bright) / 0.1)' : 'transparent',
+              color: filtro === 'todos' ? 'rgb(var(--c-ink))' : 'rgb(var(--c-ink) / 0.8)',
               fontSize: 14,
               fontWeight: 600,
               cursor: 'pointer',
@@ -440,16 +440,16 @@ function TeacherDashboardDemo() {
               gap: 8,
               minHeight: 44,
               padding: '8px 18px',
-              border: filtro === 'atencion' ? '1.5px solid #f5c842' : '1.5px solid rgba(255,255,255,0.13)',
+              border: filtro === 'atencion' ? '1.5px solid rgb(var(--c-gold-bright))' : '1.5px solid rgb(var(--c-ink) / 0.13)',
               borderRadius: 999,
-              background: filtro === 'atencion' ? 'rgba(245,200,66,0.1)' : 'transparent',
-              color: filtro === 'atencion' ? '#ffffff' : '#cbd5e1',
+              background: filtro === 'atencion' ? 'rgb(var(--c-gold-bright) / 0.1)' : 'transparent',
+              color: filtro === 'atencion' ? 'rgb(var(--c-ink))' : 'rgb(var(--c-ink) / 0.8)',
               fontSize: 14,
               fontWeight: 600,
               cursor: 'pointer',
             }}
           >
-            <span style={{ width: 8, height: 8, borderRadius: 999, background: '#f87171' }} />
+            <span style={{ width: 8, height: 8, borderRadius: 999, background: 'rgb(var(--c-peligro))' }} />
             Requieren atención · {nAtencion}
           </button>
         </div>
@@ -465,7 +465,7 @@ function TeacherDashboardDemo() {
                 padding: '0 12px 8px',
                 fontSize: 12,
                 fontWeight: 600,
-                color: '#cbd5e1',
+                color: 'rgb(var(--c-ink) / 0.8)',
               }}
             >
               <span>Alumno</span>
@@ -482,8 +482,8 @@ function TeacherDashboardDemo() {
                   margin: 0,
                   padding: '24px 12px',
                   fontSize: 14,
-                  color: 'rgba(255,255,255,0.6)',
-                  borderTop: '1px solid rgba(255,255,255,0.08)',
+                  color: 'rgb(var(--c-ink) / 0.6)',
+                  borderTop: '1px solid rgb(var(--c-ink) / 0.08)',
                 }}
               >
                 No hay alumnos que coincidan con el filtro.

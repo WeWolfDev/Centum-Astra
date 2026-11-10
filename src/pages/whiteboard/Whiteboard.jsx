@@ -253,7 +253,7 @@ export default function Whiteboard({ onExportToModule }) {
 
         {/* Size */}
         <div className="flex items-center gap-2">
-          <span className="text-white/40 text-xs">Tamaño</span>
+          <span className="text-white/60 text-xs">Tamaño</span>
           <input
             type="range" min="1" max="20" value={size}
             onChange={e => setSize(parseInt(e.target.value))}
@@ -290,7 +290,7 @@ export default function Whiteboard({ onExportToModule }) {
           onTouchMove={draw}
           onTouchEnd={endDraw}
         />
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/20 text-xs pointer-events-none">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/60 text-xs pointer-events-none">
           Herramienta: {TOOLS.find(t => t.id === tool)?.label} · Color: <span style={{ color }}>{color}</span>
         </div>
       </div>

@@ -1,3 +1,6 @@
+/** @param {string} nombre */
+const tema = nombre => `rgb(var(--c-${nombre}) / <alpha-value>)`;
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -14,34 +17,37 @@ export default {
       '2xl': '1536px',
     },
     extend: {
+      // Colores del tema: leen las variables de src/index.css para cambiar
+      // con data-theme. `white` es la tinta del tema (blanco en oscuro, navy en claro).
       colors: {
+        white: tema('ink'),
         space: {
-          void:  '#030a1a',
-          deep:  '#060f28',
-          navy:  '#0c1d45',
-          mid:   '#162850',
-          light: '#1e3a6e',
+          void:  tema('void'),
+          deep:  tema('deep'),
+          navy:  tema('navy'),
+          mid:   tema('mid'),
+          light: tema('light'),
         },
         gold: {
-          dim:    '#7a5c10',
-          muted:  '#b8880f',
-          bright: '#f5c842',
-          glow:   '#fde68a',
+          dim:    tema('gold-dim'),
+          muted:  tema('gold-muted'),
+          bright: tema('gold-bright'),
+          glow:   tema('gold-glow'),
+          fill:   tema('gold-fill'),
         },
+        'on-gold':    tema('on-gold'),
+        'on-peligro': tema('on-peligro'),
         clinical: {
           void:  '#020e0c',
           deep:  '#041e1b',
           teal:  '#1de9b6',
           light: '#b2f5e8',
         },
-        // Tokens semánticos de estado. Contraste verificado contra space-void (#030a1a):
-        // peligro 7.12:1, exito 10.2:1, advertencia 10.5:1, info 11.9:1. Todos pasan WCAG AA.
-        // Para fondos sólidos de botones, usar texto oscuro (text-space-void), no blanco.
-        peligro:     '#f87171',
-        exito:       '#34d399',
-        advertencia: '#fbbf24',
-        info:        '#93c5fd',
-        violeta:     '#c084fc',
+        peligro:     tema('peligro'),
+        exito:       tema('exito'),
+        advertencia: tema('advertencia'),
+        info:        tema('info'),
+        violeta:     tema('violeta'),
       },
       fontFamily: {
         display:  ['"Bricolage Grotesque"', 'sans-serif'],
@@ -49,14 +55,14 @@ export default {
         wordmark: ['Orbitron', 'sans-serif'],
       },
       backgroundImage: {
-        'nebula':          'radial-gradient(ellipse 80% 60% at 50% 0%, #0c1d45 0%, #030a1a 70%)',
+        'nebula':          'radial-gradient(ellipse 80% 60% at 50% 0%, rgb(var(--c-navy)) 0%, rgb(var(--c-void)) 70%)',
         'space-radial':    'radial-gradient(ellipse at top, #0d1533 0%, #030a1a 50%, #000 100%)',
         // Degradado sutil azul marino que varias páginas internas repiten como
         // style inline. Login lo adopta aquí vía token; otras páginas se migran aparte.
-        'fondo-app':       'radial-gradient(ellipse 80% 50% at 50% -10%, rgba(12,29,69,0.85), rgba(12,29,69,0) 70%)',
+        'fondo-app':       'radial-gradient(ellipse 80% 50% at 50% -10%, rgb(var(--c-halo) / calc(var(--halo-alpha) * 0.85)), rgb(var(--c-halo) / 0) 70%)',
         'gold-beam':       'linear-gradient(135deg, #b8880f 0%, #f5c842 50%, #b8880f 100%)',
         'clinical-beam':   'linear-gradient(135deg, #0d9488 0%, #1de9b6 50%, #0d9488 100%)',
-        'card-surface':    'linear-gradient(145deg, rgba(22,40,80,0.6) 0%, rgba(12,29,69,0.4) 100%)',
+        'card-surface':    'linear-gradient(145deg, rgb(var(--c-mid) / 0.6) 0%, rgb(var(--c-navy) / 0.4) 100%)',
         'medical-surface': 'linear-gradient(145deg, rgba(4,30,27,0.8) 0%, rgba(2,14,12,0.6) 100%)',
         /* ── Aceternity-style structural textures ── */
         'dot-grid':        'radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px)',

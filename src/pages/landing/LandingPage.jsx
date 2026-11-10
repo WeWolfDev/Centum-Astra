@@ -6,6 +6,7 @@ import {
   ShieldCheck, Zap, BookOpen, Trophy,
 } from 'lucide-react';
 import PublicNav from '../../components/layout/PublicNav';
+import { useModoOscuroForzado } from '../../context/ThemeContext';
 
 /* ── Mexican states ─────────────────────────────────────── */
 const MX_STATES = [
@@ -569,7 +570,7 @@ function RegistrationPayment({ sectionRef }) {
               Tu lugar en la universidad te espera.
             </span>
           </h2>
-          <p className="text-white/40 text-[15px] max-w-lg mx-auto leading-[1.7]">
+          <p className="text-white/60 text-[15px] max-w-lg mx-auto leading-[1.7]">
             Regístrate ahora y accede al mismo instante a todos los módulos y simuladores.
           </p>
         </div>
@@ -594,7 +595,7 @@ function RegistrationPayment({ sectionRef }) {
                   <CheckCircle size={32} color="#f5c842" />
                 </div>
                 <h3 className="font-syne font-bold text-white text-2xl">¡Solicitud recibida!</h3>
-                <p className="text-white/50 text-[15px] leading-[1.7] max-w-sm">
+                <p className="text-white/60 text-[15px] leading-[1.7] max-w-sm">
                   Hemos recibido tu registro. En breve recibirás un correo con los pasos
                   para completar tu pago y activar tu cuenta.
                 </p>
@@ -727,7 +728,7 @@ function RegistrationPayment({ sectionRef }) {
                     )}
                   </button>
 
-                  <p className="text-center text-white/20 text-[11.5px] mt-1">
+                  <p className="text-center text-white/60 text-[11.5px] mt-1">
                     Pago seguro · Acceso inmediato al completar la transacción
                   </p>
                 </form>
@@ -770,7 +771,7 @@ function RegistrationPayment({ sectionRef }) {
 
             {/* Features */}
             <div className="px-7 py-6">
-              <p className="text-white/45 text-[12px] font-semibold tracking-[0.06em] uppercase mb-4">
+              <p className="text-white/60 text-[12px] font-semibold tracking-[0.06em] uppercase mb-4">
                 Incluye
               </p>
               <ul className="flex flex-col gap-3">
@@ -798,7 +799,7 @@ function RegistrationPayment({ sectionRef }) {
                   Garantía de satisfacción
                 </span>
               </div>
-              <p className="text-white/38 text-[12px] leading-[1.55]">
+              <p className="text-white/60 text-[12px] leading-[1.55]">
                 Si en los primeros 7 días no estás satisfecho, te devolvemos tu inversión.
               </p>
             </div>
@@ -822,7 +823,7 @@ function LandingFooter({ onLoginClick }) {
         borderTop: '1px solid rgba(255,255,255,0.06)',
       }}
     >
-      <p className="text-white/20 text-[12px]">
+      <p className="text-white/60 text-[12px]">
         © 2025 Centum Astra · Todos los derechos reservados
       </p>
       <button
@@ -841,6 +842,7 @@ function LandingFooter({ onLoginClick }) {
 ══════════════════════════════════════════════════════════ */
 export default function LandingPage({ onLoginClick }) {
   const registroRef = useRef(null);
+  useModoOscuroForzado();
 
   function scrollToRegister() {
     registroRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });

@@ -36,7 +36,7 @@ export default function TeacherRoster() {
       <header className="flex items-center justify-between gap-4 flex-wrap">
         <h1 className="m-0 font-display font-bold text-3xl tracking-tight text-white">Mis alumnos</h1>
         <div className="relative flex-1 max-w-xs min-w-[200px]">
-          <Search size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+          <Search size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none" />
           <input
             type="search"
             aria-label="Buscar alumno"
