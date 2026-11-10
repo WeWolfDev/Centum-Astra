@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Boton from '../../components/rediseno/Boton';
 import Input from '../../components/rediseno/Input';
-import { requestRecoveryCode, setPasswordWithCode } from '../../lib/passwordFlow';
+import {
+  cancelPasswordFlow,
+  requestRecoveryCode,
+  savePassword,
+  verifyCode,
+} from '../../lib/passwordFlow';
 
 const TEXTOS = {
   recovery: {
@@ -27,6 +32,13 @@ export default function CodigoContrasena({ tipo, onVolver }) {
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
   const [cargando, setCargando] = useState(false);
+  // El código ya se validó y su sesión sigue abierta hasta guardar o salir.
+  const [verificado, setVerificado] = useState(false);
+  const sesionAbierta = useRef(false);
+
+  useEffect(() => () => {
+    if (sesionAbierta.current) void cancelPasswordFlow();
+  }, []);
 
   async function ejecutar(accion) {
     setError('');
@@ -56,9 +68,23 @@ export default function CodigoContrasena({ tipo, onVolver }) {
       return;
     }
     void ejecutar(async () => {
-      await setPasswordWithCode({ email, code: codigo, password, type: tipo });
+      if (!verificado) {
+        await verifyCode({ email, code: codigo, type: tipo });
+        sesionAbierta.current = true;
+        setVerificado(true);
+      }
+      await savePassword(password);
+      sesionAbierta.current = false;
       onVolver(textos.exito);
     });
+  }
+
+  function volver() {
+    if (sesionAbierta.current) {
+      sesionAbierta.current = false;
+      void cancelPasswordFlow();
+    }
+    onVolver('');
   }
 
   return (
@@ -78,6 +104,7 @@ export default function CodigoContrasena({ tipo, onVolver }) {
           autoComplete="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
+          disabled={verificado}
           required
         />
 
@@ -90,6 +117,7 @@ export default function CodigoContrasena({ tipo, onVolver }) {
               autoComplete="one-time-code"
               value={codigo}
               onChange={e => setCodigo(e.target.value)}
+              disabled={verificado}
               required
             />
             <Input
@@ -123,7 +151,7 @@ export default function CodigoContrasena({ tipo, onVolver }) {
         <Boton variant="primario" type="submit" isLoading={cargando} className="w-full mt-1">
           {paso === 'solicitar' ? 'Enviar código' : 'Guardar contraseña'}
         </Boton>
-        <Boton variant="ghost" type="button" onClick={() => onVolver('')} className="w-full">
+        <Boton variant="ghost" type="button" onClick={volver} className="w-full">
           Volver a iniciar sesión
         </Boton>
       </form>

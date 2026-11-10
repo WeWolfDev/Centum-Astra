@@ -81,7 +81,7 @@ function useDirectorio() {
   }, []);
 
   useEffect(() => {
-    recargar();
+    void recargar();
   }, [recargar]);
 
   return { usuarios, grupos, cargando, error, recargar };

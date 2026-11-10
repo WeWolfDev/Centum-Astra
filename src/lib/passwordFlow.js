@@ -35,16 +35,27 @@ export async function requestRecoveryCode(email) {
 }
 
 /**
- * Valida el código, guarda la contraseña y cierra la sesión para exigir un
- * inicio de sesión nuevo.
- * @param {{ email: string, code: string, password: string, type: 'recovery' | 'invite' }} datos
+ * Valida el código. Su sesión queda abierta para que, si la contraseña se
+ * rechaza, se pueda reintentar el guardado sin gastar otro código.
+ * @param {{ email: string, code: string, type: 'recovery' | 'invite' }} datos
  */
-export async function setPasswordWithCode({ email, code, password, type }) {
-  const { error: otpError } = await supabase.auth.verifyOtp({ email, token: code.trim(), type });
-  if (otpError) throw new Error(mensajeDeError(otpError));
+export async function verifyCode({ email, code, type }) {
+  const { error } = await supabase.auth.verifyOtp({ email, token: code.trim(), type });
+  if (error) throw new Error(mensajeDeError(error));
+}
 
-  const { error: updateError } = await supabase.auth.updateUser({ password });
-  // Con o sin éxito, no se deja abierta la sesión que abrió el código.
-  await supabase.auth.signOut({ scope: updateError ? 'local' : 'global' });
-  if (updateError) throw new Error(mensajeDeError(updateError));
+/**
+ * Guarda la contraseña con la sesión del código y la cierra en todos los
+ * dispositivos para exigir un inicio de sesión nuevo.
+ * @param {string} password
+ */
+export async function savePassword(password) {
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) throw new Error(mensajeDeError(error));
+  await supabase.auth.signOut({ scope: 'global' });
+}
+
+/** Cierra la sesión del código cuando se abandona el flujo sin guardar. */
+export async function cancelPasswordFlow() {
+  await supabase.auth.signOut({ scope: 'local' });
 }
