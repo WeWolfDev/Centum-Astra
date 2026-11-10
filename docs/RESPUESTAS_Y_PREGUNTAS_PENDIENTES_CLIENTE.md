@@ -224,6 +224,53 @@ Estas respuestas actualizan a las de 1.8 cuando tratan el mismo tema.
 - La inscripción es uno de los pagos.
 - El cliente todavía no define las condiciones de cada descuento.
 
+### 1.10 Aclaraciones registradas el 2026-11-09
+
+Estas respuestas actualizan a las de 1.8 y 1.9 cuando tratan el mismo tema.
+
+**Evaluaciones**
+
+- En los simuladores cada pregunta tiene una sola respuesta correcta; en los quizzes puede haber varias.
+- Las preguntas pueden llevar imágenes, audio y video.
+- El puntaje del simulador parte de 700 puntos y cada acierto suma su parte proporcional de los 600 puntos restantes. Con unos 138 reactivos evaluables, cada acierto aporta aproximadamente 4.3 puntos.
+
+**Estadísticas**
+
+- Alumno: ve su promedio de calificación, sus días de racha y las calificaciones de sus simuladores y tareas.
+- Maestro: ve las calificaciones generales de sus alumnos y de sus grupos.
+- Administrador: ve la información de todos los grupos.
+
+**Soporte y respaldos**
+
+- El administrador recibe las alertas de fallas y atiende las dudas de alumnos y maestros.
+- El administrador autoriza la restauración de un respaldo.
+
+**Cuentas técnicas**
+
+- Los 3 clientes conservan la propiedad de las cuentas de Supabase, Drive, dominio y hosting.
+- Los líderes de acceso son los 3 clientes y un solo integrante del equipo técnico.
+- Cada persona usa su propia cuenta con verificación en dos pasos; no se comparten contraseñas.
+- Cada integrante del equipo recibe solo el acceso que necesita, y los líderes llevan la lista de quién tiene qué acceso.
+- Cuando alguien deja el proyecto, un líder le retira todos sus accesos en un máximo de 24 horas y se cambian las claves que esa persona conocía.
+
+**Menores de edad**
+
+- Los usuarios reciben una cláusula de términos de uso.
+- Si el alumno es menor de edad, un adulto responsable debe firmarla.
+- El cliente genera los términos y condiciones que el adulto firma para dar acceso al menor.
+- El menor no puede entrar a la plataforma hasta que el administrador registre la firma del adulto.
+- El adulto firma en papel y el administrador sube el documento escaneado.
+
+**Recomendaciones aprobadas**
+
+- Una pregunta de quiz con varias respuestas correctas cuenta solo si el alumno marca todas las correctas y ninguna incorrecta.
+- Los videos de las preguntas son enlaces de Google Drive; las imágenes y los audios se suben a la plataforma con el límite de 50 MB.
+- Todas las preguntas cuentan para el puntaje.
+- Los cuestionarios grandes usan la escala de 700 a 1300, igual que los simuladores.
+- El resultado muestra aciertos, porcentaje y puntaje estimado, aclarando que no es un resultado oficial del EXANI-II.
+- El alumno ve dos promedios separados: uno de quizzes en porcentaje y otro de simuladores en puntos.
+- Las tareas de Centum Notes se entregan, pero no se califican.
+
 ## 2. Preguntas pendientes o que requieren aclaración
 
 Estas son las únicas preguntas que deben volver al cliente. Las demás ya no necesitan repetirse.
@@ -282,7 +329,7 @@ Se indicó que maestros y administradores pueden gestionar materiales:
 
 ### P-06. Reactivos y formatos de evaluación
 
-**Estado:** parcial (1.9). Falta confirmar si puede haber varias respuestas correctas y si las preguntas llevan imágenes, audio o video.
+**Estado:** respondida en 1.9 y 1.10.
 
 - ¿Los reactivos serán únicamente de opción múltiple?
 - ¿Se permitirán varias respuestas correctas?
@@ -307,7 +354,7 @@ Se indicó que maestros y administradores pueden gestionar materiales:
 
 ### P-08. Sistema de puntos del simulador
 
-**Estado:** parcial (1.9). Falta aprobar la fórmula lineal de 1.8, confirmar la escala de los cuestionarios grandes y si se muestran aciertos y porcentaje además de los puntos.
+**Estado:** respondida en 1.8, 1.9 y 1.10.
 
 - ¿Se mantienen 138 preguntas como total del simulador?
 - ¿Se mantiene el rango de 700 a 1300 puntos?
@@ -320,7 +367,7 @@ Se indicó que maestros y administradores pueden gestionar materiales:
 
 ### P-09. Estadísticas del sistema
 
-**Estado:** parcial (1.9). Los permisos por rol están definidos. Falta confirmar qué indicadores concretos se muestran.
+**Estado:** respondida en 1.9 y 1.10.
 
 La pregunta original sobre indicadores no quedó respondida. Se necesita definir qué verá cada rol.
 
@@ -368,7 +415,7 @@ También se debe confirmar:
 
 ### P-11. Menores de edad
 
-**Estado:** pospuesta por decisión del equipo (2026-11-09).
+**Estado:** respondida en 1.10.
 
 - ¿Habrá alumnos menores de edad?
 - Si los hay, ¿quién proporciona el consentimiento?
@@ -388,7 +435,7 @@ Se indicó que no se permitirá solicitar copia o eliminación de datos. Se nece
 
 ### P-13. Disponibilidad y soporte
 
-**Estado:** parcial (1.9). Falta confirmar si el administrador recibe alertas de fallas y quién atiende las dudas de alumnos y maestros.
+**Estado:** respondida en 1.9 y 1.10.
 
 - ¿En qué horarios debe estar disponible el sistema?
 - ¿Existen fechas críticas de alta demanda?
@@ -410,7 +457,7 @@ La respuesta “80 a 150” necesita dividirse:
 
 ### P-15. Respaldos y recuperación
 
-**Estado:** parcial (1.9). Falta confirmar quién autoriza una restauración. Con respaldos cada 3 días se pueden perder hasta 3 días de información.
+**Estado:** respondida en 1.9 y 1.10. Con respaldos cada 3 días se pueden perder hasta 3 días de información.
 
 Para cerrar producción todavía falta confirmar:
 
@@ -422,7 +469,7 @@ Para cerrar producción todavía falta confirmar:
 
 ### P-16. Administración de cuentas técnicas
 
-**Estado:** parcial (1.9). Falta definir quiénes son los líderes de acceso y cómo se retira el acceso a quien deje el proyecto.
+**Estado:** respondida en 1.9 y 1.10.
 
 Se indicó que el cliente será propietario y el equipo administrará las cuentas. Falta precisar:
 
@@ -452,11 +499,9 @@ Con las respuestas actuales, el sistema debe implementarse con estas reglas:
 
 Para reducir más las dudas, el cliente solo necesita responder primero:
 
-1. P-06 y P-08: multimedia, varias respuestas correctas y aprobación de la fórmula.
-2. P-09: indicadores de cada rol.
-3. P-13, P-15 y P-16: alertas, restauración y líderes de acceso.
-4. Condiciones de cada descuento.
-5. P-11 queda pospuesta.
+Las 16 preguntas están respondidas y el cliente aprobó estas decisiones el 2026-11-09. Solo queda pendiente:
+
+1. Condiciones de cada descuento, que se resuelven en el issue de comprobantes de pago.
 
 Con estas respuestas se podrá actualizar el esquema de Supabase, las políticas RLS, los flujos de frontend y los criterios de aceptación sin volver a revisar las 67 preguntas originales.
 
