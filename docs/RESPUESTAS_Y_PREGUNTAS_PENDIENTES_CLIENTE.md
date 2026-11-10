@@ -236,7 +236,7 @@ Estas respuestas actualizan a las de 1.8 y 1.9 cuando tratan el mismo tema.
 
 **Estadísticas**
 
-- Alumno: ve su promedio de calificación, sus días de racha y las calificaciones de sus simuladores y tareas.
+- Alumno: ve dos promedios separados (quizzes en porcentaje y simuladores en puntos), sus días de racha y las calificaciones de sus simuladores. Las tareas de Centum Notes se entregan, pero no se califican.
 - Maestro: ve las calificaciones generales de sus alumnos y de sus grupos.
 - Administrador: ve la información de todos los grupos.
 
