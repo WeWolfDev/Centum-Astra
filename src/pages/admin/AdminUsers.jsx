@@ -1,16 +1,26 @@
 // Administración de cuentas con datos reales de Supabase (#33).
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronRight, GraduationCap, Layers, Search, UserPlus, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { setGroupModules } from '../../lib/groupModulesService';
-import { filterUsers, listGroups, listUsers, runAdminAction, setUserGroups } from '../../lib/usersService';
+import { useDebounce } from '../../hooks/useDebounce';
+import {
+  PAGE_SIZE,
+  getDirectorySummary,
+  listGroups,
+  listUsers,
+  runAdminAction,
+  setUserGroups,
+} from '../../lib/usersService';
 import { cn } from '../../lib/utils';
+import EstadoGrupos from './EstadoGrupos';
 import ModalModulosGrupo from './ModalModulosGrupo';
 import { Aviso } from '../../components/rediseno/Aviso';
 import Boton from '../../components/rediseno/Boton';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
 import Input from '../../components/rediseno/Input';
 import Modal from '../../components/rediseno/Modal';
+import Paginacion from '../../components/rediseno/Paginacion';
 import Pastilla from '../../components/rediseno/Pastilla';
 import StatCard from '../../components/rediseno/StatCard';
 
@@ -53,6 +63,8 @@ const ACCIONES_ESTADO = {
   },
 };
 
+const SEARCH_DELAY_MS = 300;
+
 const CLASE_SELECT =
   'w-full rounded-[10px] bg-space-navy/50 border border-white/10 px-4 py-3 text-sm text-white font-body ' +
   'outline-none focus:border-gold-bright/40';
@@ -61,30 +73,55 @@ function rolDe(valor) {
   return ROLES.find(r => r.valor === valor) ?? ROLES[0];
 }
 
-function useDirectorio() {
-  const [usuarios, setUsuarios] = useState([]);
+// Grupos activos: alimentan los diálogos y cargan aparte para no frenar la lista.
+function useGrupos() {
   const [grupos, setGrupos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
 
-  const recargar = useCallback(async () => {
-    setError('');
-    try {
-      const [cuentas, listaGrupos] = await Promise.all([listUsers(), listGroups()]);
-      setUsuarios(cuentas);
-      setGrupos(listaGrupos);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setCargando(false);
-    }
+  useEffect(() => {
+    let vigente = true;
+    listGroups()
+      .then(lista => { if (vigente) setGrupos(lista); })
+      .catch(e => { if (vigente) setError(e.message); })
+      .finally(() => { if (vigente) setCargando(false); });
+    return () => { vigente = false; };
   }, []);
+
+  return { grupos, cargandoGrupos: cargando, errorGrupos: error };
+}
+
+// Una página de cuentas; la búsqueda, el rol y los totales los resuelve el servidor.
+function useCuentas({ search, role, page, onFueraDeRango }) {
+  const [pagina, setPagina] = useState({ users: [], total: 0 });
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
+
+  // Solo la consulta más reciente actualiza la lista: al paginar o buscar rápido,
+  // una respuesta vieja no debe pisar a la nueva.
+  const ultimaConsulta = useRef(0);
+
+  const recargar = useCallback(async () => {
+    const consulta = ++ultimaConsulta.current;
+    setError('');
+    setCargando(true);
+    try {
+      const resultado = await listUsers({ search, role, page });
+      if (consulta !== ultimaConsulta.current) return;
+      if (resultado.outOfRange) onFueraDeRango();
+      setPagina({ users: resultado.users, total: resultado.total });
+    } catch (e) {
+      if (consulta === ultimaConsulta.current) setError(e.message);
+    } finally {
+      if (consulta === ultimaConsulta.current) setCargando(false);
+    }
+  }, [search, role, page, onFueraDeRango]);
 
   useEffect(() => {
     void recargar();
   }, [recargar]);
 
-  return { usuarios, grupos, cargando, error, recargar };
+  return { ...pagina, cargando, error, recargar };
 }
 
 function Pagina({ children }) {
@@ -214,7 +251,7 @@ function ModalEstado({ accion, usuario, guardando, error, onConfirmar, onCerrar 
   );
 }
 
-function ModalGrupos({ usuario, grupos, guardando, error, onGuardar, onCerrar }) {
+function ModalGrupos({ usuario, grupos, cargandoGrupos = false, errorGrupos = '', guardando, error, onGuardar, onCerrar }) {
   const [elegidos, setElegidos] = useState(usuario.groups.map(g => g.id));
   const esAlumno = usuario.role === 'student';
 
@@ -232,7 +269,7 @@ function ModalGrupos({ usuario, grupos, guardando, error, onGuardar, onCerrar })
   return (
     <Modal abierto onCerrar={onCerrar} titulo={`Grupos de ${usuario.name}`}>
       <form onSubmit={enviar} className="flex flex-col gap-4">
-        {grupos.length === 0 && <p className="m-0 text-sm text-white/70">Aún no hay grupos activos.</p>}
+        {grupos.length === 0 && <EstadoGrupos cargando={cargandoGrupos} error={errorGrupos} />}
         {grupos.length > 0 && esAlumno && (
           <div>
             <label htmlFor="grupo-alumno" className="block mb-1.5 text-xs font-medium text-white/70 tracking-wide">Grupo</label>
@@ -288,15 +325,32 @@ function AccionesFila({ usuario, esPropia, onAbrir }) {
 
 export default function AdminUsers() {
   const { user } = useAuth();
-  const { usuarios, grupos, cargando, error, recargar } = useDirectorio();
+  const { grupos, cargandoGrupos, errorGrupos } = useGrupos();
   const [busqueda, setBusqueda] = useState('');
   const [rol, setRol] = useState('all');
+  const [pagina, setPagina] = useState(0);
+  const busquedaServidor = useDebounce(busqueda, SEARCH_DELAY_MS);
+  const volverAlInicio = useCallback(() => setPagina(0), []);
+  const { users: usuarios, total, cargando, error, recargar } = useCuentas({
+    search: busquedaServidor,
+    role: rol,
+    page: pagina,
+    onFueraDeRango: volverAlInicio,
+  });
   const [dialogo, setDialogo] = useState(null);
   const [errorDialogo, setErrorDialogo] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [aviso, setAviso] = useState('');
 
-  const visibles = useMemo(() => filterUsers(usuarios, { search: busqueda, role: rol }), [usuarios, busqueda, rol]);
+  function cambiarBusqueda(texto) {
+    setBusqueda(texto);
+    setPagina(0);
+  }
+
+  function cambiarRol(valor) {
+    setRol(valor);
+    setPagina(0);
+  }
 
   function abrir(tipo, usuario = null) {
     setErrorDialogo('');
@@ -365,7 +419,7 @@ export default function AdminUsers() {
               aria-label="Buscar por nombre o correo"
               placeholder="Buscar por nombre o correo"
               value={busqueda}
-              onChange={e => setBusqueda(e.target.value)}
+              onChange={e => cambiarBusqueda(e.target.value)}
               className="w-full py-2 pl-9 pr-3.5 rounded-lg text-sm text-white bg-space-navy/50 border border-white/10 outline-none focus:border-gold-bright/50"
             />
           </div>
@@ -375,7 +429,7 @@ export default function AdminUsers() {
                 key={r.valor}
                 type="button"
                 aria-pressed={rol === r.valor}
-                onClick={() => setRol(r.valor)}
+                onClick={() => cambiarRol(r.valor)}
                 className={cn(
                   'px-3.5 py-2 rounded-lg text-xs font-medium cursor-pointer border',
                   rol === r.valor ? 'bg-gold-bright/10 text-gold-bright border-gold-bright/25' : 'bg-white/5 text-white/70 border-white/10',
@@ -388,28 +442,29 @@ export default function AdminUsers() {
         </div>
 
         <EstadoCarga cargando={cargando} error={error} onReintentar={recargar} />
-        {!cargando && !error && visibles.length === 0 && (
+        {!cargando && !error && usuarios.length === 0 && (
           <EstadoVacio titulo="Sin resultados" descripcion="No hay cuentas que coincidan con la búsqueda." />
         )}
-        {!cargando && !error && visibles.length > 0 && (
+        {!cargando && !error && usuarios.length > 0 && (
           <ul className="list-none m-0 p-0">
-            {visibles.map(u => (
+            {usuarios.map(u => (
               <FilaUsuario key={u.id} usuario={u}>
                 <AccionesFila usuario={u} esPropia={u.id === user?.id} onAbrir={abrir} />
               </FilaUsuario>
             ))}
           </ul>
         )}
+        <Paginacion page={pagina} pageSize={PAGE_SIZE} total={total} disabled={cargando} onCambiar={setPagina} />
       </Tarjeta>
 
       {dialogo?.tipo === 'cuenta' && (
         <ModalCuenta usuario={dialogo.usuario} esPropia={dialogo.usuario?.id === user?.id} onGuardar={guardarCuenta} {...propsDialogo} />
       )}
       {dialogo?.tipo === 'grupos' && (
-        <ModalGrupos usuario={dialogo.usuario} grupos={grupos} onGuardar={guardarGrupos} {...propsDialogo} />
+        <ModalGrupos usuario={dialogo.usuario} grupos={grupos} cargandoGrupos={cargandoGrupos} errorGrupos={errorGrupos} onGuardar={guardarGrupos} {...propsDialogo} />
       )}
       {dialogo?.tipo === 'modulos' && (
-        <ModalModulosGrupo grupos={grupos} claseSelect={CLASE_SELECT} onGuardar={guardarModulos} {...propsDialogo} />
+        <ModalModulosGrupo grupos={grupos} cargandoGrupos={cargandoGrupos} errorGrupos={errorGrupos} claseSelect={CLASE_SELECT} onGuardar={guardarModulos} {...propsDialogo} />
       )}
       {dialogo && ACCIONES_ESTADO[dialogo.tipo] && (
         <ModalEstado accion={dialogo.tipo} usuario={dialogo.usuario} onConfirmar={confirmarEstado} {...propsDialogo} />
@@ -419,21 +474,38 @@ export default function AdminUsers() {
 }
 
 export function AdminOverview({ onNavigate }) {
-  const { usuarios, grupos, cargando, error, recargar } = useDirectorio();
+  const [resumen, setResumen] = useState(null);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState('');
 
-  const alumnos = usuarios.filter(u => u.role === 'student' && u.status !== 'deleted');
-  const tarjetas = [
-    { icono: Users, cifra: alumnos.length, etiqueta: 'Total alumnos' },
-    { icono: Users, cifra: alumnos.filter(u => u.status === 'active').length, etiqueta: 'Alumnos activos' },
-    { icono: GraduationCap, cifra: usuarios.filter(u => u.role === 'teacher' && u.status === 'active').length, etiqueta: 'Profesores activos' },
-    { icono: Layers, cifra: grupos.length, etiqueta: 'Grupos activos' },
+  const recargar = useCallback(async () => {
+    setError('');
+    setCargando(true);
+    try {
+      setResumen(await getDirectorySummary());
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setCargando(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void recargar();
+  }, [recargar]);
+
+  const tarjetas = resumen && [
+    { icono: Users, cifra: resumen.totalStudents, etiqueta: 'Total alumnos' },
+    { icono: Users, cifra: resumen.activeStudents, etiqueta: 'Alumnos activos' },
+    { icono: GraduationCap, cifra: resumen.activeTeachers, etiqueta: 'Profesores activos' },
+    { icono: Layers, cifra: resumen.activeGroups, etiqueta: 'Grupos activos' },
   ];
-  const recientes = [...usuarios].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).slice(0, 4);
+  const recientes = resumen?.recent ?? [];
 
   return (
     <Pagina>
       <EstadoCarga cargando={cargando} error={error} onReintentar={recargar} />
-      {!cargando && !error && (
+      {!cargando && !error && resumen && (
         <>
           <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4">
             {tarjetas.map(t => (

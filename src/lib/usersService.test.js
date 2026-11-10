@@ -18,12 +18,27 @@ const fake = vi.hoisted(() => {
       return chain;
     },
   };
-  return { calls, result, invoke, supabase: { from: vi.fn(() => builder), functions: { invoke } } };
+  // Consultas de lectura: registra cada llamada encadenada y responde en orden.
+  const queries = [];
+  const respuestas = [];
+  function consulta(tabla, argsSelect) {
+    const q = { tabla, select: argsSelect, llamadas: [] };
+    queries.push(q);
+    const chain = { then: (ok, ko) => Promise.resolve(respuestas.shift() ?? { data: [], count: 0, error: null }).then(ok, ko) };
+    ['eq', 'neq', 'or', 'order', 'range', 'limit'].forEach(metodo => {
+      chain[metodo] = (...args) => { q.llamadas.push([metodo, ...args]); return chain; };
+    });
+    return chain;
+  }
+  const from = vi.fn(tabla => ({ ...builder, select: (...args) => consulta(tabla, args) }));
+  return { calls, result, invoke, queries, respuestas, supabase: { from, functions: { invoke } } };
 });
 
 vi.mock('./supabaseClient', () => ({ supabase: fake.supabase }));
 
-const { filterUsers, runAdminAction, setUserGroups, toUserRow } = await import('./usersService');
+const {
+  PAGE_SIZE, getDirectorySummary, listGroups, listMyStudents, listUsers, runAdminAction, setUserGroups, toUserRow,
+} = await import('./usersService');
 
 beforeEach(() => {
   fake.calls.upsert.length = 0;
@@ -31,6 +46,8 @@ beforeEach(() => {
   fake.calls.insert.length = 0;
   fake.result.error = null;
   fake.invoke.mockReset();
+  fake.queries.length = 0;
+  fake.respuestas.length = 0;
 });
 
 describe('toUserRow', () => {
@@ -56,19 +73,92 @@ describe('toUserRow', () => {
   });
 });
 
-describe('filterUsers', () => {
-  const users = [
-    { name: 'Ana García', email: 'ana@x.mx', role: 'student' },
-    { name: 'Luis Pérez', email: 'luis@x.mx', role: 'teacher' },
-  ];
+const PERFIL = { id: '1', full_name: 'Ana', email: 'a@x.mx', role: 'student', status: 'active', created_at: 'hoy' };
 
-  test('busca por nombre o correo sin distinguir mayúsculas', () => {
-    expect(filterUsers(users, { search: 'GARC' })).toHaveLength(1);
-    expect(filterUsers(users, { search: 'luis@' })).toHaveLength(1);
+describe('listUsers', () => {
+  test('pide la página al servidor y devuelve el total real', async () => {
+    fake.respuestas.push({ data: [PERFIL], count: 1500, error: null });
+    const { users, total } = await listUsers({ page: 2 });
+    const consulta = fake.queries[0];
+    expect(consulta.select[1]).toEqual({ count: 'exact' });
+    expect(consulta.llamadas).toContainEqual(['range', 2 * PAGE_SIZE, 3 * PAGE_SIZE - 1]);
+    expect(users).toHaveLength(1);
+    expect(total).toBe(1500);
   });
 
-  test('filtra por rol', () => {
-    expect(filterUsers(users, { role: 'teacher' })[0].name).toBe('Luis Pérez');
+  test('filtra por rol y busca por nombre o correo en el servidor', async () => {
+    await listUsers({ search: ' ana ', role: 'teacher' });
+    const { llamadas } = fake.queries[0];
+    expect(llamadas).toContainEqual(['eq', 'role', 'teacher']);
+    expect(llamadas).toContainEqual(['or', 'full_name.ilike."%ana%",email.ilike."%ana%"']);
+  });
+
+  test('escapa comodines y comillas del texto buscado', async () => {
+    await listUsers({ search: 'a_b%"c' });
+    const [, filtro] = fake.queries[0].llamadas.find(([metodo]) => metodo === 'or');
+    expect(filtro).toContain('"%a\\\\_b\\\\%\\"c%"');
+  });
+
+  test('sin búsqueda ni rol no agrega filtros', async () => {
+    await listUsers();
+    const metodos = fake.queries[0].llamadas.map(([metodo]) => metodo);
+    expect(metodos).not.toContain('or');
+    expect(metodos).not.toContain('eq');
+  });
+
+  test('una página fuera de rango se informa sin fallar', async () => {
+    fake.respuestas.push({ data: null, count: null, error: { code: 'PGRST103' } });
+    await expect(listUsers({ page: 9 })).resolves.toEqual({ users: [], total: 0, outOfRange: true });
+  });
+
+  test('un error del servidor muestra el mensaje de carga', async () => {
+    fake.respuestas.push({ data: null, count: null, error: { code: '500' } });
+    await expect(listUsers()).rejects.toThrow('No pudimos cargar');
+  });
+});
+
+describe('listMyStudents', () => {
+  test('limita a alumnos y pagina igual que el administrador', async () => {
+    fake.respuestas.push({ data: [PERFIL], count: 40, error: null });
+    const { total } = await listMyStudents({ search: 'ana', page: 1 });
+    const { llamadas } = fake.queries[0];
+    expect(llamadas).toContainEqual(['eq', 'role', 'student']);
+    expect(llamadas).toContainEqual(['range', PAGE_SIZE, 2 * PAGE_SIZE - 1]);
+    expect(total).toBe(40);
+  });
+});
+
+describe('getDirectorySummary', () => {
+  test('cuenta en el servidor sin traer todas las filas', async () => {
+    [1200, 900, 30, 12].forEach(count => fake.respuestas.push({ count, error: null }));
+    fake.respuestas.push({ data: [PERFIL], error: null });
+    const resumen = await getDirectorySummary();
+    expect(resumen).toMatchObject({ totalStudents: 1200, activeStudents: 900, activeTeachers: 30, activeGroups: 12 });
+    expect(resumen.recent).toHaveLength(1);
+    expect(fake.queries.slice(0, 4).every(q => q.select[1].head === true)).toBe(true);
+  });
+
+  test('falla con el mensaje de carga si un conteo falla', async () => {
+    fake.respuestas.push({ count: null, error: { code: '500' } });
+    await expect(getDirectorySummary()).rejects.toThrow('No pudimos cargar');
+  });
+});
+
+describe('listGroups', () => {
+  const grupo = n => ({ id: `g${n}`, name: `G${n}`, code: 'c', course_id: 'c1', courses: { name: 'Curso' } });
+
+  test('lee en lotes y no se detiene en 1000 grupos', async () => {
+    fake.respuestas.push({ data: Array.from({ length: 1000 }, (_, i) => grupo(i)), error: null });
+    fake.respuestas.push({ data: [grupo(1000)], error: null });
+    const grupos = await listGroups();
+    expect(grupos).toHaveLength(1001);
+    expect(fake.queries[1].llamadas).toContainEqual(['range', 1000, 1999]);
+    expect(grupos[0]).toMatchObject({ id: 'g0', course: 'Curso', courseId: 'c1' });
+  });
+
+  test('falla con el mensaje de carga', async () => {
+    fake.respuestas.push({ data: null, error: { code: '500' } });
+    await expect(listGroups()).rejects.toThrow('No pudimos cargar');
   });
 });
 

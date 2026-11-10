@@ -29,49 +29,91 @@ export function toUserRow(profile) {
   };
 }
 
-export function filterUsers(users, { search = '', role = 'all' } = {}) {
-  const termino = search.trim().toLowerCase();
-  return users.filter(u => {
-    if (role !== 'all' && u.role !== role) return false;
-    if (!termino) return true;
-    return u.name.toLowerCase().includes(termino) || u.email.toLowerCase().includes(termino);
-  });
+export const PAGE_SIZE = 25;
+const RECENT_LIMIT = 4;
+const GROUPS_BATCH = 1000;
+const OUT_OF_RANGE = 'PGRST103';
+
+// Escapa los comodines de ilike y luego las comillas del filtro .or() de PostgREST.
+function patronBusqueda(search) {
+  const literal = search.trim().replace(/[\\%_]/g, '\\$&');
+  return `"%${literal.replace(/[\\"]/g, '\\$&')}%"`;
 }
 
-export async function listUsers() {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select(USER_COLUMNS)
-    .order('full_name');
+function aplicarFiltros(consulta, { search = '', role = 'all' }) {
+  let filtrada = consulta;
+  if (role !== 'all') filtrada = filtrada.eq('role', role);
+  if (search.trim()) {
+    const patron = patronBusqueda(search);
+    filtrada = filtrada.or(`full_name.ilike.${patron},email.ilike.${patron}`);
+  }
+  return filtrada;
+}
+
+// Una página de cuentas con el total real que cuenta el servidor, no el de la página.
+async function leerPagina(consulta, { page = 0 } = {}) {
+  const desde = page * PAGE_SIZE;
+  const { data, count, error } = await consulta
+    .order('full_name')
+    .order('id')
+    .range(desde, desde + PAGE_SIZE - 1);
+  if (error?.code === OUT_OF_RANGE) return { users: [], total: 0, outOfRange: true };
   if (error) throw new Error(LOAD_ERROR);
-  return data.map(toUserRow);
+  return { users: data.map(toUserRow), total: count ?? 0, outOfRange: false };
+}
+
+export function listUsers({ search, role, page } = {}) {
+  const consulta = supabase.from('profiles').select(USER_COLUMNS, { count: 'exact' });
+  return leerPagina(aplicarFiltros(consulta, { search, role }), { page });
 }
 
 // RLS limita el resultado a los alumnos de los grupos del profesor.
-export async function listMyStudents() {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select(USER_COLUMNS)
-    .eq('role', 'student')
-    .order('full_name');
-  if (error) throw new Error(LOAD_ERROR);
-  return data.map(toUserRow);
+export function listMyStudents({ search, page } = {}) {
+  const consulta = supabase.from('profiles').select(USER_COLUMNS, { count: 'exact' }).eq('role', 'student');
+  return leerPagina(aplicarFiltros(consulta, { search }), { page });
 }
 
-export async function listGroups() {
-  const { data, error } = await supabase
-    .from('groups')
-    .select('id, name, code, course_id, courses(name)')
-    .eq('status', 'active')
-    .order('name');
+async function contar(tabla, { eq = [], neq = [] }) {
+  let consulta = supabase.from(tabla).select('id', { count: 'exact', head: true });
+  for (const [columna, valor] of eq) consulta = consulta.eq(columna, valor);
+  for (const [columna, valor] of neq) consulta = consulta.neq(columna, valor);
+  const { count, error } = await consulta;
   if (error) throw new Error(LOAD_ERROR);
-  return data.map(g => ({
-    id: g.id,
-    name: g.name,
-    code: g.code,
-    courseId: g.course_id,
-    course: g.courses?.name ?? '',
-  }));
+  return count ?? 0;
+}
+
+// Cifras del resumen del administrador, contadas en el servidor.
+export async function getDirectorySummary() {
+  const [totalStudents, activeStudents, activeTeachers, activeGroups, recent] = await Promise.all([
+    contar('profiles', { eq: [['role', 'student']], neq: [['status', 'deleted']] }),
+    contar('profiles', { eq: [['role', 'student'], ['status', 'active']] }),
+    contar('profiles', { eq: [['role', 'teacher'], ['status', 'active']] }),
+    contar('groups', { eq: [['status', 'active']] }),
+    supabase.from('profiles').select(USER_COLUMNS).order('created_at', { ascending: false }).limit(RECENT_LIMIT),
+  ]);
+  if (recent.error) throw new Error(LOAD_ERROR);
+  return { totalStudents, activeStudents, activeTeachers, activeGroups, recent: recent.data.map(toUserRow) };
+}
+
+function toGroup(g) {
+  return { id: g.id, name: g.name, code: g.code, courseId: g.course_id, course: g.courses?.name ?? '' };
+}
+
+// PostgREST corta cada respuesta en 1000 filas: se leen lotes hasta agotarlos.
+export async function listGroups() {
+  const grupos = [];
+  for (let desde = 0; ; desde += GROUPS_BATCH) {
+    const { data, error } = await supabase
+      .from('groups')
+      .select('id, name, code, course_id, courses(name)')
+      .eq('status', 'active')
+      .order('name')
+      .order('id')
+      .range(desde, desde + GROUPS_BATCH - 1);
+    if (error) throw new Error(LOAD_ERROR);
+    grupos.push(...data.map(toGroup));
+    if (data.length < GROUPS_BATCH) return grupos;
+  }
 }
 
 async function mensajeDeFuncion(error) {
