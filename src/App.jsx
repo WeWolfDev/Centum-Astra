@@ -10,6 +10,7 @@ import LandingPage from './pages/landing/LandingPage';
 import Login from './pages/auth/Login';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Statistics from './pages/admin/Statistics';
+import AdminCursos from './pages/admin/AdminCursos';
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import StudentDashboard from './pages/student/StudentDashboard';
 import FileManager from './pages/modules/FileManager';
@@ -77,6 +78,7 @@ function AppContent() {
     if (user.role === 'admin') {
       if (activeSection === 'dashboard') return <AdminDashboard view="overview" onNavigate={handleNavigation} />;
       if (activeSection === 'students')  return <AdminDashboard view="students" />;
+      if (activeSection === 'courses')   return <AdminCursos />;
       if (activeSection === 'stats') return <Statistics />;
     }
 
