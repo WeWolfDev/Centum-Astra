@@ -26,7 +26,7 @@ export default function TeacherRoster() {
   }, []);
 
   useEffect(() => {
-    cargar();
+    void cargar();
   }, [cargar]);
 
   const visibles = filterUsers(alumnos, { search: busqueda });

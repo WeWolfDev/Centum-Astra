@@ -11,9 +11,9 @@ const fake = vi.hoisted(() => ({
 
 vi.mock('./supabaseClient', () => ({ supabase: { auth: fake.auth } }));
 
-const { requestRecoveryCode, setPasswordWithCode } = await import('./passwordFlow');
+const { requestRecoveryCode, verifyCode, savePassword, cancelPasswordFlow } = await import('./passwordFlow');
 
-const DATOS = { email: 'a@x.mx', code: ' 123456 ', password: 'nueva-clave', type: 'recovery' };
+const DATOS = { email: 'a@x.mx', code: ' 123456 ', type: 'recovery' };
 
 beforeEach(() => {
   Object.values(fake.auth).forEach(fn => fn.mockReset());
@@ -35,23 +35,40 @@ describe('requestRecoveryCode', () => {
   });
 });
 
-describe('setPasswordWithCode', () => {
-  test('valida el código, guarda la contraseña y exige iniciar sesión', async () => {
-    await setPasswordWithCode(DATOS);
+describe('verifyCode', () => {
+  test('valida el código sin espacios', async () => {
+    await verifyCode(DATOS);
     expect(fake.auth.verifyOtp).toHaveBeenCalledWith({ email: 'a@x.mx', token: '123456', type: 'recovery' });
+  });
+
+  test('informa un código inválido o expirado', async () => {
+    fake.auth.verifyOtp.mockResolvedValue({ error: { code: 'otp_expired' } });
+    await expect(verifyCode(DATOS)).rejects.toThrow('incorrecto o ya expiró');
+  });
+});
+
+describe('savePassword', () => {
+  test('guarda la contraseña y exige iniciar sesión en todos los dispositivos', async () => {
+    await savePassword('nueva-clave');
     expect(fake.auth.updateUser).toHaveBeenCalledWith({ password: 'nueva-clave' });
     expect(fake.auth.signOut).toHaveBeenCalledWith({ scope: 'global' });
   });
 
-  test('no toca la contraseña si el código es inválido', async () => {
-    fake.auth.verifyOtp.mockResolvedValue({ error: { code: 'otp_expired' } });
-    await expect(setPasswordWithCode(DATOS)).rejects.toThrow('incorrecto o ya expiró');
-    expect(fake.auth.updateUser).not.toHaveBeenCalled();
+  test('conserva la sesión del código si la contraseña se rechaza', async () => {
+    fake.auth.updateUser.mockResolvedValue({ error: { code: 'weak_password' } });
+    await expect(savePassword('corta')).rejects.toThrow('demasiado débil');
+    expect(fake.auth.signOut).not.toHaveBeenCalled();
   });
 
-  test('cierra la sesión del código si falla el guardado', async () => {
-    fake.auth.updateUser.mockResolvedValue({ error: { code: 'weak_password' } });
-    await expect(setPasswordWithCode(DATOS)).rejects.toThrow('demasiado débil');
+  test('pide una contraseña distinta a la anterior', async () => {
+    fake.auth.updateUser.mockResolvedValue({ error: { code: 'same_password' } });
+    await expect(savePassword('misma')).rejects.toThrow('distinta a la anterior');
+  });
+});
+
+describe('cancelPasswordFlow', () => {
+  test('cierra solo la sesión local del código', async () => {
+    await cancelPasswordFlow();
     expect(fake.auth.signOut).toHaveBeenCalledWith({ scope: 'local' });
   });
 });
