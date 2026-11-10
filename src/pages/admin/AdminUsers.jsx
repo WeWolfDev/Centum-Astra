@@ -359,7 +359,7 @@ export default function AdminUsers() {
       >
         <div className="flex items-center gap-2.5 flex-wrap mb-4">
           <div className="relative flex-1 min-w-[200px]">
-            <Search size={14} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+            <Search size={14} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none" />
             <input
               type="search"
               aria-label="Buscar por nombre o correo"

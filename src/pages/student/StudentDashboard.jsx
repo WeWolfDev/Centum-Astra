@@ -139,7 +139,7 @@ function HeaderSaludo({ nombre, onContinuar }) {
           fontSize: 36,
           lineHeight: 1.1,
           letterSpacing: '-0.03em',
-          color: '#ffffff',
+          color: 'rgb(var(--c-ink))',
         }}
       >
         Hola, {nombre}
@@ -154,9 +154,9 @@ function HeaderSaludo({ nombre, onContinuar }) {
           minHeight: 56,
           padding: '6px 20px 6px 8px',
           borderRadius: 999,
-          border: '1px solid rgba(255,255,255,0.13)',
+          border: '1px solid rgb(var(--c-ink) / 0.13)',
           background: 'transparent',
-          color: '#e2e8f0',
+          color: 'rgb(var(--c-ink) / 0.9)',
           cursor: 'pointer',
           textAlign: 'left',
         }}
@@ -169,18 +169,18 @@ function HeaderSaludo({ nombre, onContinuar }) {
             width: 44,
             height: 44,
             borderRadius: 999,
-            background: '#f5c842',
+            background: 'rgb(var(--c-gold-fill))',
             flexShrink: 0,
           }}
         >
-          <Play size={18} fill="#030a1a" color="#030a1a" strokeWidth={0} aria-hidden="true" />
+          <Play size={18} fill="rgb(var(--c-on-gold))" color="rgb(var(--c-on-gold))" strokeWidth={0} aria-hidden="true" />
         </span>
         <span>
-          <span style={{ display: 'block', fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>
+          <span style={{ display: 'block', fontSize: 12, color: 'rgb(var(--c-ink) / 0.6)' }}>
             Continuar clase
           </span>
           {/* TODO(rediseno): la "última clase vista" no existe en el mock. */}
-          <span style={{ display: 'block', fontSize: 15, fontWeight: 600, color: '#ffffff' }}>
+          <span style={{ display: 'block', fontSize: 15, fontWeight: 600, color: 'rgb(var(--c-ink))' }}>
             Geometría analítica
           </span>
         </span>
@@ -225,7 +225,7 @@ function PuntajeHero({
       }}
     >
       <div style={{ flex: '0 1 auto', minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 600, color: '#e2e8f0' }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: 'rgb(var(--c-ink) / 0.9)' }}>
           Puntaje estimado EXANI-II
         </div>
         <div
@@ -236,7 +236,7 @@ function PuntajeHero({
             fontSize: 'clamp(56px, 12vw, 112px)',
             lineHeight: 0.9,
             letterSpacing: '-0.04em',
-            color: '#f5c842',
+            color: 'rgb(var(--c-gold-bright))',
           }}
         >
           {puntaje.toLocaleString('es-MX')}
@@ -250,8 +250,8 @@ function PuntajeHero({
             fontSize: 15,
           }}
         >
-          <span style={{ color: '#e2e8f0' }}>
-            <strong style={{ fontWeight: 600, color: '#ffffff' }}>{aciertos}</strong> / 138 aciertos
+          <span style={{ color: 'rgb(var(--c-ink) / 0.9)' }}>
+            <strong style={{ fontWeight: 600, color: 'rgb(var(--c-ink))' }}>{aciertos}</strong> / 138 aciertos
           </span>
           <span
             style={{
@@ -260,7 +260,7 @@ function PuntajeHero({
               gap: 6,
               fontWeight: 600,
               // HANDOFF: baja de puntaje en gris, no en rojo.
-              color: subio ? '#f5c842' : '#cbd5e1',
+              color: subio ? 'rgb(var(--c-gold-bright))' : 'rgb(var(--c-ink) / 0.8)',
             }}
           >
             {subio ? (
@@ -287,7 +287,7 @@ function PuntajeHero({
           metaCeneval={metaCeneval}
           metaVisible={metaVisible}
         />
-        <div style={{ marginTop: 8, fontSize: 16, color: '#e2e8f0' }}>
+        <div style={{ marginTop: 8, fontSize: 16, color: 'rgb(var(--c-ink) / 0.9)' }}>
           Has subido{' '}
           <strong
             style={{
@@ -295,7 +295,7 @@ function PuntajeHero({
               fontWeight: 700,
               fontSize: 28,
               letterSpacing: '-0.02em',
-              color: subio ? '#f5c842' : '#cbd5e1',
+              color: subio ? 'rgb(var(--c-gold-bright))' : 'rgb(var(--c-ink) / 0.8)',
             }}
           >
             {absDelta} puntos
@@ -320,10 +320,10 @@ function PuntajeHero({
               gap: 8,
               minHeight: 44,
               padding: '8px 16px',
-              border: '1px solid rgba(147,197,253,0.45)',
+              border: '1px solid rgb(var(--c-info) / 0.45)',
               borderRadius: 999,
-              background: metaVisible ? 'rgba(147,197,253,0.14)' : 'transparent',
-              color: '#93c5fd',
+              background: metaVisible ? 'rgb(var(--c-info) / 0.14)' : 'transparent',
+              color: 'rgb(var(--c-info))',
               fontSize: 14,
               fontWeight: 600,
               cursor: 'pointer',
@@ -332,11 +332,11 @@ function PuntajeHero({
             <Flag size={16} strokeWidth={1.8} aria-hidden="true" />
             {metaVisible ? 'Ocultar mi meta' : 'Ver mi meta'}
           </BotonSecundario>
-          <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+          <span style={{ fontSize: 13, color: 'rgb(var(--c-ink) / 0.6)' }}>
             Estimación. No es resultado oficial del Ceneval.
           </span>
           {metaVisible && (
-            <span style={{ fontSize: 13, color: '#93c5fd', fontWeight: 600 }}>
+            <span style={{ fontSize: 13, color: 'rgb(var(--c-info))', fontWeight: 600 }}>
               Meta {metaCeneval.toLocaleString('es-MX')}
               {faltante > 0 ? ` · diferencia ${faltante} pts` : ' · meta alcanzada'}
             </span>
@@ -379,10 +379,10 @@ function BarraEscalaCeneval({
       aria-label={`Escala del índice Ceneval de ${min} a ${max}: empezaste en ${primero} y hoy vas en ${ultimo}`}
       style={{ display: 'block', width: '100%', height: 'auto' }}
     >
-      <text x={padL} y={34} fontSize={13} fill="#ffffff" fillOpacity={0.6}>
+      <text x={padL} y={34} fontSize={13} fill="rgb(var(--c-ink))" fillOpacity={0.6}>
         {min}
       </text>
-      <text x={W - padR} y={34} textAnchor="end" fontSize={13} fill="#ffffff" fillOpacity={0.6}>
+      <text x={W - padR} y={34} textAnchor="end" fontSize={13} fill="rgb(var(--c-ink))" fillOpacity={0.6}>
         {max}
       </text>
 
@@ -392,7 +392,7 @@ function BarraEscalaCeneval({
         width={barW}
         height={14}
         rx={7}
-        fill="#ffffff"
+        fill="rgb(var(--c-ink))"
         fillOpacity={0.09}
       />
       <rect
@@ -401,7 +401,7 @@ function BarraEscalaCeneval({
         width={barW * rangeEnd}
         height={14}
         rx={7}
-        fill="#f5c842"
+        fill="rgb(var(--c-gold-bright))"
         fillOpacity={0.32}
       />
       <rect
@@ -410,7 +410,7 @@ function BarraEscalaCeneval({
         width={barW * (rangeEnd - rangeStart)}
         height={14}
         rx={7}
-        fill="#f5c842"
+        fill="rgb(var(--c-gold-bright))"
       />
 
       {metaVisible && (
@@ -420,7 +420,7 @@ function BarraEscalaCeneval({
             x2={metaX}
             y1={44}
             y2={102}
-            stroke="#93c5fd"
+            stroke="rgb(var(--c-info))"
             strokeWidth={2.5}
             strokeDasharray="5 4"
           />
@@ -430,7 +430,7 @@ function BarraEscalaCeneval({
             textAnchor={metaAnchor}
             fontSize={14}
             fontWeight={600}
-            fill="#93c5fd"
+            fill="rgb(var(--c-info))"
           >
             Meta · {metaCeneval.toLocaleString('es-MX')}
           </text>
@@ -441,11 +441,11 @@ function BarraEscalaCeneval({
         cx={toX(posPrimero)}
         cy={63}
         r={8}
-        fill="#030a1a"
-        stroke="#f5c842"
+        fill="rgb(var(--c-on-gold))"
+        stroke="rgb(var(--c-gold-bright))"
         strokeWidth={3}
       />
-      <text x={toX(posPrimero)} y={96} textAnchor="middle" fontSize={13} fill="#cbd5e1">
+      <text x={toX(posPrimero)} y={96} textAnchor="middle" fontSize={13} fill="rgb(var(--c-ink) / 0.8)">
         Inicio · {primero.toLocaleString('es-MX')}
       </text>
 
@@ -453,8 +453,8 @@ function BarraEscalaCeneval({
         cx={toX(posUltimo)}
         cy={63}
         r={12}
-        fill="#f5c842"
-        stroke="#030a1a"
+        fill="rgb(var(--c-gold-bright))"
+        stroke="rgb(var(--c-on-gold))"
         strokeWidth={4}
       />
       <text
@@ -463,7 +463,7 @@ function BarraEscalaCeneval({
         textAnchor="middle"
         fontSize={14}
         fontWeight={700}
-        fill="#ffffff"
+        fill="rgb(var(--c-ink))"
       >
         Hoy · {ultimo.toLocaleString('es-MX')}
       </text>
@@ -495,13 +495,14 @@ function EvolucionBlock({
       }}
     >
       <div
+        data-theme="dark"
         style={{
           flex: '1 1 100%',
           minWidth: 0,
           boxSizing: 'border-box',
           padding: 28,
           borderRadius: 18,
-          background: '#0c1d45',
+          background: 'rgb(var(--c-navy))',
           display: 'flex',
           flexDirection: 'column',
           gap: 20,
@@ -516,7 +517,7 @@ function EvolucionBlock({
               width: 48,
               height: 48,
               borderRadius: 12,
-              background: 'rgba(245,200,66,0.14)',
+              background: 'rgb(var(--c-gold-bright) / 0.14)',
               flexShrink: 0,
             }}
             aria-hidden="true"
@@ -526,7 +527,7 @@ function EvolucionBlock({
               height="26"
               viewBox="0 0 24 24"
               fill="none"
-              stroke="#f5c842"
+              stroke="rgb(var(--c-gold-bright))"
               strokeWidth="1.7"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -544,12 +545,12 @@ function EvolucionBlock({
                 fontSize: 22,
                 lineHeight: 1.2,
                 letterSpacing: '-0.02em',
-                color: '#ffffff',
+                color: 'rgb(var(--c-ink))',
               }}
             >
               Simulador EXANI-II
             </h2>
-            <div style={{ fontSize: 14, color: '#cbd5e1' }}>
+            <div style={{ fontSize: 14, color: 'rgb(var(--c-ink) / 0.8)' }}>
               138 preguntas · da puntaje Ceneval
             </div>
           </div>
@@ -571,12 +572,12 @@ function EvolucionBlock({
                 fontSize: 64,
                 lineHeight: 0.95,
                 letterSpacing: '-0.03em',
-                color: '#ffffff',
+                color: 'rgb(var(--c-ink))',
               }}
             >
               {historial.length}
             </div>
-            <div style={{ fontSize: 14, color: '#cbd5e1' }}>completos</div>
+            <div style={{ fontSize: 14, color: 'rgb(var(--c-ink) / 0.8)' }}>completos</div>
           </div>
 
           <div style={{ flex: '1 1 260px', minWidth: 0, height: 140 }}>
@@ -587,44 +588,44 @@ function EvolucionBlock({
               >
                 <defs>
                   <linearGradient id="goldFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f5c842" stopOpacity={0.28} />
-                    <stop offset="100%" stopColor="#f5c842" stopOpacity={0.02} />
+                    <stop offset="0%" stopColor="rgb(var(--c-gold-bright))" stopOpacity={0.28} />
+                    <stop offset="100%" stopColor="rgb(var(--c-gold-bright))" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <CartesianGrid stroke="rgb(var(--c-ink) / 0.04)" vertical={false} />
                 <XAxis
                   dataKey="label"
-                  tick={{ fill: '#cbd5e1', fontSize: 11 }}
+                  tick={{ fill: 'rgb(var(--c-ink) / 0.8)', fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
                   domain={[SIMULADOR_RANGO_CENEVAL.min, SIMULADOR_RANGO_CENEVAL.max]}
-                  tick={{ fill: 'rgba(255,255,255,0.6)', fontSize: 11 }}
+                  tick={{ fill: 'rgb(var(--c-ink) / 0.6)', fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                   width={44}
                 />
                 <Tooltip
                   contentStyle={{
-                    background: '#030a1a',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: 'rgb(var(--c-void))',
+                    border: '1px solid rgb(var(--c-ink) / 0.1)',
                     borderRadius: 10,
-                    color: '#fff',
+                    color: 'rgb(var(--c-ink))',
                     fontSize: 13,
                   }}
-                  cursor={{ stroke: 'rgba(255,255,255,0.15)' }}
+                  cursor={{ stroke: 'rgb(var(--c-ink) / 0.15)' }}
                   formatter={(v) => [`${Number(v).toLocaleString('es-MX')} pts`, 'Ceneval']}
                 />
                 {metaVisible && (
                   <ReferenceLine
                     y={metaCeneval}
-                    stroke="#93c5fd"
+                    stroke="rgb(var(--c-info))"
                     strokeDasharray="5 4"
                     label={{
                       value: `Meta ${metaCeneval}`,
                       position: 'insideTopRight',
-                      fill: '#93c5fd',
+                      fill: 'rgb(var(--c-info))',
                       fontSize: 12,
                       fontWeight: 600,
                     }}
@@ -633,11 +634,11 @@ function EvolucionBlock({
                 <Area
                   type="monotone"
                   dataKey="ceneval"
-                  stroke="#f5c842"
+                  stroke="rgb(var(--c-gold-bright))"
                   strokeWidth={2.5}
                   fill="url(#goldFill)"
-                  dot={{ r: 4, fill: '#0c1d45', stroke: '#f5c842', strokeWidth: 2 }}
-                  activeDot={{ r: 6, fill: '#f5c842', stroke: '#030a1a', strokeWidth: 2 }}
+                  dot={{ r: 4, fill: 'rgb(var(--c-navy))', stroke: 'rgb(var(--c-gold-bright))', strokeWidth: 2 }}
+                  activeDot={{ r: 6, fill: 'rgb(var(--c-gold-bright))', stroke: 'rgb(var(--c-on-gold))', strokeWidth: 2 }}
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -651,15 +652,15 @@ function EvolucionBlock({
             alignItems: 'center',
             gap: '8px 14px',
             fontSize: 15,
-            color: '#cbd5e1',
+            color: 'rgb(var(--c-ink) / 0.8)',
           }}
         >
           <span>
-            Primero <strong style={{ fontWeight: 700, color: '#ffffff' }}>{primero.toLocaleString('es-MX')}</strong>
+            Primero <strong style={{ fontWeight: 700, color: 'rgb(var(--c-ink))' }}>{primero.toLocaleString('es-MX')}</strong>
           </span>
           <ArrowRight size={18} strokeWidth={2} aria-hidden="true" />
           <span>
-            Último <strong style={{ fontWeight: 700, color: '#ffffff' }}>{ultimo.toLocaleString('es-MX')}</strong>
+            Último <strong style={{ fontWeight: 700, color: 'rgb(var(--c-ink))' }}>{ultimo.toLocaleString('es-MX')}</strong>
           </span>
           <span
             style={{
@@ -668,7 +669,7 @@ function EvolucionBlock({
               gap: 6,
               marginLeft: 'auto',
               fontWeight: 600,
-              color: subio ? '#f5c842' : '#cbd5e1',
+              color: subio ? 'rgb(var(--c-gold-bright))' : 'rgb(var(--c-ink) / 0.8)',
             }}
           >
             {subio ? (

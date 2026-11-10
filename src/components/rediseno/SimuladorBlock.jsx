@@ -18,14 +18,15 @@ export default function SimuladorBlock({
   return (
     <section
       aria-label={titulo}
+      data-theme="dark"
       style={{
-        background: '#0c1d45',
+        background: 'rgb(var(--c-navy))',
         borderRadius: 18,
         padding: 28,
         display: 'flex',
         flexDirection: 'column',
         gap: 20,
-        color: '#e2e8f0',
+        color: 'rgb(var(--c-ink) / 0.9)',
       }}
     >
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
@@ -38,16 +39,16 @@ export default function SimuladorBlock({
               fontSize: 22,
               lineHeight: 1.2,
               letterSpacing: '-0.02em',
-              color: '#ffffff',
+              color: 'rgb(var(--c-ink))',
             }}
           >
             {titulo}
           </h2>
           {subtitulo && (
-            <p style={{ margin: '4px 0 0', fontSize: 14, color: '#cbd5e1' }}>{subtitulo}</p>
+            <p style={{ margin: '4px 0 0', fontSize: 14, color: 'rgb(var(--c-ink) / 0.8)' }}>{subtitulo}</p>
           )}
           {fecha && (
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>{fecha}</p>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgb(var(--c-ink) / 0.6)' }}>{fecha}</p>
           )}
         </div>
 
@@ -60,7 +61,7 @@ export default function SimuladorBlock({
                 fontSize: 40,
                 lineHeight: 1,
                 letterSpacing: '-0.03em',
-                color: '#f5c842',
+                color: 'rgb(var(--c-gold-bright))',
               }}
             >
               {puntajeCeneval.toLocaleString('es-MX')}
@@ -73,7 +74,7 @@ export default function SimuladorBlock({
                   gap: 4,
                   fontSize: 14,
                   fontWeight: 600,
-                  color: positivo ? '#f5c842' : '#cbd5e1',
+                  color: positivo ? 'rgb(var(--c-gold-bright))' : 'rgb(var(--c-ink) / 0.8)',
                 }}
               >
                 {positivo ? <ArrowUp size={13} strokeWidth={2.6} /> : <ArrowDown size={13} strokeWidth={2.6} />}

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Menu } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import BotonTema from '../rediseno/BotonTema';
 
 const titlesByRole = {
   student: {
@@ -41,8 +42,8 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 20px',
-        borderBottom: '1px solid rgba(255,255,255,0.05)',
-        background: 'rgba(4,11,28,0.72)',
+        borderBottom: '1px solid rgb(var(--c-ink) / 0.05)',
+        background: 'rgb(var(--c-void) / 0.72)',
         backdropFilter: 'blur(18px)',
         WebkitBackdropFilter: 'blur(18px)',
         position: 'relative',
@@ -57,14 +58,14 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
           <button
             onClick={onMenuToggle}
             style={{
-              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+              background: 'rgb(var(--c-ink) / 0.05)', border: '1px solid rgb(var(--c-ink) / 0.08)',
               borderRadius: 7, padding: '5px', cursor: 'pointer', flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: 'rgba(255,255,255,0.5)',
+              color: 'rgb(var(--c-ink) / 0.5)',
               transition: 'color 0.15s ease, background 0.15s ease',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'white'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'rgb(var(--c-ink))'; e.currentTarget.style.background = 'rgb(var(--c-ink) / 0.08)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'rgb(var(--c-ink) / 0.5)'; e.currentTarget.style.background = 'rgb(var(--c-ink) / 0.05)'; }}
           >
             <Menu size={17} strokeWidth={1.7} />
           </button>
@@ -80,7 +81,7 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
             alt="Centum Astra"
             style={{
               width: 26, height: 26, borderRadius: 6, objectFit: 'cover', flexShrink: 0,
-              boxShadow: '0 0 10px rgba(245,200,66,0.25)',
+              boxShadow: '0 0 10px rgb(var(--c-gold-bright) / 0.25)',
             }}
           />
         ) : (
@@ -88,7 +89,7 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
           <span style={{
             fontFamily: '"Bricolage Grotesque", sans-serif',
             fontSize: 15, fontWeight: 700,
-            color: 'rgba(255,255,255,0.88)',
+            color: 'rgb(var(--c-ink) / 0.88)',
             letterSpacing: '-0.01em',
             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
@@ -97,35 +98,37 @@ export default function Header({ activeSection, onMenuToggle, isMobile }) {
         )}
       </div>
 
-      {/* Right — date (desktop only) + welcome chip */}
+      {/* Right — date (desktop only) + modo claro/oscuro + welcome chip */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         {!isMobile && (
-          <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, whiteSpace: 'nowrap' }}>
+          <span style={{ color: 'rgb(var(--c-ink) / 0.6)', fontSize: 12, whiteSpace: 'nowrap' }}>
             {new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}
           </span>
         )}
+
+        <BotonTema />
 
         {/* Welcome chip */}
         <div style={{
           display: 'flex', alignItems: 'center', gap: 7,
           padding: '4px 10px 4px 6px',
           borderRadius: 999,
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.07)',
+          background: 'rgb(var(--c-ink) / 0.04)',
+          border: '1px solid rgb(var(--c-ink) / 0.07)',
           minWidth: 0, maxWidth: isMobile ? 160 : 220,
           overflow: 'hidden',
         }}>
           <div style={{
             width: 20, height: 20, borderRadius: '50%',
-            background: 'rgba(255,255,255,0.08)',
+            background: 'rgb(var(--c-ink) / 0.08)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.65)',
+            fontSize: 9, fontWeight: 700, color: 'rgb(var(--c-ink) / 0.65)',
             flexShrink: 0,
           }}>
             {user?.avatar || firstName?.[0] || '?'}
           </div>
           <span style={{
-            color: 'rgba(255,255,255,0.72)',
+            color: 'rgb(var(--c-ink) / 0.72)',
             fontSize: isMobile ? 11.5 : 12,
             fontWeight: 500,
             overflow: 'hidden',

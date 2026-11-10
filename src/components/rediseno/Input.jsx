@@ -13,7 +13,7 @@ import { Eye, EyeOff } from 'lucide-react';
 const BASE_INPUT =
   'w-full rounded-[10px] bg-space-navy/50 border border-white/10 ' +
   'px-4 py-3 text-sm text-white font-body outline-none transition-colors ' +
-  'placeholder:text-white/55 ' +
+  'placeholder:text-white/60 ' +
   'focus:bg-space-mid/60 focus:border-gold-bright/40';
 
 const BASE_INPUT_INVALID =
@@ -81,7 +81,7 @@ export default function Input({
             onClick={() => setShowPass(s => !s)}
             aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
             aria-pressed={showPass}
-            className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-white/55 hover:text-white/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-bright focus-visible:ring-offset-2 focus-visible:ring-offset-space-void rounded"
+            className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center text-white/60 hover:text-white/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-bright focus-visible:ring-offset-2 focus-visible:ring-offset-space-void rounded"
           >
             {showPass ? <EyeOff size={15} aria-hidden="true" /> : <Eye size={15} aria-hidden="true" />}
           </button>

@@ -65,9 +65,9 @@ export default function Statistics() {
         transition={{ delay: 0.12 }}
         className="group relative overflow-hidden bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-yellow-500/20 transition-colors duration-300 p-6"
       >
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgba(245,200,66,0.05)_0%,transparent_65%)]" />
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgb(var(--c-gold-bright)_/_0.05)_0%,transparent_65%)]" />
         <div className="section-divider relative mb-1"><h3>Rendimiento por Materia</h3></div>
-        <p className="text-white/30 text-xs mb-5">
+        <p className="text-white/60 text-xs mb-5">
           Identifica qué área necesita refuerzo urgente
         </p>
         <ResponsiveContainer width="100%" height={220}>
@@ -88,9 +88,9 @@ export default function Statistics() {
         transition={{ delay: 0.22 }}
         className="group relative overflow-hidden bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-yellow-500/20 transition-colors duration-300 p-6"
       >
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgba(245,200,66,0.05)_0%,transparent_65%)]" />
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgb(var(--c-gold-bright)_/_0.05)_0%,transparent_65%)]" />
         <div className="section-divider relative mb-1"><h3>Evolución Semanal</h3></div>
-        <p className="text-white/30 text-xs mb-5">
+        <p className="text-white/60 text-xs mb-5">
           Detecta tendencias y ajusta el plan de estudio
         </p>
         <ResponsiveContainer width="100%" height={220}>

@@ -1,6 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
+import { ThemeProvider } from './context/ThemeContext'
+import { aplicarTema, temaInicial } from './lib/tema'
+
+// Antes del primer render, para no mostrar el modo equivocado un instante.
+aplicarTema(temaInicial());
 
 // Sandbox dev-only: ?sandbox=1 renderiza la página de pruebas de componentes
 // en lugar de la app principal. El import es dinámico para que no entre al
@@ -12,7 +17,9 @@ if (esSandbox) {
   import('./pages/_sandbox/Componentes.jsx').then(({ default: Componentes }) => {
     createRoot(document.getElementById('root')).render(
       <StrictMode>
-        <Componentes />
+        <ThemeProvider>
+          <Componentes />
+        </ThemeProvider>
       </StrictMode>,
     );
   });
@@ -23,9 +30,11 @@ if (esSandbox) {
   ]).then(([{ default: App }, { AvisoProvider }]) => {
     createRoot(document.getElementById('root')).render(
       <StrictMode>
-        <AvisoProvider>
-          <App />
-        </AvisoProvider>
+        <ThemeProvider>
+          <AvisoProvider>
+            <App />
+          </AvisoProvider>
+        </ThemeProvider>
       </StrictMode>,
     );
   });

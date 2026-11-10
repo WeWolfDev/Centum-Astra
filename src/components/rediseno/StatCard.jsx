@@ -18,14 +18,14 @@ import StatCifra from './StatCifra';
 // compartido por las tarjetas del rediseño.
 
 const TONO_HEX = {
-  dorado:      '#f5c842',
-  exito:       '#34d399',
-  info:        '#93c5fd',
-  peligro:     '#f87171',
-  advertencia: '#fbbf24',
-  violeta:     '#c084fc',
-  blanco:      '#ffffff',
-  suave:       '#cbd5e1',
+  dorado:      'rgb(var(--c-gold-bright))',
+  exito:       'rgb(var(--c-exito))',
+  info:        'rgb(var(--c-info))',
+  peligro:     'rgb(var(--c-peligro))',
+  advertencia: 'rgb(var(--c-advertencia))',
+  violeta:     'rgb(var(--c-violeta))',
+  blanco:      'rgb(var(--c-ink))',
+  suave:       'rgb(var(--c-ink) / 0.8)',
 };
 
 // Clases estáticas: Tailwind JIT las detecta por scan de fuente, no por composición dinámica.
@@ -59,7 +59,7 @@ export default function StatCard({
     <div
       className={
         'group relative overflow-hidden rounded-2xl p-5 ' +
-        'bg-white/5 backdrop-blur-xl border border-white/10 ' +
+        'tarjeta ' +
         `${hoverBorder} transition-colors duration-300 ` +
         className
       }

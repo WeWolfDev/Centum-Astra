@@ -7,6 +7,7 @@ import CodigoContrasena from './CodigoContrasena';
 import PublicNav from '../../components/layout/PublicNav';
 import Boton from '../../components/rediseno/Boton';
 import Input from '../../components/rediseno/Input';
+import BotonTema from '../../components/rediseno/BotonTema';
 import { cn } from '../../lib/utils';
 
 const roles = [
@@ -100,6 +101,8 @@ export default function Login({ onBack }) {
         </button>
       )}
 
+      <BotonTema className="fixed top-[72px] right-4 md:right-6 z-20 backdrop-blur" />
+
       {/* pt-[60px] se mantiene arbitrario: depende de la altura real
           (60px) de PublicNav fija en la parte superior. */}
       <div className="relative z-10 flex flex-1 flex-col md:flex-row pt-[60px]">
@@ -130,11 +133,11 @@ export default function Login({ onBack }) {
           {/* Hero headline */}
           <motion.div variants={item} className="mb-8 relative">
             <h1 className="relative z-10 font-display font-bold tracking-tight leading-tight text-4xl md:text-5xl lg:text-6xl mb-6">
-              <span className="bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">
+              <span className="text-white">
                 Domina el EXANI-II.
               </span>
               <br />
-              <span className="bg-gold-beam bg-clip-text text-transparent">
+              <span className="text-gold-bright">
                 Vive tu vocación.
               </span>
             </h1>
@@ -155,7 +158,7 @@ export default function Login({ onBack }) {
                   <p className={cn(
                     'font-display text-2xl font-bold leading-none mb-1.5 tracking-tight relative',
                     s.hero
-                      ? 'bg-gold-beam bg-clip-text text-transparent'
+                      ? 'text-gold-bright'
                       : 'text-white',
                   )}>
                     {s.val}
@@ -174,7 +177,7 @@ export default function Login({ onBack }) {
           initial={{ opacity: 0, x: 24 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="relative flex w-full md:w-5/12 flex-col items-center justify-center gap-5 px-5 md:px-12 py-8 md:py-12"
+          className="relative flex w-full md:w-5/12 flex-col items-center justify-center gap-5 px-5 md:px-12 pt-20 pb-8 md:py-12"
         >
           <div className="w-full max-w-sm rounded-2xl p-8 bg-space-void/60 backdrop-blur-xl border border-white/10">
             {modo !== 'login' ? (

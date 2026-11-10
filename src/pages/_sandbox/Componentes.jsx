@@ -145,7 +145,7 @@ function Contenido() {
           <BotonPrimario onClick={() => setUltimaAccion('BotonPrimario wrapper')}>
             BotonPrimario
           </BotonPrimario>
-          <span className="text-white/40">vs</span>
+          <span className="text-white/60">vs</span>
           <button type="button" className="btn-gold-flat">
             btn-gold-flat
           </button>
@@ -157,7 +157,7 @@ function Contenido() {
           <BotonSecundario onClick={() => setUltimaAccion('BotonSecundario wrapper')}>
             BotonSecundario
           </BotonSecundario>
-          <span className="text-white/40">vs</span>
+          <span className="text-white/60">vs</span>
           <button type="button" className="btn-flat-secundario">
             btn-flat-secundario
           </button>
@@ -382,7 +382,7 @@ function Contenido() {
       <SelectorAreasDemo />
 
       {ultimaAccion && (
-        <p className="text-white/50 text-xs">Última acción: {ultimaAccion}</p>
+        <p className="text-white/60 text-xs">Última acción: {ultimaAccion}</p>
       )}
     </main>
   );
@@ -406,7 +406,7 @@ function SelectorAreasDemo() {
             ))}
           </div>
         </Pestanas>
-        <p className="text-xs text-white/50">
+        <p className="text-xs text-white/60">
           Activa: {activo?.title}. Usa flechas ← → y Home/End para navegar.
         </p>
       </div>

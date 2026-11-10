@@ -113,20 +113,20 @@ function StudentTable({ students }) {
                   <p className="text-sm font-medium text-white/85 whitespace-nowrap overflow-hidden text-ellipsis m-0">
                     {student.name}
                   </p>
-                  <p className="text-xs text-white/30 whitespace-nowrap overflow-hidden text-ellipsis m-0">
+                  <p className="text-xs text-white/60 whitespace-nowrap overflow-hidden text-ellipsis m-0">
                     {student.email}
                   </p>
                 </div>
               </div>
 
               {/* Middle row: module label */}
-              <p className="text-xs text-white/45 m-0">{student.subject}</p>
+              <p className="text-xs text-white/60 m-0">{student.subject}</p>
 
               {/* Stats row: progress bar + score badge + payment badge */}
               <div className="flex items-center gap-2.5 flex-wrap">
                 <div className="flex items-center gap-1.5 flex-1 min-w-[100px]">
                   <BarraProgreso valor={student.progress} />
-                  <span className="text-xs text-white/45 min-w-[30px] text-right">
+                  <span className="text-xs text-white/60 min-w-[30px] text-right">
                     {student.progress}%
                   </span>
                 </div>
@@ -159,7 +159,7 @@ function StudentTable({ students }) {
             {['Alumno', 'Módulo', 'Progreso', 'Quizzes', 'Promedio', 'Pago', ''].map(h => (
               <th
                 key={h}
-                className="px-3 pb-3 text-left text-xs font-semibold text-white/30 tracking-wide"
+                className="px-3 pb-3 text-left text-xs font-semibold text-white/60 tracking-wide"
               >
                 {h}
               </th>
@@ -182,18 +182,18 @@ function StudentTable({ students }) {
                     <Avatar nombre={student.name} chico />
                     <div>
                       <p className="text-sm font-medium text-white/85 m-0">{student.name}</p>
-                      <p className="text-xs text-white/30 m-0">{student.email}</p>
+                      <p className="text-xs text-white/60 m-0">{student.email}</p>
                     </div>
                   </div>
                 </td>
-                <td className="py-3.5 px-3 text-xs text-white/55">{student.subject}</td>
+                <td className="py-3.5 px-3 text-xs text-white/60">{student.subject}</td>
                 <td className="py-3.5 px-3">
                   <div className="flex items-center gap-2">
                     <BarraProgreso valor={student.progress} ancho="fijo" />
-                    <span className="text-xs text-white/50 min-w-[28px]">{student.progress}%</span>
+                    <span className="text-xs text-white/60 min-w-[28px]">{student.progress}%</span>
                   </div>
                 </td>
-                <td className="py-3.5 px-3 text-sm text-white/55">{student.quizzes}</td>
+                <td className="py-3.5 px-3 text-sm text-white/60">{student.quizzes}</td>
                 <td className="py-3.5 px-3">
                   <span className={cn('text-sm font-semibold', textScore(student.avgScore))}>
                     {student.avgScore}%
@@ -224,9 +224,9 @@ function TableCard({ title, controls, children }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="group relative overflow-hidden bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:border-gold-bright/30 transition-colors duration-300 p-6 z-10"
+      className="group relative overflow-hidden tarjeta rounded-2xl hover:border-gold-bright/30 transition-colors duration-300 p-6 z-10"
     >
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgba(245,200,66,0.07)_0%,transparent_65%)]" />
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-[radial-gradient(ellipse_at_top_left,rgb(var(--c-gold-bright)_/_0.07)_0%,transparent_65%)]" />
       <div className="absolute top-0 left-4 right-4 h-px opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none bg-gradient-to-r from-transparent via-gold-bright/35 to-transparent" />
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <div className="section-divider relative flex-1">
@@ -329,7 +329,7 @@ function StudentsView() {
             <div className="relative">
               <Search
                 size={14}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none"
               />
               <input
                 type="text"
@@ -349,7 +349,7 @@ function StudentsView() {
                     'px-3.5 py-2 rounded-lg text-xs font-medium cursor-pointer transition-colors duration-150',
                     filterStatus === val
                       ? 'bg-gold-bright/10 text-gold-bright border border-gold-bright/25'
-                      : 'bg-white/5 text-white/40 border border-white/10',
+                      : 'bg-white/5 text-white/60 border border-white/10',
                   )}
                 >
                   {lbl}

@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 //   primario   — dorado plano, acción principal (btn-gold-flat definida en index.css)
 //   secundario — relleno sutil, acciones no destructivas (btn-flat-secundario)
 //   ghost      — sin fondo ni borde, para toolbar y acciones terciarias
-//   danger     — fondo peligro con texto space-void (contraste 7:1, WCAG AA)
+//   danger     — fondo peligro con texto on-peligro (≥ 6:1 en ambos modos, WCAG AA)
 //
 // Tamaños:
 //   md — default, 44px de alto, para acciones principales y UI de pantalla completa
@@ -38,13 +38,13 @@ const VARIANT_CLASSES_MD = {
     `${BASE_INLINE} text-white/80 bg-transparent border border-transparent ` +
     'hover:bg-white/5 hover:text-white',
   danger:
-    `${BASE_INLINE} text-space-void bg-peligro border-none ` +
+    `${BASE_INLINE} text-on-peligro bg-peligro border-none ` +
     'shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:bg-peligro/80',
 };
 
 const VARIANT_CLASSES_SM = {
   primario:
-    `${BASE_INLINE_SM} text-space-void bg-gold-bright hover:bg-gold-glow`,
+    `${BASE_INLINE_SM} text-on-gold bg-gold-fill hover:bg-gold-fill/85`,
   secundario:
     `${BASE_INLINE_SM} text-white/90 bg-white/5 border border-white/10 ` +
     'hover:bg-white/10 hover:border-white/20',
@@ -52,7 +52,7 @@ const VARIANT_CLASSES_SM = {
     `${BASE_INLINE_SM} text-white/80 bg-transparent border border-transparent ` +
     'hover:bg-white/5 hover:text-white',
   danger:
-    `${BASE_INLINE_SM} text-space-void bg-peligro hover:bg-peligro/80`,
+    `${BASE_INLINE_SM} text-on-peligro bg-peligro hover:bg-peligro/80`,
 };
 
 const VARIANTS_BY_SIZE = {

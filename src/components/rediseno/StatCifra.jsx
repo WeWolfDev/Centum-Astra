@@ -3,14 +3,14 @@
 //       ('exito' | 'info' | 'peligro' | 'advertencia' | 'violeta').
 // Los tokens coinciden con tailwind.config.js y con src/config/graficas.js.
 const COLORES = {
-  blanco:      '#ffffff',
-  dorado:      '#f5c842',
-  suave:       '#cbd5e1',
-  exito:       '#34d399',
-  info:        '#93c5fd',
-  peligro:     '#f87171',
-  advertencia: '#fbbf24',
-  violeta:     '#c084fc',
+  blanco:      'rgb(var(--c-ink))',
+  dorado:      'rgb(var(--c-gold-bright))',
+  suave:       'rgb(var(--c-ink) / 0.8)',
+  exito:       'rgb(var(--c-exito))',
+  info:        'rgb(var(--c-info))',
+  peligro:     'rgb(var(--c-peligro))',
+  advertencia: 'rgb(var(--c-advertencia))',
+  violeta:     'rgb(var(--c-violeta))',
 };
 
 // degradado: aplica el gradiente dorado (yellow-200 → gold-bright → amber-500/80)
@@ -31,7 +31,7 @@ export default function StatCifra({
       <p
         className={
           esGradienteDorado
-            ? 'bg-gradient-to-br from-yellow-200 via-gold-bright to-amber-500/80 bg-clip-text text-transparent'
+            ? 'text-gold-bright'
             : undefined
         }
         style={{
@@ -53,7 +53,7 @@ export default function StatCifra({
             fontSize: 11,
             fontWeight: 500,
             letterSpacing: '0.06em',
-            color: 'rgba(255,255,255,0.6)',
+            color: 'rgb(var(--c-ink) / 0.6)',
             textTransform: 'uppercase',
             marginTop: 6,
             marginBottom: 0,
