@@ -1,5 +1,5 @@
-// Simuladores y quizzes (maestro/admin).
-// Dos pestañas con su propio listado, estado vacío y botón de crear.
+// Simuladores y quizzes (admin) o solo quizzes (maestro).
+// Cada pestaña tiene su propio listado, estado vacío y botón de crear.
 //
 // Reglas del HANDOFF que aplican:
 //  - Simulador = da puntaje Ceneval y alimenta la gráfica del alumno.
@@ -14,6 +14,7 @@ import IconSubject from '../../components/rediseno/IconSubject';
 import Pastilla from '../../components/rediseno/Pastilla';
 import Pestanas from '../../components/rediseno/Pestanas';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
+import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import ModalNuevaEvaluacion from './ModalNuevaEvaluacion';
 import { TIPO_COPY } from './tipoCopy';
 import { AREA_POR_ID } from '../../config/areas';
@@ -144,15 +145,53 @@ function EstadoVacioPanel({ tipo, onCrear }) {
   );
 }
 
-export default function MaestroQuizzes() {
+function ContadorTab({ total, color }) {
+  if (total === 0) return null;
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        marginLeft: 8,
+        padding: '2px 8px',
+        borderRadius: 999,
+        background: `rgb(var(${color}) / 0.14)`,
+        color: `rgb(var(${color}))`,
+        fontSize: 12,
+        fontWeight: 700,
+      }}
+    >
+      {total}
+    </span>
+  );
+}
+
+function PanelEvaluaciones({ tipo, items, onCrear, onEliminar }) {
+  return (
+    <div style={{ marginTop: 20 }}>
+      {items.length === 0 ? (
+        <EstadoVacioPanel tipo={tipo} onCrear={onCrear} />
+      ) : (
+        <ListadoPorMateria items={items} onEliminar={onEliminar} />
+      )}
+    </div>
+  );
+}
+
+// El maestro solo arma quizzes: según la matriz de permisos, los simuladores
+// los crea el administrador (#37). `conSimuladores` agrega su pestaña.
+export default function MaestroQuizzes({ conSimuladores = false }) {
   const { simuladores, quizzes, agregarEvaluacion, eliminarEvaluacion } = useMaterial();
-  const [tabActiva, setTabActiva] = useState('simuladores');
+  const [tabActiva, setTabActiva] = useState(conSimuladores ? 'simuladores' : 'quizzes');
   const [modalTipo, setModalTipo] = useState(null); // 'simulador' | 'quiz' | null
 
   const itemsActivos = tabActiva === 'simuladores' ? simuladores : quizzes;
   const tipoActivo = tabActiva === 'simuladores' ? 'simulador' : 'quiz';
   const copyActivo = TIPO_COPY[tipoActivo];
   const hayItems = itemsActivos.length > 0;
+  const titulo = conSimuladores ? 'Simuladores y quizzes' : 'Quizzes';
+  const descripcion = conSimuladores
+    ? 'Arma simuladores con puntaje Ceneval y quizzes cortos por tema. Los verán tus alumnos.'
+    : 'Arma quizzes cortos por tema para que tus alumnos repasen. Los verán tus alumnos.';
 
   function abrirModal() {
     setModalTipo(tipoActivo);
@@ -161,6 +200,15 @@ export default function MaestroQuizzes() {
   function handleGuardar(data) {
     agregarEvaluacion(modalTipo, data);
   }
+
+  const panelQuizzes = (
+    <PanelEvaluaciones
+      tipo="quiz"
+      items={quizzes}
+      onCrear={() => setModalTipo('quiz')}
+      onEliminar={eliminarEvaluacion}
+    />
+  );
 
   return (
     <div
@@ -197,10 +245,10 @@ export default function MaestroQuizzes() {
               color: 'rgb(var(--c-ink))',
             }}
           >
-            Simuladores y quizzes
+            {titulo}
           </h1>
           <p style={{ margin: '6px 0 0', fontSize: 14, color: 'rgb(var(--c-ink) / 0.7)' }}>
-            Arma simuladores con puntaje Ceneval y quizzes cortos por tema. Los verán tus alumnos.
+            {descripcion}
           </p>
         </div>
         {hayItems && (
@@ -210,72 +258,37 @@ export default function MaestroQuizzes() {
         )}
       </header>
 
-      <Pestanas
-        valor={tabActiva}
-        onCambio={setTabActiva}
-        aria-label="Simuladores y quizzes"
-      >
-        <Pestanas.Lista>
-          <Pestanas.Tab valor="simuladores">
-            Simuladores
-            {simuladores.length > 0 && (
-              <span
-                aria-hidden="true"
-                style={{
-                  marginLeft: 8,
-                  padding: '2px 8px',
-                  borderRadius: 999,
-                  background: 'rgb(var(--c-gold-bright) / 0.14)',
-                  color: 'rgb(var(--c-gold-bright))',
-                  fontSize: 12,
-                  fontWeight: 700,
-                }}
-              >
-                {simuladores.length}
-              </span>
-            )}
-          </Pestanas.Tab>
-          <Pestanas.Tab valor="quizzes">
-            Quizzes
-            {quizzes.length > 0 && (
-              <span
-                aria-hidden="true"
-                style={{
-                  marginLeft: 8,
-                  padding: '2px 8px',
-                  borderRadius: 999,
-                  background: 'rgb(var(--c-info) / 0.14)',
-                  color: 'rgb(var(--c-info))',
-                  fontSize: 12,
-                  fontWeight: 700,
-                }}
-              >
-                {quizzes.length}
-              </span>
-            )}
-          </Pestanas.Tab>
-        </Pestanas.Lista>
+      <AvisoDatosEjemplo>
+        Lo que crees aquí se guarda solo en esta sesión hasta que las evaluaciones se conecten.
+      </AvisoDatosEjemplo>
 
-        <Pestanas.Panel valor="simuladores">
-          <div style={{ marginTop: 20 }}>
-            {simuladores.length === 0 ? (
-              <EstadoVacioPanel tipo="simulador" onCrear={() => setModalTipo('simulador')} />
-            ) : (
-              <ListadoPorMateria items={simuladores} onEliminar={eliminarEvaluacion} />
-            )}
-          </div>
-        </Pestanas.Panel>
+      {conSimuladores ? (
+        <Pestanas valor={tabActiva} onCambio={setTabActiva} aria-label={titulo}>
+          <Pestanas.Lista>
+            <Pestanas.Tab valor="simuladores">
+              Simuladores
+              <ContadorTab total={simuladores.length} color="--c-gold-bright" />
+            </Pestanas.Tab>
+            <Pestanas.Tab valor="quizzes">
+              Quizzes
+              <ContadorTab total={quizzes.length} color="--c-info" />
+            </Pestanas.Tab>
+          </Pestanas.Lista>
 
-        <Pestanas.Panel valor="quizzes">
-          <div style={{ marginTop: 20 }}>
-            {quizzes.length === 0 ? (
-              <EstadoVacioPanel tipo="quiz" onCrear={() => setModalTipo('quiz')} />
-            ) : (
-              <ListadoPorMateria items={quizzes} onEliminar={eliminarEvaluacion} />
-            )}
-          </div>
-        </Pestanas.Panel>
-      </Pestanas>
+          <Pestanas.Panel valor="simuladores">
+            <PanelEvaluaciones
+              tipo="simulador"
+              items={simuladores}
+              onCrear={() => setModalTipo('simulador')}
+              onEliminar={eliminarEvaluacion}
+            />
+          </Pestanas.Panel>
+
+          <Pestanas.Panel valor="quizzes">{panelQuizzes}</Pestanas.Panel>
+        </Pestanas>
+      ) : (
+        panelQuizzes
+      )}
 
       <ModalNuevaEvaluacion
         tipo={modalTipo ?? 'quiz'}

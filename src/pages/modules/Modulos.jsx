@@ -6,6 +6,7 @@
 import { useMemo, useState } from 'react';
 import { Lock, ChevronDown } from 'lucide-react';
 import { mockModules, mockSessionsByModule, mockVideos } from '../../data/mockData';
+import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { useAuth } from '../../context/AuthContext';
 import { useMaterial } from '../../context/MaterialContext';
 import { puedeDescargarPdf } from '../../config/rediseno';
@@ -453,6 +454,10 @@ export default function Modulos({ defaultModuleId = null }) {
       >
         Módulos
       </h1>
+
+      <AvisoDatosEjemplo>
+        Las clases, videos y documentos de esta sección son de muestra hasta que se conecte el material del curso.
+      </AvisoDatosEjemplo>
 
       <Pestanas
         valor={selectedId}
