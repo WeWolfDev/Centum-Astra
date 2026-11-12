@@ -9,18 +9,15 @@ import Header from './components/layout/Header';
 import LandingPage from './pages/landing/LandingPage';
 import Login from './pages/auth/Login';
 import AdminDashboard from './pages/admin/AdminDashboard';
-import Statistics from './pages/admin/Statistics';
 import AdminCursos from './pages/admin/AdminCursos';
 import TeacherDashboard from './pages/teacher/TeacherDashboard';
 import StudentDashboard from './pages/student/StudentDashboard';
-import FileManager from './pages/modules/FileManager';
 import Modulos from './pages/modules/Modulos';
 import Material from './pages/modules/Material';
 import VideoLibrary from './pages/video/VideoLibrary';
-import ExamSimulator from './pages/exam/ExamSimulator';
 import SimuladoresQuizzes from './pages/exam/SimuladoresQuizzes';
 import MaestroQuizzes from './pages/exam/MaestroQuizzes';
-import Whiteboard from './pages/whiteboard/Whiteboard';
+import PagosProximamente from './pages/admin/PagosProximamente';
 
 function AppContent() {
   const { user, isInitializing } = useAuth();
@@ -79,17 +76,16 @@ function AppContent() {
       if (activeSection === 'dashboard') return <AdminDashboard view="overview" onNavigate={handleNavigation} />;
       if (activeSection === 'students')  return <AdminDashboard view="students" />;
       if (activeSection === 'courses')   return <AdminCursos />;
-      if (activeSection === 'stats') return <Statistics />;
     }
 
     if (user.role === 'teacher') {
       if (activeSection === 'dashboard') return <TeacherDashboard setActiveSection={handleNavigation} />;
-      if (activeSection === 'stats') return <Statistics />;
     }
 
     if (user.role === 'student') {
       if (activeSection === 'dashboard') return <StudentDashboard setActiveSection={handleNavigation} />;
       if (activeSection === 'modules')   return <Modulos defaultModuleId={activeModuleId} />;
+      if (activeSection === 'videos')    return <VideoLibrary />;
       if (activeSection === 'exam')      return <SimuladoresQuizzes customQuizzes={customQuizzes} onAddQuiz={addCustomQuiz} onDeleteQuiz={deleteCustomQuiz} />;
     }
 
@@ -100,18 +96,9 @@ function AppContent() {
 
     if (user.role === 'admin') {
       if (activeSection === 'modules')   return <Material defaultModuleId={activeModuleId} />;
-      if (activeSection === 'exam')      return <MaestroQuizzes />;
-      if (activeSection === 'payments')  return (
-        <div className="flex items-center justify-center h-full p-8 text-white/60">
-          TODO(rediseno): Pagos — sin mockup todavía.
-        </div>
-      );
+      if (activeSection === 'exam')      return <MaestroQuizzes conSimuladores />;
+      if (activeSection === 'payments')  return <PagosProximamente />;
     }
-
-    if (activeSection === 'modules') return <FileManager defaultModuleId={activeModuleId} />;
-    if (activeSection === 'videos') return <VideoLibrary />;
-    if (activeSection === 'exam') return <ExamSimulator customQuizzes={customQuizzes} onAddQuiz={addCustomQuiz} onDeleteQuiz={deleteCustomQuiz} />;
-    if (activeSection === 'whiteboard' && user.role !== 'student') return <Whiteboard />;
 
     return (
       <div className="flex items-center justify-center h-full text-white/60 text-lg p-8">

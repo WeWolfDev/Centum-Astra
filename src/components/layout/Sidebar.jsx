@@ -6,8 +6,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-// Admin queda sin rediseñar hasta tener mockup; conservamos su nav previo.
-// TODO(rediseno): Pagos (sin mockup — admin pendiente).
+// Menú por rol según la matriz de permisos aprobada
+// (docs/RESPUESTAS_Y_PREGUNTAS_PENDIENTES_CLIENTE.md, "Permisos por rol").
+// Pagos muestra "próximamente" hasta #53; el maestro no crea simuladores.
 const adminNav = [
   { id: 'dashboard', label: 'Cuentas',                 Icon: Users },
   { id: 'courses',   label: 'Cursos',                  Icon: BookOpen },
@@ -19,7 +20,7 @@ const adminNav = [
 const teacherNav = [
   { id: 'dashboard', label: 'Mis alumnos',             Icon: Users },
   { id: 'modules',   label: 'Material',                Icon: FolderOpen },
-  { id: 'exam',      label: 'Simuladores y quizzes',   Icon: GraduationCap },
+  { id: 'exam',      label: 'Quizzes',                 Icon: GraduationCap },
 ];
 
 const studentNav = [
@@ -91,7 +92,9 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
         </div>
         {isMobile && (
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar menú"
             style={{
               background: 'rgb(var(--c-ink) / 0.06)', border: '1px solid rgb(var(--c-ink) / calc(0.1 * var(--borde-k)))',
               borderRadius: 8, padding: '6px', cursor: 'pointer',
@@ -99,7 +102,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
               color: 'rgb(var(--c-ink) / 0.5)',
             }}
           >
-            <X size={16} strokeWidth={1.7} />
+            <X size={16} strokeWidth={1.7} aria-hidden="true" />
           </button>
         )}
       </div>
@@ -128,17 +131,19 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
       </div>
 
       {/* Nav */}
-      <nav style={{ flex: 1, padding: '12px 12px', overflowY: 'auto' }} className="scrollbar-hide">
+      <nav aria-label="Secciones" style={{ flex: 1, padding: '12px 12px', overflowY: 'auto' }} className="scrollbar-hide">
         {nav.map(({ id, label, Icon }) => {
           const active = activeSection === id;
           return (
             <button
               key={id}
+              type="button"
               onClick={() => setActiveSection(id)}
+              aria-current={active ? 'page' : undefined}
               className={`nav-link ${active ? 'nav-link-active' : ''}`}
               style={{ marginBottom: 2 }}
             >
-              <Icon size={16} strokeWidth={active ? 2 : 1.7} style={{ flexShrink: 0, opacity: active ? 1 : 0.7 }} />
+              <Icon size={16} strokeWidth={active ? 2 : 1.7} aria-hidden="true" style={{ flexShrink: 0, opacity: active ? 1 : 0.7 }} />
               {label}
             </button>
           );
@@ -148,6 +153,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
       {/* Logout */}
       <div style={{ padding: '12px', borderTop: '1px solid rgb(var(--c-ink) / calc(0.05 * var(--borde-k)))' }}>
         <button
+          type="button"
           onClick={logout}
           onMouseEnter={() => setLogoutHover(true)}
           onMouseLeave={() => setLogoutHover(false)}
@@ -161,7 +167,7 @@ export default function Sidebar({ activeSection, setActiveSection, isOpen, onClo
             transition: 'color 0.15s ease, background 0.15s ease',
           }}
         >
-          <LogOut size={15} strokeWidth={1.7} />
+          <LogOut size={15} strokeWidth={1.7} aria-hidden="true" />
           Cerrar sesión
         </button>
       </div>

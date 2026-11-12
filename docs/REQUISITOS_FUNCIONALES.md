@@ -14,8 +14,9 @@ Los requisitos de esta fase se contrastaron con los componentes montados en `App
 
 - La aplicación es un prototipo navegable: autenticación, alumnos, métricas, publicaciones y progreso usan datos mock o estado en memoria; no hay API ni persistencia.
 - Las rutas que se muestran dependen del rol y del estado de navegación en `App.jsx`. La existencia de un componente no significa que el usuario pueda llegar a él desde la interfaz.
-- `Statistics.jsx`, `VideoLibrary.jsx` y `ExamSimulator.jsx` no son accesibles desde el menú de todos los roles. En concreto, Estadísticas no tiene una entrada visible en el menú actual; Videoteca aparece en el menú de alumno; y la toma de examen de `ExamSimulator.jsx` no es la pantalla montada para los roles de demostración.
-- `FileManager.jsx` es una implementación anterior que no se monta para los roles `admin`, `teacher` o `student`. La experiencia actual de módulos usa `Material.jsx` (admin/profesor) y `Modulos.jsx` (alumno).
+- El menú de cada rol sigue la matriz de permisos aprobada (#37): el profesor solo arma quizzes, el administrador además simuladores, y Pagos muestra "disponible pronto" hasta #53. Videoteca aparece solo en el menú de alumno.
+- Las pantallas que todavía leen `mockData.js` (dashboard del alumno, Módulos, Material, Videoteca y evaluaciones) muestran el aviso "Datos de ejemplo".
+- `Statistics.jsx`, `ExamSimulator.jsx`, `FileManager.jsx` y `Whiteboard.jsx` se retiraron en #37 porque no se podían abrir desde ningún menú; siguen en el historial de git.
 - Los controles de “Ver”, “Aprobar”, subida, creación y reproducción no deben interpretarse como operaciones completadas: varios solo modifican estado local o muestran una interfaz sin persistir/enviar el archivo.
 
 ---
@@ -76,19 +77,16 @@ Los requisitos de esta fase se contrastaron con los componentes montados en `App
 - La acción de reproducción no inicia un reproductor. El modal de carga lee nombre/título/datos, pero no envía el archivo; los cambios son locales.
 - El modal de carga no es accesible desde la navegación actual de admin/profesor.
 
-### RF-08 · Simulador EXANI-II (`ExamSimulator.jsx`)
+### RF-08 · Simuladores y quizzes
 
-- Para admin/profesor, `MaestroQuizzes.jsx` permite crear/eliminar evaluaciones por materia; se agregan preguntas con enunciado, cuatro opciones, respuesta correcta y explicación. El estado se conserva solo durante la sesión.
+- Para el administrador, `MaestroQuizzes.jsx` permite crear/eliminar simuladores y quizzes por materia; el profesor solo quizzes; se agregan preguntas con enunciado, cuatro opciones, respuesta correcta y explicación. El estado se conserva solo durante la sesión.
 - Para alumno, `SimuladoresQuizzes.jsx` muestra historial/gráficas y quizzes generados a partir de mocks. El CTA para iniciar simulador está deshabilitado (“Próximamente”).
-- La pantalla de examen (`ExamSimulator.jsx`) no es la que monta `App.jsx` para los tres roles disponibles; temporizador, evaluación cronometrada y reporte de examen no forman hoy un flujo accesible completo.
+- No hay pantalla de examen montada: temporizador, evaluación cronometrada y reporte de examen llegan con #36.
 - No hay persistencia de preguntas/resultados ni cálculo oficial de puntaje CENEVAL.
 
-### RF-09 · Estadísticas Admin/Profesor (`Statistics.jsx`)
+### RF-09 · Estadísticas Admin/Profesor
 
-- Existe una página con 2 KPI de demostración: tasa de aprobación (78%) y alumnos evaluados (312).
-- **BarChart "Rendimiento por Materia"** a ancho completo — con subtítulo accionable "Identifica qué área necesita refuerzo urgente".
-- **LineChart "Evolución Semanal"** a ancho completo — con subtítulo "Detecta tendencias y ajusta el plan de estudio" — doble serie: promedio del grupo vs. calificación máxima.
-- Las cifras y gráficas se alimentan de `mockStats`; no son métricas calculadas en tiempo real. La página está conectada en el código, pero actualmente no se alcanza desde la navegación visible por rol.
+- No hay página de estadísticas: la anterior (`Statistics.jsx`) usaba cifras mock y no se podía abrir; se retiró en #37. Las métricas reales dependen de #31.
 
 ### RF-10 · Responsividad
 
@@ -107,11 +105,11 @@ Los requisitos de esta fase se contrastaron con los componentes montados en `App
 
 ### RF-12 · Sitio público, cursos y prueba de muestra
 
-- La página pública presenta la propuesta de preparación EXANI-II, testimonios, indicadores promocionales y el plan de acceso completo.
+- La página pública presenta la propuesta de preparación EXANI-II y el plan de acceso completo. Los testimonios y las cifras promocionales se retiraron en #37 hasta tener datos verificados y autorizados por el cliente.
 - La navegación pública permite abrir un selector de cursos y probar una muestra de preguntas para Pensamiento Matemático, Redacción Indirecta, Comprensión Lectora o Pre-medicina.
 - Cada prueba de muestra permite responder reactivos, muestra retroalimentación y explicación, controla un tiempo y presenta un resultado al terminar o agotarse el tiempo.
 - El botón principal de la página desplaza a la sección de registro; los accesos de inicio de sesión abren la pantalla de login.
-- Los testimonios, cifras promocionales, contenidos, precio y resultados de muestra son contenido fijo de demostración y no deben presentarse como datos verificados o personalizados.
+- El contenido, el precio y los resultados de muestra son contenido fijo de demostración y no deben presentarse como datos verificados o personalizados.
 
 ### RF-13 · Registro y solicitud de acceso
 
@@ -234,7 +232,7 @@ Lo que falta para pasar del diseño funcional al sistema operativo real.
 
 ### BE-07 · Estadísticas en Tiempo Real
 
-- Conectar `Statistics.jsx` a endpoints reales que agreguen datos de la DB.
+- Construir la página de estadísticas sobre consultas reales que agreguen datos de la DB (#31).
 - Métricas calculadas en servidor: tasa de aprobación, promedio de grupo, evolución semanal.
 - Caché de métricas (Redis o similar) para no recalcular en cada petición.
 - Posibilidad de exportar reporte en PDF (admin).
@@ -267,15 +265,14 @@ src/
 ├── pages/
 │   ├── landing/LandingPage.jsx       # Página pública, muestras y solicitud visual de acceso
 │   ├── auth/Login.jsx                # Acceso de demostración (mock)
-│   ├── admin/                        # Panel administrativo; Statistics no tiene acceso visible
+│   ├── admin/                        # Panel administrativo: cuentas, cursos y pagos (próximamente)
 │   ├── teacher/TeacherDashboard.jsx  # Lista/resumen de alumnos con datos mock
 │   ├── student/StudentDashboard.jsx  # Progreso estimado y material del alumno
 │   ├── modules/Material.jsx          # Gestión local de material para staff
 │   ├── modules/Modulos.jsx           # Vista de módulos del alumno
 │   ├── video/VideoLibrary.jsx        # Videoteca, accesible desde el menú de alumno
 │   ├── exam/MaestroQuizzes.jsx       # Creación local de evaluaciones para staff
-│   ├── exam/SimuladoresQuizzes.jsx   # Vista mock del alumno; inicio de simulador deshabilitado
-│   └── exam/ExamSimulator.jsx        # Pantalla de examen no conectada al flujo actual por rol
+│   └── exam/SimuladoresQuizzes.jsx   # Vista mock del alumno; inicio de simulador deshabilitado
 ├── hooks/useBreakpoint.js            # Detección de viewport
 └── index.css                         # Estilos y reglas responsive
 

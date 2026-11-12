@@ -53,71 +53,6 @@ export const mockVideos = [
 ];
 
 
-export const mockExamQuestions = [
-  {
-    id: 1, subject: 'Pensamiento Matemático',
-    question: 'Si f(x) = 3x² - 2x + 1, ¿cuál es el valor de f(2)?',
-    options: ['9', '11', '13', '15'],
-    correct: 1,
-    explanation: 'f(2) = 3(4) - 2(2) + 1 = 12 - 4 + 1 = 9... Espera: 3(4)=12, 12-4=8, 8+1=9. Opción A.',
-  },
-  {
-    id: 2, subject: 'Pensamiento Matemático',
-    question: 'Resuelve: ∫(2x + 3)dx',
-    options: ['x² + 3x + C', '2x² + 3x + C', 'x² + C', '2 + C'],
-    correct: 0,
-    explanation: 'La integral de 2x es x², y la integral de 3 es 3x, sumando la constante C.',
-  },
-  {
-    id: 3, subject: 'Comprensión Lectora',
-    question: '"El silencio pesaba como una losa sobre la habitación." Esta expresión es un ejemplo de:',
-    options: ['Metáfora', 'Símil', 'Hipérbole', 'Metonimia'],
-    correct: 0,
-    explanation: 'Es una metáfora porque compara directamente el silencio con una losa sin usar "como" o "tal como".',
-  },
-  {
-    id: 4, subject: 'Redacción Indirecta',
-    question: '¿Cuál de los siguientes enunciados tiene un error de coherencia?',
-    options: [
-      'El perro ladra fuerte; además, es muy tranquilo.',
-      'Estudié toda la noche y aprobé el examen.',
-      'Hace frío afuera, así que llevaré un abrigo.',
-      'La reunión fue productiva y llegamos a acuerdos.',
-    ],
-    correct: 0,
-    explanation: 'El primer enunciado es incoherente porque afirma que el perro ladra fuerte (ruidoso) y al mismo tiempo es tranquilo.',
-  },
-  {
-    id: 5, subject: 'Pre-medicina',
-    question: '¿Cuál es la función principal de la mitocondria?',
-    options: ['Síntesis de proteínas', 'Producción de ATP', 'Digestión celular', 'División celular'],
-    correct: 1,
-    explanation: 'La mitocondria es el organelo responsable de la producción de energía en forma de ATP mediante la respiración celular.',
-  },
-  {
-    id: 6, subject: 'Pre-medicina',
-    question: 'El ADN está compuesto por nucleótidos. ¿Cuál de las siguientes bases nitrogenadas es exclusiva del ARN?',
-    options: ['Adenina', 'Guanina', 'Uracilo', 'Citosina'],
-    correct: 2,
-    explanation: 'El Uracilo (U) es exclusivo del ARN, mientras que el ADN utiliza Timina (T) en su lugar.',
-  },
-  {
-    id: 7, subject: 'Pensamiento Matemático',
-    question: 'Una recta tiene pendiente m = 3 y pasa por el punto (1, 2). ¿Cuál es su ecuación?',
-    options: ['y = 3x - 1', 'y = 3x + 1', 'y = 3x - 2', 'y = 3x + 2'],
-    correct: 0,
-    explanation: 'Usando y - y₁ = m(x - x₁): y - 2 = 3(x - 1) → y = 3x - 3 + 2 → y = 3x - 1',
-  },
-  {
-    id: 8, subject: 'Comprensión Lectora',
-    question: 'Según el contexto, ¿qué tipo de texto presenta argumentos a favor y en contra de una posición?',
-    options: ['Narrativo', 'Descriptivo', 'Argumentativo', 'Expositivo'],
-    correct: 2,
-    explanation: 'El texto argumentativo presenta tesis, argumentos a favor y en contra, y llega a una conclusión.',
-  },
-];
-
-
 export const mockSessionsByModule = {
   1: [
     { id: '1-s1', label: 'Primera clase: Ecuaciones de primer grado', visible: true, videoIds: [1], resources: [
@@ -180,19 +115,4 @@ export const mockStats = {
     avgProgress: 61,
     avgScore: 78,
   },
-  progressData: [
-    { name: 'Sem 1', promedio: 45, maxScore: 92 },
-    { name: 'Sem 2', promedio: 52, maxScore: 95 },
-    { name: 'Sem 3', promedio: 58, maxScore: 88 },
-    { name: 'Sem 4', promedio: 64, maxScore: 97 },
-    { name: 'Sem 5', promedio: 71, maxScore: 98 },
-    { name: 'Sem 6', promedio: 78, maxScore: 99 },
-  ],
-  subjectPerformance: [
-    { subject: 'Pensamiento Mat.', avg: 74, students: 312 },
-    { subject: 'Comprensión Lect.', avg: 81, students: 312 },
-    { subject: 'Redacción Ind.', avg: 69, students: 312 },
-    { subject: 'Pre-medicina', avg: 77, students: 156 },
-    { subject: 'Ciencias Salud', avg: 72, students: 156 },
-  ],
 };

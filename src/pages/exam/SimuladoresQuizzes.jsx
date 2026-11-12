@@ -10,6 +10,7 @@ import IconSubject from '../../components/rediseno/IconSubject';
 import { aciertosACeneval, SIMULADOR_TOTAL_PREGUNTAS, META_OCULTA_POR_DEFECTO, SIMULADOR_RANGO_CENEVAL } from '../../config/rediseno';
 import { resultadosParaGrafica } from '../../lib/examScoring';
 import { mockStudents, mockModules } from '../../data/mockData';
+import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { AREA_POR_ID } from '../../config/areas';
 
 // Nota del HANDOFF: "Estimación. No es resultado oficial del Ceneval."
@@ -139,6 +140,10 @@ export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQ
       >
         Simuladores y quizzes
       </h1>
+
+      <AvisoDatosEjemplo>
+        Tus resultados e historial de esta sección son de muestra hasta que los simuladores guarden tus intentos.
+      </AvisoDatosEjemplo>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 24 }}>
         {/* ----- SIMULADOR EXANI-II (bloque azul sólido via SimuladorBlock) ----- */}

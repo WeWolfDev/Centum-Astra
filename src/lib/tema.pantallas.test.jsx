@@ -41,6 +41,7 @@ const { default: Material } = await import('../pages/modules/Material');
 const { default: VideoLibrary } = await import('../pages/video/VideoLibrary');
 const { default: SimuladoresQuizzes } = await import('../pages/exam/SimuladoresQuizzes');
 const { default: MaestroQuizzes } = await import('../pages/exam/MaestroQuizzes');
+const { default: PagosProximamente } = await import('../pages/admin/PagosProximamente');
 const { MaterialProvider } = await import('../context/MaterialContext');
 const { CatalogoConectado } = await import('../pages/admin/AdminCursos');
 const { ThemeProvider } = await import('../context/ThemeContext');
@@ -190,11 +191,23 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
     expect(coloresFijos(baseElement)).toEqual([]);
   });
 
-  test('Simuladores y quizzes del profesor con el modal de nueva evaluación', async () => {
+  test('Quizzes del profesor con el modal de nueva evaluación', async () => {
     usuario.current = PROFESOR;
     const { baseElement } = renderizar(<MaestroQuizzes />);
     await userEvent.click(screen.getAllByRole('button', { name: /crear|nuevo/i })[0]);
     expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Simuladores y quizzes del administrador', () => {
+    const { baseElement } = renderizar(<MaestroQuizzes conSimuladores />);
+    expect(screen.getByRole('tab', { name: 'Simuladores' })).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Pagos del administrador mientras llega #53', () => {
+    const { baseElement } = renderizar(<PagosProximamente />);
+    expect(screen.getByRole('heading', { name: 'Pagos estará disponible pronto' })).toBeInTheDocument();
     expect(coloresFijos(baseElement)).toEqual([]);
   });
 

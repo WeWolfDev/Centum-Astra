@@ -6,6 +6,7 @@
 import { useMemo, useState } from 'react';
 import { ChevronDown, Pencil, Plus, Upload, Eye } from 'lucide-react';
 import { mockModules, mockSessionsByModule, mockVideos } from '../../data/mockData';
+import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { useAuth } from '../../context/AuthContext';
 import { useMaterial } from '../../context/MaterialContext';
 import { puedeDescargarPdf } from '../../config/rediseno';
@@ -422,6 +423,10 @@ export default function Material({ defaultModuleId = null }) {
           Nueva clase
         </BotonPrimario>
       </header>
+
+      <AvisoDatosEjemplo>
+        Las clases y archivos son de muestra, y lo que agregues se guarda solo en esta sesión hasta que se conecte el material del curso.
+      </AvisoDatosEjemplo>
 
       <Pestanas
         valor={selectedId}

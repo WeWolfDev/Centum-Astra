@@ -8,7 +8,6 @@ import PublicNav from '../../components/layout/PublicNav';
 import Boton from '../../components/rediseno/Boton';
 import Input from '../../components/rediseno/Input';
 import { useModoOscuroForzado } from '../../context/ThemeContext';
-import { cn } from '../../lib/utils';
 
 const roles = [
   {
@@ -34,11 +33,6 @@ const roles = [
   },
 ];
 
-const STATS = [
-  { val: '95 %', label: 'tasa de aprobación', hero: true },
-  { val: '500+', label: 'alumnos activos' },
-  { val: '5 años', label: 'de experiencia' },
-];
 
 export default function Login({ onBack }) {
   // El inicio de sesión es público: siempre en oscuro, como la landing (DESIGN.md › modes).
@@ -131,7 +125,7 @@ export default function Login({ onBack }) {
           />
 
           {/* Hero headline */}
-          <motion.div variants={item} className="mb-8 relative">
+          <motion.div variants={item} className="relative">
             <h1 className="relative z-10 font-display font-bold tracking-tight leading-tight text-4xl md:text-5xl lg:text-6xl mb-6">
               <span className="text-white">
                 Domina el EXANI-II.
@@ -146,30 +140,6 @@ export default function Login({ onBack }) {
             </p>
           </motion.div>
 
-          {/* Stats — editorial, with vertical dividers */}
-          <motion.div variants={item} className="flex items-stretch">
-            {STATS.map((s, i) => (
-              <div key={s.label} className="flex items-stretch">
-                {i > 0 && <div className="w-px bg-white/10 self-stretch mx-8" />}
-                <div className="relative">
-                  {s.hero && (
-                    <div className="absolute -inset-4 pointer-events-none bg-stat-glow" />
-                  )}
-                  <p className={cn(
-                    'font-display text-2xl font-bold leading-none mb-1.5 tracking-tight relative',
-                    s.hero
-                      ? 'text-gold-bright'
-                      : 'text-white',
-                  )}>
-                    {s.val}
-                  </p>
-                  <p className="text-xs text-white/70 font-normal tracking-wide relative">
-                    {s.label}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </motion.div>
         </motion.div>
 
         {/* ── RIGHT PANEL — Form ── */}
