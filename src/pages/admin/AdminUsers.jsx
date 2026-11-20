@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronRight, GraduationCap, Layers, Search, UserPlus, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { setStudentAreas } from '../../lib/areasExtraService';
 import { setGroupModules } from '../../lib/groupModulesService';
 import { useDebounce } from '../../hooks/useDebounce';
 import {
@@ -14,6 +15,7 @@ import {
 } from '../../lib/usersService';
 import { cn } from '../../lib/utils';
 import EstadoGrupos from './EstadoGrupos';
+import ModalAreasAlumno from './ModalAreasAlumno';
 import ModalModulosGrupo from './ModalModulosGrupo';
 import { Aviso } from '../../components/rediseno/Aviso';
 import Boton from '../../components/rediseno/Boton';
@@ -310,6 +312,9 @@ function AccionesFila({ usuario, esPropia, onAbrir }) {
       {usuario.role !== 'admin' && (
         <Boton size="sm" variant="secundario" onClick={() => onAbrir('grupos', usuario)}>Grupos</Boton>
       )}
+      {usuario.role === 'student' && (
+        <Boton size="sm" variant="secundario" onClick={() => onAbrir('areas', usuario)}>Áreas</Boton>
+      )}
       {!esPropia && usuario.status === 'active' && (
         <Boton size="sm" variant="secundario" onClick={() => onAbrir('suspend', usuario)}>Suspender</Boton>
       )}
@@ -397,6 +402,10 @@ export default function AdminUsers() {
     void ejecutar(() => setGroupModules(grupo, actuales, nuevos), 'Módulos actualizados.');
   }
 
+  function guardarAreas(actuales, nuevas) {
+    void ejecutar(() => setStudentAreas(dialogo.usuario.id, actuales, nuevas), 'Áreas actualizadas.');
+  }
+
   const propsDialogo = { guardando, error: errorDialogo, onCerrar: cerrar };
 
   return (
@@ -462,6 +471,9 @@ export default function AdminUsers() {
       )}
       {dialogo?.tipo === 'grupos' && (
         <ModalGrupos usuario={dialogo.usuario} grupos={grupos} cargandoGrupos={cargandoGrupos} errorGrupos={errorGrupos} onGuardar={guardarGrupos} {...propsDialogo} />
+      )}
+      {dialogo?.tipo === 'areas' && (
+        <ModalAreasAlumno usuario={dialogo.usuario} grupos={grupos} cargandoGrupos={cargandoGrupos} errorGrupos={errorGrupos} onGuardar={guardarAreas} {...propsDialogo} />
       )}
       {dialogo?.tipo === 'modulos' && (
         <ModalModulosGrupo grupos={grupos} cargandoGrupos={cargandoGrupos} errorGrupos={errorGrupos} claseSelect={CLASE_SELECT} onGuardar={guardarModulos} {...propsDialogo} />
