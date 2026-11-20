@@ -10,12 +10,18 @@ const fake = vi.hoisted(() => ({
   listGroups: vi.fn(),
   runAdminAction: vi.fn(),
   setUserGroups: vi.fn(),
+  loadStudentAreas: vi.fn(),
+  setStudentAreas: vi.fn(),
 }));
 
 vi.mock('../../lib/usersService', async () => {
   const real = await vi.importActual('../../lib/usersService');
   return { ...real, ...fake };
 });
+vi.mock('../../lib/areasExtraService', () => ({
+  loadStudentAreas: fake.loadStudentAreas,
+  setStudentAreas: fake.setStudentAreas,
+}));
 vi.mock('../../lib/supabaseClient', () => ({ supabase: {} }));
 vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ user: { id: 'yo' } }) }));
 
@@ -34,6 +40,12 @@ beforeEach(() => {
   fake.listGroups.mockResolvedValue([{ id: 'g1', name: 'Grupo A', code: 'A', course: 'Curso' }]);
   fake.runAdminAction.mockResolvedValue({});
   fake.setUserGroups.mockResolvedValue();
+  fake.loadStudentAreas.mockResolvedValue({
+    modules: [{ id: 'm1', title: 'Matemático' }, { id: 'm2', title: 'Premedicina' }],
+    fromGroup: ['m1'],
+    extra: [],
+  });
+  fake.setStudentAreas.mockResolvedValue();
 });
 
 afterEach(cleanup);
@@ -182,6 +194,19 @@ describe('AdminUsers', () => {
     await userEvent.selectOptions(dialogo.getByLabelText('Grupo'), 'g1');
     await userEvent.click(dialogo.getByRole('button', { name: 'Guardar' }));
     await waitFor(() => expect(fake.setUserGroups).toHaveBeenCalledWith(ALUMNA, ['g1']));
+  });
+
+  test('otorga un área extra al alumno y solo a alumnos', async () => {
+    fake.listUsers.mockResolvedValue({ users: [{ ...ALUMNA, groups: [{ id: 'g1', name: 'Grupo A' }] }, PROFE], total: 2 });
+    render(<AdminUsers />);
+    await screen.findByText('Ana García');
+    expect(within(filaDe('Luis Pérez')).queryByRole('button', { name: 'Áreas' })).not.toBeInTheDocument();
+    await userEvent.click(within(filaDe('Ana García')).getByRole('button', { name: 'Áreas' }));
+    const dialogo = within(await screen.findByRole('dialog'));
+    await userEvent.click(await dialogo.findByLabelText(/Premedicina/));
+    await userEvent.click(dialogo.getByRole('button', { name: 'Guardar' }));
+    await waitFor(() => expect(fake.setStudentAreas).toHaveBeenCalledWith('a1', [], ['m2']));
+    expect(await screen.findByText('Áreas actualizadas.')).toBeInTheDocument();
   });
 
   test('reactiva sin pedir motivo', async () => {
