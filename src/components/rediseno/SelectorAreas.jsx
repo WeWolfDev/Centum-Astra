@@ -1,6 +1,6 @@
 import Pestanas from './Pestanas';
 import IconSubject from './IconSubject';
-import { AREA_POR_ID } from '../../config/areas';
+import { areaDeModulo } from '../../config/areas';
 
 // Las clases van explícitas (string literal) para que el scanner JIT de Tailwind
 // las encuentre en el source y genere su CSS.
@@ -28,7 +28,7 @@ export default function SelectorAreas({ modulos }) {
       }
     >
       {modulos.map((mod) => {
-        const area = AREA_POR_ID[mod.id];
+        const area = areaDeModulo(mod);
         return (
           <Pestanas.Tab
             key={mod.id}

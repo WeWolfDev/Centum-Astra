@@ -8,6 +8,8 @@ import { ChevronDown, Pencil, Plus, Upload, Eye } from 'lucide-react';
 import { mockModules, mockSessionsByModule, mockVideos } from '../../data/mockData';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { useAuth } from '../../context/AuthContext';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import MaterialCurso from './MaterialCurso';
 import { useMaterial } from '../../context/MaterialContext';
 import { puedeDescargarPdf } from '../../config/rediseno';
 import PdfCard from '../../components/rediseno/PdfCard';
@@ -360,7 +362,14 @@ function ContenidoDeArea({ mod }) {
   );
 }
 
+// Con Supabase, Material usa los datos reales del curso; sin él (modo demo),
+// las clases de ejemplo de mockData.
 export default function Material({ defaultModuleId = null }) {
+  if (isSupabaseConfigured) return <MaterialCurso />;
+  return <MaterialDemo defaultModuleId={defaultModuleId} />;
+}
+
+function MaterialDemo({ defaultModuleId }) {
   const { agregarClase } = useMaterial();
 
   const [selectedId, setSelectedId] = useState(() => {

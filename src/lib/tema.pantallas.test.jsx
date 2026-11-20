@@ -31,6 +31,18 @@ vi.mock('./catalogoService', async () => {
   };
 });
 
+vi.mock('./materialService', async () => {
+  const real = await vi.importActual('./materialService');
+  return {
+    ...real,
+    listMaterialCourses: vi.fn(async () => [{ id: 'c1', name: 'Curso', modules: [{ id: 'm1', title: 'Pensamiento matemático' }] }]),
+    listModuleSessions: vi.fn(async () => ({
+      sessions: [{ id: 's1', title: 'Clase 1', materials: [{ id: 'x', title: 'Video', kind: 'video_link', url: 'https://a.mx' }] }],
+      nextPosition: 1,
+    })),
+  };
+});
+
 const { default: Header } = await import('../components/layout/Header');
 const { default: Sidebar } = await import('../components/layout/Sidebar');
 const { default: PublicNav } = await import('../components/layout/PublicNav');
@@ -42,6 +54,7 @@ const { default: VideoLibrary } = await import('../pages/video/VideoLibrary');
 const { default: SimuladoresQuizzes } = await import('../pages/exam/SimuladoresQuizzes');
 const { default: MaestroQuizzes } = await import('../pages/exam/MaestroQuizzes');
 const { default: PagosProximamente } = await import('../pages/admin/PagosProximamente');
+const { default: MaterialCurso } = await import('../pages/modules/MaterialCurso');
 const { MaterialProvider } = await import('../context/MaterialContext');
 const { CatalogoConectado } = await import('../pages/admin/AdminCursos');
 const { ThemeProvider } = await import('../context/ThemeContext');
@@ -188,6 +201,20 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
     await userEvent.keyboard('{Escape}');
 
     await userEvent.click(screen.getByRole('button', { name: 'Agregar nueva clase' }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Material conectado del administrador con sus diálogos', async () => {
+    usuario.current = { ...PROFESOR, id: 'a1', role: 'admin' };
+    const { baseElement } = renderizar(<MaterialCurso />);
+    await userEvent.click(await screen.findByRole('button', { name: /^Clase 1/ }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+
+    await userEvent.click(screen.getByRole('button', { name: /Agregar enlace/ }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Retirar' }));
     expect(coloresFijos(baseElement)).toEqual([]);
   });
 
