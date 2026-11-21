@@ -3,14 +3,16 @@ import { useEffect, useState } from 'react';
 import { loadGroupModules } from '../../lib/groupModulesService';
 import Boton from '../../components/rediseno/Boton';
 import Modal from '../../components/rediseno/Modal';
+import EstadoGrupos from './EstadoGrupos';
 
 const CARGANDO = { estado: 'cargando', modulos: [], actuales: [], error: '' };
 
-export default function ModalModulosGrupo({ grupos, claseSelect, guardando, error, onGuardar, onCerrar }) {
-  const [grupoId, setGrupoId] = useState(grupos[0]?.id ?? '');
+export default function ModalModulosGrupo({ grupos, cargandoGrupos = false, errorGrupos = '', claseSelect, guardando, error, onGuardar, onCerrar }) {
+  const [grupoId, setGrupoId] = useState('');
   const [datos, setDatos] = useState(CARGANDO);
   const [elegidos, setElegidos] = useState([]);
-  const grupo = grupos.find(g => g.id === grupoId);
+  // Si los grupos llegan con el diálogo abierto, se toma el primero en cuanto aparece.
+  const grupo = grupos.find(g => g.id === grupoId) ?? grupos[0];
 
   useEffect(() => {
     if (!grupo) return undefined;
@@ -46,11 +48,11 @@ export default function ModalModulosGrupo({ grupos, claseSelect, guardando, erro
   return (
     <Modal abierto onCerrar={onCerrar} titulo="Módulos por grupo">
       <form onSubmit={enviar} className="flex flex-col gap-4">
-        {grupos.length === 0 && <p className="m-0 text-sm text-white/70">Aún no hay grupos activos.</p>}
+        {grupos.length === 0 && <EstadoGrupos cargando={cargandoGrupos} error={errorGrupos} />}
         {grupos.length > 0 && (
           <div>
             <label htmlFor="modulos-grupo" className="block mb-1.5 text-xs font-medium text-white/70 tracking-wide">Grupo</label>
-            <select id="modulos-grupo" className={claseSelect} value={grupoId} onChange={e => cambiarGrupo(e.target.value)}>
+            <select id="modulos-grupo" className={claseSelect} value={grupo?.id ?? ''} onChange={e => cambiarGrupo(e.target.value)}>
               {grupos.map(g => <option key={g.id} value={g.id}>{g.course ? `${g.name} · ${g.course}` : g.name}</option>)}
             </select>
           </div>

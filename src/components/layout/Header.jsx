@@ -13,16 +13,15 @@ const titlesByRole = {
   teacher: {
     dashboard: 'Mis alumnos',
     modules:   'Material',
-    exam:      'Simuladores y quizzes',
+    exam:      'Quizzes',
   },
   admin: {
     dashboard: 'Cuentas',
+    courses:   'Cursos',
     modules:   'Material',
     exam:      'Simuladores y quizzes',
     payments:  'Pagos',
     students:  'Cuentas',
-    videos:    'Videoteca',
-    stats:     'Estadísticas',
   },
 };
 

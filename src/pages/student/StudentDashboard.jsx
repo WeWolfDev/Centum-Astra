@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { useAuth } from '../../context/AuthContext';
 import { mockModules } from '../../data/mockData';
+import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import {
   SIMULADOR_RANGO_CENEVAL,
   META_OCULTA_POR_DEFECTO,
@@ -87,6 +88,10 @@ export default function StudentDashboard({ setActiveSection }) {
       }}
     >
       <HeaderSaludo nombre={nombreCorto} onContinuar={() => setActiveSection('modules')} />
+
+      <AvisoDatosEjemplo>
+        Tu puntaje y su evolución todavía no salen de tus simuladores; se calcularán con tus resultados reales.
+      </AvisoDatosEjemplo>
 
       <PuntajeHero
         puntaje={puntajeActual}

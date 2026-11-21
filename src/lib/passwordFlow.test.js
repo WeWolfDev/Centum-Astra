@@ -2,22 +2,26 @@ import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 const fake = vi.hoisted(() => ({
   auth: {
-    resetPasswordForEmail: vi.fn(),
     verifyOtp: vi.fn(),
     updateUser: vi.fn(),
     signOut: vi.fn(),
   },
 }));
 
-vi.mock('./supabaseClient', () => ({ supabase: { auth: fake.auth } }));
+const mainAuth = vi.hoisted(() => ({ resetPasswordForEmail: vi.fn(), verifyOtp: vi.fn(), updateUser: vi.fn(), signOut: vi.fn() }));
+const createCodeClient = vi.hoisted(() => vi.fn());
+
+vi.mock('./supabaseClient', () => ({ supabase: { auth: mainAuth }, createCodeClient }));
 
 const { requestRecoveryCode, verifyCode, savePassword, cancelPasswordFlow } = await import('./passwordFlow');
 
 const DATOS = { email: 'a@x.mx', code: ' 123456 ', type: 'recovery' };
 
 beforeEach(() => {
+  Object.values(mainAuth).forEach(fn => fn.mockReset());
+  createCodeClient.mockReset().mockImplementation(() => ({ auth: fake.auth }));
   Object.values(fake.auth).forEach(fn => fn.mockReset());
-  fake.auth.resetPasswordForEmail.mockResolvedValue({ error: null });
+  mainAuth.resetPasswordForEmail.mockResolvedValue({ error: null });
   fake.auth.verifyOtp.mockResolvedValue({ error: null });
   fake.auth.updateUser.mockResolvedValue({ error: null });
   fake.auth.signOut.mockResolvedValue({ error: null });
@@ -25,12 +29,12 @@ beforeEach(() => {
 
 describe('requestRecoveryCode', () => {
   test('no revela si el correo existe', async () => {
-    fake.auth.resetPasswordForEmail.mockResolvedValue({ error: { code: 'user_not_found', status: 400 } });
+    mainAuth.resetPasswordForEmail.mockResolvedValue({ error: { code: 'user_not_found', status: 400 } });
     await expect(requestRecoveryCode('x@x.mx')).resolves.toBeUndefined();
   });
 
   test('informa el límite de envíos', async () => {
-    fake.auth.resetPasswordForEmail.mockResolvedValue({ error: { status: 429 } });
+    mainAuth.resetPasswordForEmail.mockResolvedValue({ error: { status: 429 } });
     await expect(requestRecoveryCode('x@x.mx')).rejects.toThrow('Demasiados intentos');
   });
 });
@@ -47,7 +51,33 @@ describe('verifyCode', () => {
   });
 });
 
+describe('sesión del código', () => {
+  test('el código se valida con el cliente sin persistencia, no con el de la app', async () => {
+    await verifyCode(DATOS);
+    expect(createCodeClient).toHaveBeenCalledTimes(1);
+    expect(fake.auth.verifyOtp).toHaveBeenCalled();
+    expect(mainAuth.verifyOtp).not.toHaveBeenCalled();
+  });
+
+  test('guardar y cancelar usan ese mismo cliente, no el de la app', async () => {
+    await verifyCode(DATOS);
+    await savePassword('nueva-clave');
+    expect(mainAuth.updateUser).not.toHaveBeenCalled();
+    expect(mainAuth.signOut).not.toHaveBeenCalled();
+  });
+
+  test('un código rechazado suelta el cliente y no deja sesión', async () => {
+    fake.auth.verifyOtp.mockResolvedValue({ error: { code: 'otp_expired' } });
+    await expect(verifyCode(DATOS)).rejects.toThrow();
+    fake.auth.signOut.mockClear();
+    await cancelPasswordFlow();
+    expect(fake.auth.signOut).not.toHaveBeenCalled();
+  });
+});
+
 describe('savePassword', () => {
+  beforeEach(() => verifyCode(DATOS));
+
   test('guarda la contraseña y exige iniciar sesión en todos los dispositivos', async () => {
     await savePassword('nueva-clave');
     expect(fake.auth.updateUser).toHaveBeenCalledWith({ password: 'nueva-clave' });
@@ -68,6 +98,7 @@ describe('savePassword', () => {
 
 describe('cancelPasswordFlow', () => {
   test('cierra solo la sesión local del código', async () => {
+    await verifyCode(DATOS);
     await cancelPasswordFlow();
     expect(fake.auth.signOut).toHaveBeenCalledWith({ scope: 'local' });
   });

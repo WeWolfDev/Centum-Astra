@@ -67,26 +67,27 @@ src/
 ├── pages/                   # Una carpeta por ruta/vista
 │   ├── admin/
 │   │   ├── AdminDashboard.jsx
-│   │   └── Statistics.jsx
+│   │   ├── AdminCursos.jsx
+│   │   └── PagosProximamente.jsx
 │   ├── auth/
 │   │   └── Login.jsx
 │   ├── exam/
-│   │   └── ExamSimulator.jsx
+│   │   ├── MaestroQuizzes.jsx
+│   │   └── SimuladoresQuizzes.jsx
 │   ├── modules/
-│   │   └── FileManager.jsx
+│   │   ├── Material.jsx
+│   │   └── Modulos.jsx
 │   ├── student/
 │   │   └── StudentDashboard.jsx
 │   ├── teacher/
 │   │   └── TeacherDashboard.jsx
-│   ├── video/
-│   │   └── VideoLibrary.jsx
-│   └── whiteboard/
-│       └── Whiteboard.jsx
+│   └── video/
+│       └── VideoLibrary.jsx
 │
 ├── context/
 │   └── AuthContext.jsx      # Estado global de autenticación
 ├── data/
-│   └── mockData.js          # Mock de usuarios, módulos, videos y preguntas EXANI
+│   └── mockData.js          # Mock de usuarios, módulos y videos (pantallas con aviso "Datos de ejemplo")
 ├── hooks/
 │   └── useBreakpoint.js     # Hook para breakpoints responsivos
 ├── lib/

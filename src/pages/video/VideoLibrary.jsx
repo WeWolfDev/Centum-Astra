@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Upload, X, Search } from 'lucide-react';
 import { mockVideos } from '../../data/mockData';
+import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { useMaterial } from '../../context/MaterialContext';
 import { useAuth } from '../../context/AuthContext';
 import Pastilla from '../../components/rediseno/Pastilla';
@@ -439,6 +440,10 @@ export default function VideoLibrary() {
           )}
         </div>
       </header>
+
+      <AvisoDatosEjemplo>
+        Los videos de la videoteca son de muestra hasta que se conecten los enlaces de Drive del curso.
+      </AvisoDatosEjemplo>
 
       {/* Chips de materia */}
       <div

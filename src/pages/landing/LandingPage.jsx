@@ -1,12 +1,12 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ChevronLeft, ChevronRight, Play, Star,
-  MapPin, Phone, Mail, User, CheckCircle,
-  ShieldCheck, Zap, BookOpen, Trophy,
+  ChevronRight, MapPin, Phone, Mail, User, CheckCircle,
+  ShieldCheck, Zap, BookOpen, MessageCircle,
 } from 'lucide-react';
 import PublicNav from '../../components/layout/PublicNav';
 import { useModoOscuroForzado } from '../../context/ThemeContext';
+import { canalDeRegistro, enlaceRegistro } from '../../config/contacto';
 
 /* ── Mexican states ─────────────────────────────────────── */
 const MX_STATES = [
@@ -18,77 +18,9 @@ const MX_STATES = [
   'Veracruz','Yucatán','Zacatecas',
 ];
 
-/* ── Testimonials mock data ─────────────────────────────── */
-const TESTIMONIALS = [
-  {
-    id: 1,
-    name: 'Sofía Ramírez',
-    career: 'Medicina · UNAM',
-    state: 'Ciudad de México',
-    score: '1,180 pts',
-    quote: 'Gracias a Centum Astra entendí que el EXANI-II se puede dominar con método. Los simuladores son exactamente como el examen real.',
-    avatar: 'SR',
-    color: '#f5c842',
-    thumbBg: 'from-amber-900/60 to-slate-900',
-  },
-  {
-    id: 2,
-    name: 'Diego Hernández',
-    career: 'Odontología · UAG',
-    state: 'Guadalajara, Jalisco',
-    score: '1,095 pts',
-    quote: 'Estudié dos meses con la plataforma y superé el puntaje que necesitaba. Las retroalimentaciones en cada pregunta son increíbles.',
-    avatar: 'DH',
-    color: '#1de9b6',
-    thumbBg: 'from-teal-900/60 to-slate-900',
-  },
-  {
-    id: 3,
-    name: 'Valentina Cruz',
-    career: 'Enfermería · UANL',
-    state: 'Monterrey, N.L.',
-    score: '1,040 pts',
-    quote: 'Tenía mucho miedo al examen. La metodología de Centum me dio la confianza que necesitaba. ¡Lo recomiendo al 100%!',
-    avatar: 'VC',
-    color: '#93c5fd',
-    thumbBg: 'from-blue-900/60 to-slate-900',
-  },
-  {
-    id: 4,
-    name: 'Andrés Morales',
-    career: 'Médico Cirujano · UdG',
-    state: 'Guadalajara, Jalisco',
-    score: '1,210 pts',
-    quote: 'El módulo de Pre-medicina es brutal. Repasar biología y química de forma organizada hizo toda la diferencia.',
-    avatar: 'AM',
-    color: '#f5c842',
-    thumbBg: 'from-amber-900/60 to-slate-900',
-  },
-  {
-    id: 5,
-    name: 'Camila Torres',
-    career: 'Nutrición · IPN',
-    state: 'Ciudad de México',
-    score: '1,155 pts',
-    quote: 'Pensé que no tendría tiempo para estudiar y trabajar. Centum Astra me permitió avanzar a mi propio ritmo desde el celular.',
-    avatar: 'CT',
-    color: '#1de9b6',
-    thumbBg: 'from-teal-900/60 to-slate-900',
-  },
-];
-
-/* ── Stats for Hero ─────────────────────────────────────── */
-const HERO_STATS = [
-  { val: '95%',  label: 'Tasa de aprobación' },
-  { val: '500+', label: 'Alumnos admitidos' },
-  { val: '5 años', label: 'De experiencia' },
-  { val: '1,200+', label: 'Preguntas EXANI-II' },
-];
-
 /* ── Pricing ────────────────────────────────────────────── */
 const PLAN_FEATURES = [
   'Acceso completo al simulador EXANI-II',
-  '+1,200 preguntas con retroalimentación',
   'Módulos: Matemáticas, Redacción, Lectura',
   'Módulo específico Pre-medicina',
   'Estadísticas de progreso personalizadas',
@@ -191,7 +123,7 @@ function Hero({ onRegisterClick }) {
         </motion.p>
 
         {/* CTAs */}
-        <motion.div variants={item} className="flex flex-wrap gap-3 justify-center mb-14">
+        <motion.div variants={item} className="flex flex-wrap gap-3 justify-center">
           <button
             className="btn-gold-flat"
             onClick={onRegisterClick}
@@ -199,270 +131,9 @@ function Hero({ onRegisterClick }) {
           >
             Quiero acceder a la plataforma
           </button>
-          <a
-            href="#testimonios"
-            className="btn-ghost"
-            style={{ padding: '14px 22px', fontSize: 15, borderRadius: 10 }}
-          >
-            Ver testimonios
-          </a>
         </motion.div>
 
-        {/* Stats en línea separados por puntos — colapsa a grid 2x2 en móvil */}
-        <motion.div
-          variants={item}
-          className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3"
-          style={{ maxWidth: 720 }}
-        >
-          {HERO_STATS.map((s, i) => (
-            <div key={s.label} className="flex items-center gap-5">
-              {i > 0 && (
-                <span
-                  aria-hidden="true"
-                  style={{
-                    width: 3, height: 3, borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.3)',
-                  }}
-                />
-              )}
-              <div className="flex items-baseline gap-2">
-                <span
-                  style={{
-                    fontFamily: '"Bricolage Grotesque", sans-serif',
-                    fontWeight: 700,
-                    fontSize: 20,
-                    color: i === 0 ? '#f5c842' : 'white',
-                    letterSpacing: '-0.01em',
-                  }}
-                >
-                  {s.val}
-                </span>
-                <span
-                  style={{
-                    color: 'rgba(255,255,255,0.65)',
-                    fontSize: 12,
-                    letterSpacing: '0.03em',
-                  }}
-                >
-                  {s.label}
-                </span>
-              </div>
-            </div>
-          ))}
-        </motion.div>
       </motion.div>
-    </section>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════
-   SECTION B — Testimonials Carousel
-══════════════════════════════════════════════════════════ */
-function TestimonialCard({ t }) {
-  const [playing, setPlaying] = useState(false);
-
-  return (
-    <div
-      className="flex-shrink-0 w-[300px] md:w-[340px] rounded-2xl overflow-hidden"
-      style={{
-        background: 'white',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.05)',
-        border: '1px solid rgba(0,0,0,0.06)',
-      }}
-    >
-      {/* Video thumbnail mock */}
-      <div
-        className={`relative h-44 bg-gradient-to-br ${t.thumbBg} cursor-pointer overflow-hidden`}
-        onClick={() => setPlaying(p => !p)}
-        style={{ background: '#0c1d45' }}
-      >
-        {/* Simulated thumbnail gradient */}
-        <div
-          className="absolute inset-0"
-          style={{ background: `linear-gradient(135deg, #0c1d45 0%, #030a1a 100%)` }}
-        />
-        {/* Avatar large */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            style={{
-              width: 64, height: 64, borderRadius: '50%',
-              background: `rgba(${t.color === '#f5c842' ? '245,200,66' : t.color === '#1de9b6' ? '29,233,182' : '147,197,253'},0.15)`,
-              border: `2px solid ${t.color}40`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 22,
-              color: t.color,
-            }}
-          >
-            {t.avatar}
-          </div>
-        </div>
-        {/* Play button overlay */}
-        <div className="absolute inset-0 flex items-end justify-between p-3">
-          <div style={{
-            display: 'inline-flex', alignItems: 'center', gap: 5,
-            padding: '4px 10px', borderRadius: 999,
-            background: 'rgba(3,10,26,0.7)',
-            fontSize: 11, fontWeight: 600,
-            color: t.color, border: `1px solid ${t.color}30`,
-          }}>
-            <Trophy size={10} /> {t.score}
-          </div>
-          <div style={{
-            width: 36, height: 36, borderRadius: '50%',
-            background: playing ? 'rgba(255,255,255,0.2)' : t.color,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: playing ? 'none' : `0 0 20px ${t.color}60`,
-            transition: 'all 0.2s ease',
-          }}>
-            <Play size={14} fill={playing ? 'white' : '#030a1a'} color={playing ? 'white' : '#030a1a'} style={{ marginLeft: 2 }} />
-          </div>
-        </div>
-        {/* Stars top right */}
-        <div className="absolute top-3 right-3 flex gap-[2px]">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={10} fill="#f5c842" color="#f5c842" />
-          ))}
-        </div>
-      </div>
-
-      {/* Card body */}
-      <div className="p-5">
-        <p className="text-slate-700 text-[13.5px] leading-[1.7] mb-4 italic">
-          "{t.quote}"
-        </p>
-        <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
-          <div
-            style={{
-              width: 36, height: 36, borderRadius: '50%',
-              background: `rgba(${t.color === '#f5c842' ? '245,200,66' : t.color === '#1de9b6' ? '29,233,182' : '147,197,253'},0.12)`,
-              border: `1px solid ${t.color}30`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontFamily: 'Syne, sans-serif', fontWeight: 700, fontSize: 12,
-              color: t.color, flexShrink: 0,
-            }}
-          >
-            {t.avatar}
-          </div>
-          <div>
-            <p className="text-slate-800 font-semibold text-[13px] leading-tight">{t.name}</p>
-            <p className="text-slate-400 text-[11.5px] mt-[2px]">{t.career}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TestimonialCarousel() {
-  const trackRef = useRef(null);
-  const [idx, setIdx] = useState(0);
-  const visible = 1; // logical navigation unit
-  const max = TESTIMONIALS.length - 1;
-
-  function scrollTo(i) {
-    const clamped = Math.max(0, Math.min(i, max));
-    setIdx(clamped);
-    const card = trackRef.current?.children[clamped];
-    card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-  }
-
-  return (
-    <section
-      id="testimonios"
-      className="py-20 md:py-28"
-      style={{ background: '#f8fafc' }}
-    >
-      <div className="max-w-6xl mx-auto px-6 md:px-12">
-        {/* Header */}
-        <div className="text-center mb-14">
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '4px 14px', borderRadius: 999, marginBottom: 16,
-            background: 'rgba(245,200,66,0.1)',
-            border: '1px solid rgba(245,200,66,0.3)',
-            fontSize: 11.5, fontWeight: 600, color: '#b8880f',
-            letterSpacing: '0.06em',
-          }}>
-            <Star size={10} fill="#b8880f" color="#b8880f" />
-            TESTIMONIOS REALES
-          </span>
-          <h2
-            className="font-syne font-bold text-slate-900 mb-4"
-            style={{ fontSize: 36, letterSpacing: '-0.03em', lineHeight: 1.1 }}
-          >
-            Ellos ya entraron a la universidad.
-            <br />
-            <span style={{
-              background: 'linear-gradient(90deg,#b8880f,#f5c842)',
-              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}>
-              Tú también puedes.
-            </span>
-          </h2>
-          <p className="text-slate-500 text-[15px] max-w-xl mx-auto leading-[1.7]">
-            Más de 500 alumnos han logrado su admisión con nuestra metodología.
-            Aquí escuchas sus historias directamente.
-          </p>
-        </div>
-
-        {/* Track */}
-        <div
-          ref={trackRef}
-          className="flex gap-5 overflow-x-auto scrollbar-hide pb-4 snap-x snap-mandatory"
-          style={{ scrollPaddingLeft: 24 }}
-        >
-          {TESTIMONIALS.map((t) => (
-            <div key={t.id} className="snap-center">
-              <TestimonialCard t={t} />
-            </div>
-          ))}
-        </div>
-
-        {/* Navigation */}
-        <div className="flex items-center justify-center gap-4 mt-8">
-          <button
-            onClick={() => scrollTo(idx - 1)}
-            disabled={idx === 0}
-            className="btn-ghost"
-            style={{
-              padding: '10px 16px', borderRadius: 10,
-              opacity: idx === 0 ? 0.3 : 1,
-            }}
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <div className="flex gap-2">
-            {TESTIMONIALS.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => scrollTo(i)}
-                style={{
-                  width: i === idx ? 24 : 8,
-                  height: 8,
-                  borderRadius: 999,
-                  border: 'none',
-                  background: i === idx ? '#f5c842' : '#cbd5e1',
-                  transition: 'all 0.25s ease',
-                  cursor: 'pointer',
-                  padding: 0,
-                }}
-              />
-            ))}
-          </div>
-          <button
-            onClick={() => scrollTo(idx + 1)}
-            disabled={idx === max}
-            className="btn-ghost"
-            style={{
-              padding: '10px 16px', borderRadius: 10,
-              opacity: idx === max ? 0.3 : 1,
-            }}
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-      </div>
     </section>
   );
 }
@@ -508,19 +179,21 @@ function RegistrationPayment({ sectionRef }) {
   const [form, setForm] = useState({
     nombres: '', apellidos: '', celular: '', estado: '', email: '',
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading]     = useState(false);
+  const [enlace, setEnlace] = useState(null);
+  const canal = canalDeRegistro();
+  const nombreCanal = canal === 'whatsapp' ? 'WhatsApp' : 'tu correo';
 
   function set(field) {
     return (e) => setForm(p => ({ ...p, [field]: e.target.value }));
   }
 
-  async function handleSubmit(e) {
+  // Sin backend: abre WhatsApp o el correo con los datos ya escritos.
+  function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true);
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
-    setSubmitted(true);
+    const url = enlaceRegistro(form);
+    if (!url) return;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setEnlace(url);
   }
 
   return (
@@ -571,7 +244,7 @@ function RegistrationPayment({ sectionRef }) {
             </span>
           </h2>
           <p className="text-white/60 text-[15px] max-w-lg mx-auto leading-[1.7]">
-            Regístrate ahora y accede al mismo instante a todos los módulos y simuladores.
+            Déjanos tus datos y te contactamos para completar tu pago y activar tu cuenta.
           </p>
         </div>
 
@@ -579,7 +252,7 @@ function RegistrationPayment({ sectionRef }) {
 
           {/* ── Form ── */}
           <AnimatePresence mode="wait">
-            {submitted ? (
+            {enlace ? (
               <motion.div
                 key="success"
                 initial={{ opacity: 0, scale: 0.96 }}
@@ -594,14 +267,19 @@ function RegistrationPayment({ sectionRef }) {
                 }}>
                   <CheckCircle size={32} color="#f5c842" />
                 </div>
-                <h3 className="font-syne font-bold text-white text-2xl">¡Solicitud recibida!</h3>
+                <h3 className="font-syne font-bold text-white text-2xl">Ya casi</h3>
                 <p className="text-white/60 text-[15px] leading-[1.7] max-w-sm">
-                  Hemos recibido tu registro. En breve recibirás un correo con los pasos
-                  para completar tu pago y activar tu cuenta.
+                  Abrimos {nombreCanal} con tus datos. Envía el mensaje para que te respondamos
+                  con los pasos para pagar y activar tu cuenta.
                 </p>
-                <p className="text-gold-dim text-[13px]">
-                  Revisa tu bandeja de entrada en <strong className="text-gold">{form.email}</strong>
-                </p>
+                <a
+                  href={enlace}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gold text-[13px] underline underline-offset-4"
+                >
+                  Si no se abrió, toca aquí
+                </a>
               </motion.div>
             ) : (
               <motion.div
@@ -710,26 +388,18 @@ function RegistrationPayment({ sectionRef }) {
 
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={!canal}
                     className="btn-gold mt-2 w-full"
-                    style={{ padding: '16px 24px', fontSize: 16, borderRadius: 12, justifyContent: 'center', opacity: loading ? 0.7 : 1 }}
+                    style={{ padding: '16px 24px', fontSize: 16, borderRadius: 12, justifyContent: 'center', opacity: canal ? 1 : 0.6 }}
                   >
-                    {loading ? (
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
-                        style={{ width: 18, height: 18, border: '2px solid rgba(3,10,26,0.3)', borderTopColor: '#030a1a', borderRadius: '50%' }}
-                      />
-                    ) : (
-                      <>
-                        <ShieldCheck size={17} />
-                        Comprar para acceder a la plataforma
-                      </>
-                    )}
+                    <MessageCircle size={17} aria-hidden="true" />
+                    {canal === 'correo' ? 'Enviar mis datos por correo' : 'Enviar mis datos por WhatsApp'}
                   </button>
 
                   <p className="text-center text-white/60 text-[11.5px] mt-1">
-                    Pago seguro · Acceso inmediato al completar la transacción
+                    {canal
+                      ? 'Te respondemos con los pasos para pagar. La plataforma no cobra en línea.'
+                      : 'El registro en línea todavía no está disponible.'}
                   </p>
                 </form>
               </motion.div>
@@ -852,7 +522,6 @@ export default function LandingPage({ onLoginClick }) {
     <div className="relative" style={{ background: '#030a1a' }}>
       <PublicNav onLoginClick={onLoginClick} />
       <Hero onRegisterClick={scrollToRegister} />
-      <TestimonialCarousel />
       <RegistrationPayment sectionRef={registroRef} />
       <LandingFooter onLoginClick={onLoginClick} />
     </div>

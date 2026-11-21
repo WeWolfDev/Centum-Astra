@@ -19,6 +19,29 @@ vi.mock('./supabaseClient', () => ({
   isSupabaseConfigured: false,
   mockAuthEnabled: true,
 }));
+vi.mock('./catalogoService', async () => {
+  const real = await vi.importActual('./catalogoService');
+  return {
+    ...real,
+    listCatalog: vi.fn(async () => [{
+      id: 'c1', name: 'Curso', description: 'Desc', status: 'active', startsOn: '2027-01-11', endsOn: '',
+      groups: [{ id: 'g1', name: 'Grupo A', code: 'A', schedule: 'Sabatino', status: 'archived' }],
+      modules: [{ id: 'm1', title: 'Módulo', description: '', position: 0, status: 'active' }],
+    }]),
+  };
+});
+
+vi.mock('./materialService', async () => {
+  const real = await vi.importActual('./materialService');
+  return {
+    ...real,
+    listMaterialCourses: vi.fn(async () => [{ id: 'c1', name: 'Curso', modules: [{ id: 'm1', title: 'Pensamiento matemático' }] }]),
+    listModuleSessions: vi.fn(async () => ({
+      sessions: [{ id: 's1', title: 'Clase 1', materials: [{ id: 'x', title: 'Video', kind: 'video_link', url: 'https://a.mx' }] }],
+      nextPosition: 1,
+    })),
+  };
+});
 
 const { default: Header } = await import('../components/layout/Header');
 const { default: Sidebar } = await import('../components/layout/Sidebar');
@@ -30,7 +53,10 @@ const { default: Material } = await import('../pages/modules/Material');
 const { default: VideoLibrary } = await import('../pages/video/VideoLibrary');
 const { default: SimuladoresQuizzes } = await import('../pages/exam/SimuladoresQuizzes');
 const { default: MaestroQuizzes } = await import('../pages/exam/MaestroQuizzes');
+const { default: PagosProximamente } = await import('../pages/admin/PagosProximamente');
+const { default: MaterialCurso } = await import('../pages/modules/MaterialCurso');
 const { MaterialProvider } = await import('../context/MaterialContext');
+const { CatalogoConectado } = await import('../pages/admin/AdminCursos');
 const { ThemeProvider } = await import('../context/ThemeContext');
 
 // jsdom normaliza los hex de `style` a rgb(r, g, b), así que se buscan ambas formas.
@@ -178,10 +204,50 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
     expect(coloresFijos(baseElement)).toEqual([]);
   });
 
-  test('Simuladores y quizzes del profesor con el modal de nueva evaluación', async () => {
+  test('Material conectado del administrador con sus diálogos', async () => {
+    usuario.current = { ...PROFESOR, id: 'a1', role: 'admin' };
+    const { baseElement } = renderizar(<MaterialCurso />);
+    await userEvent.click(await screen.findByRole('button', { name: /^Clase 1/ }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+
+    await userEvent.click(screen.getByRole('button', { name: /Agregar enlace/ }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Retirar' }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Quizzes del profesor con el modal de nueva evaluación', async () => {
     usuario.current = PROFESOR;
     const { baseElement } = renderizar(<MaestroQuizzes />);
     await userEvent.click(screen.getAllByRole('button', { name: /crear|nuevo/i })[0]);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Simuladores y quizzes del administrador', () => {
+    const { baseElement } = renderizar(<MaestroQuizzes conSimuladores />);
+    expect(screen.getByRole('tab', { name: 'Simuladores' })).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Pagos del administrador mientras llega #53', () => {
+    const { baseElement } = renderizar(<PagosProximamente />);
+    expect(screen.getByRole('heading', { name: 'Pagos estará disponible pronto' })).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Cursos del administrador con sus diálogos', async () => {
+    const { baseElement } = renderizar(<CatalogoConectado />);
+    await screen.findByRole('heading', { name: /Curso/, level: 3 });
+    expect(coloresFijos(baseElement)).toEqual([]);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Agregar grupo a Curso' }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Archivar módulo Módulo' }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(coloresFijos(baseElement)).toEqual([]);
   });

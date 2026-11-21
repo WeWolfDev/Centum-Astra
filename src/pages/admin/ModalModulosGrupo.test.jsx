@@ -38,6 +38,16 @@ describe('ModalModulosGrupo', () => {
     expect(screen.getByLabelText('Lectura')).not.toBeChecked();
   });
 
+  test('si los grupos llegan con el diálogo abierto, carga los módulos del primero', async () => {
+    const props = { claseSelect: '', guardando: false, error: '', onGuardar: () => {}, onCerrar: () => {} };
+    const { rerender } = render(<ModalModulosGrupo grupos={[]} cargandoGrupos {...props} />);
+    expect(screen.getByRole('status')).toHaveTextContent('Cargando');
+    rerender(<ModalModulosGrupo grupos={GRUPOS} {...props} />);
+    expect(await screen.findByLabelText('Álgebra')).toBeChecked();
+    expect(fake.loadGroupModules).toHaveBeenCalledWith(GRUPOS[0]);
+    expect(screen.getByLabelText('Grupo')).toHaveValue('g1');
+  });
+
   test('guarda la selección nueva', async () => {
     const usuario = userEvent.setup();
     const { onGuardar } = montar();
