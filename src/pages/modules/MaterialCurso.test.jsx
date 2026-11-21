@@ -147,7 +147,7 @@ describe('MaterialCurso', () => {
     const dialogo = within(screen.getByRole('dialog'));
     expect(dialogo.getByText(/dejarán de ver "Video de ecuaciones"/)).toBeInTheDocument();
     await usuario.click(dialogo.getByRole('button', { name: 'Retirar' }));
-    await waitFor(() => expect(fake.retireMaterial).toHaveBeenCalledWith('mat1'));
+    await waitFor(() => expect(fake.retireMaterial).toHaveBeenCalledWith('mat1', undefined));
     expect(await screen.findByText('Material retirado.')).toBeInTheDocument();
   });
 
