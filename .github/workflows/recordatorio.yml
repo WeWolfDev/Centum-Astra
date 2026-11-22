@@ -47,4 +47,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_USUARIOS: ${{ secrets.DISCORD_USUARIOS }}
         run: node scripts/recordatorio/index.mjs --publicar

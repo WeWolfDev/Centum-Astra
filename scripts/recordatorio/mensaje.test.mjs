@@ -119,6 +119,19 @@ describe('construirMensaje', () => {
     expect(texto).not.toContain('Tarea 2');
   });
 
+  it('etiqueta al responsable y al autor del PR si conoce su ID', () => {
+    const usuarios = { KERMITH79: '11111111111111111', Killercrod: '22222222222222222' };
+    const texto = construirMensaje({ issues: [issue(1)], prs: [pr(9)], ahora, usuarios });
+    expect(texto).toContain('**<@11111111111111111>**: 1 para avanzar');
+    expect(texto).toContain('(<@22222222222222222>, espera review)');
+  });
+
+  it('un título no puede etiquetar ni a alguien permitido', () => {
+    const id = '11111111111111111';
+    const texto = mensaje([issue(1, { title: `<@${id}> <@!${id}>` })]);
+    expect(texto).not.toMatch(/<@!?\d+>/);
+  });
+
   it('avisa cuando no hay pendientes', () => {
     expect(mensaje([])).toContain('No hay pendientes');
   });

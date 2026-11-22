@@ -57,10 +57,13 @@ function lineaIssue(issue, hoy) {
   return `• ${nivel}#${issue.number} ${textoSeguro(issue.title)}${vencido} <${issue.url}>`;
 }
 
-function lineaPr(pr) {
-  const nombre = EQUIPO.find(({ login }) => login === pr.author.login).nombre;
+// Con ID de Discord se etiqueta; sin él queda el nombre.
+const etiquetar = ({ login, nombre }, usuarios) => (usuarios[login] ? `<@${usuarios[login]}>` : nombre);
+
+function lineaPr(pr, usuarios) {
+  const autor = etiquetar(EQUIPO.find(({ login }) => login === pr.author.login), usuarios);
   const estado = pr.isDraft ? 'borrador' : (REVISION[pr.reviewDecision] ?? 'espera review');
-  return `• #${pr.number} ${textoSeguro(pr.title)} (${nombre}, ${estado}) <${pr.url}>`;
+  return `• #${pr.number} ${textoSeguro(pr.title)} (${autor}, ${estado}) <${pr.url}>`;
 }
 
 function clasificar(issues, prs, prsEquipo) {
@@ -89,16 +92,20 @@ function seccion(titulo, items, hoy) {
   return ['', `**${titulo}**: ${resumen.join(', ')}`, ...libres.map(issue => lineaIssue(issue, hoy))];
 }
 
-export function construirMensaje({ issues, prs, ahora }) {
+export function construirMensaje({ issues, prs, ahora, usuarios = {} }) {
   const hoy = ahora.toLocaleDateString('en-CA', { timeZone: ZONA });
   const fecha = ahora.toLocaleDateString('es-MX', { timeZone: ZONA, weekday: 'short', day: 'numeric', month: 'short' });
   const prsEquipo = prs.filter(pr => EQUIPO.some(({ login }) => login === pr.author?.login));
   const items = clasificar(issues, prs, prsEquipo);
 
   const secciones = [
-    ...(prsEquipo.length ? ['', '**PRs abiertos**', ...prsEquipo.map(lineaPr)] : []),
-    ...EQUIPO.flatMap(({ login, nombre }) =>
-      seccion(nombre, items.filter(({ issue }) => issue.assignees.some(asignado => asignado.login === login)), hoy),
+    ...(prsEquipo.length ? ['', '**PRs abiertos**', ...prsEquipo.map(pr => lineaPr(pr, usuarios))] : []),
+    ...EQUIPO.flatMap(persona =>
+      seccion(
+        etiquetar(persona, usuarios),
+        items.filter(({ issue }) => issue.assignees.some(({ login }) => login === persona.login)),
+        hoy,
+      ),
     ),
     // Solo lo priorizado: cualquiera puede abrir un issue, no cualquiera etiquetarlo.
     ...seccion(
