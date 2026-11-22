@@ -6,7 +6,7 @@ set local search_path = public, extensions;
 -- revisar la política de borrado.
 set local storage.allow_delete_query = 'true';
 
-select plan(18);
+select plan(23);
 
 -- Mismo helper que storage.test.sql: sube o reemplaza como la API.
 create function pg_temp.subir(bucket text, ruta text, mime text, tamano bigint)
@@ -90,6 +90,8 @@ where id in ('a7500000-0000-0000-0000-000000000001', 'a7500000-0000-0000-0000-00
 -- Objetos: la imagen y el audio que usan las preguntas, y un borrador sin usar.
 select pg_temp.subir('reactivos', 'a7600000-0000-0000-0000-000000000011/figura.png', 'image/png', 100);
 select pg_temp.subir('reactivos', 'a7600000-0000-0000-0000-000000000011/borrador.png', 'image/png', 100);
+-- Huérfano: la carpeta es de una pregunta que ya no existe.
+select pg_temp.subir('reactivos', 'a7699999-0000-0000-0000-000000000000/huerfano.png', 'image/png', 100);
 select pg_temp.subir('reactivos', 'a7600000-0000-0000-0000-000000000021/audio.mp3', 'audio/mpeg', 100);
 
 insert into public.attempts (evaluation_id, student_id, status, finished_at, total_questions, correct_count, percent, duration_seconds)
@@ -124,6 +126,10 @@ select throws_ok(
 select throws_ok(
   $$ select pg_temp.subir('reactivos', 'sin-pregunta/x.png', 'image/png', 1) $$,
   '42501', null, 'una ruta que no es de ninguna pregunta se rechaza'
+);
+select is_empty(
+  $$ delete from storage.objects where bucket_id = 'reactivos' and name = 'a7699999-0000-0000-0000-000000000000/huerfano.png' returning name $$,
+  'el profesor no borra un reactivo huérfano'
 );
 reset role;
 
@@ -172,6 +178,14 @@ select is_empty(
      where bucket_id = 'reactivos' and name = 'a7600000-0000-0000-0000-000000000011/figura.png' returning name $$,
   'el alumno no reemplaza un reactivo que sí puede ver'
 );
+select is_empty(
+  $$ delete from storage.objects where bucket_id = 'reactivos' and name = 'a7699999-0000-0000-0000-000000000000/huerfano.png' returning name $$,
+  'el alumno no borra un reactivo huérfano'
+);
+select is_empty(
+  $$ select name from storage.objects where bucket_id = 'reactivos' and name = 'a7699999-0000-0000-0000-000000000000/huerfano.png' $$,
+  'el alumno no ve un reactivo huérfano'
+);
 reset role;
 
 -- ── Alumno sin el módulo ─────────────────────────────────────────────────────
@@ -202,6 +216,14 @@ select isnt_empty(
   $$ delete from storage.objects where bucket_id = 'reactivos'
      and name = 'a7600000-0000-0000-0000-000000000011/borrador.png' returning name $$,
   'el administrador borra un reactivo de una evaluación sin intentos'
+);
+select isnt_empty(
+  $$ select name from storage.objects where bucket_id = 'reactivos' and name = 'a7699999-0000-0000-0000-000000000000/huerfano.png' $$,
+  'el administrador ve un reactivo huérfano'
+);
+select isnt_empty(
+  $$ delete from storage.objects where bucket_id = 'reactivos' and name = 'a7699999-0000-0000-0000-000000000000/huerfano.png' returning name $$,
+  'el administrador borra un reactivo huérfano'
 );
 reset role;
 

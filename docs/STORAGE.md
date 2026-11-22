@@ -12,7 +12,7 @@ Los tres son privados: ningún archivo se lee sin sesión y sin permiso.
 | Bucket | Ruta del objeto | Formatos | Quién sube y reemplaza | Quién lee | Quién borra |
 | --- | --- | --- | --- | --- | --- |
 | `materiales` | `{material_id}/{nombre}` | Todos salvo ejecutables | Administrador; profesor del curso, sobre el material que creó | Quien ve la fila en `materials` (el alumno, solo lo publicado de sus módulos) | Administrador; el profesor solo en sus borradores |
-| `reactivos` | `{pregunta_id}/{nombre}` | Imágenes y audio | Administrador y profesores | Administrador y profesores (la lectura del alumno llega en el seguimiento de #74) | Administrador y profesores |
+| `reactivos` | `{pregunta_id}/{nombre}` | Imágenes y audio | Quien puede editar la evaluación de la pregunta (administrador; profesor del curso en sus quizzes y cuestionarios), mientras no tenga intentos | Quien administra la evaluación ve toda la carpeta; los demás, solo el archivo que usa la pregunta (`media_path`) si pueden ver la evaluación | Como al subir; los huérfanos (su pregunta ya no existe), solo el administrador |
 | `terminos` | `{alumno_id}/{nombre}` | Imágenes y PDF | Administrador | Administrador | Administrador |
 
 - **Tamaño:** 50 MB por archivo, sin límite total por curso.
@@ -25,11 +25,13 @@ Los tres son privados: ningún archivo se lee sin sesión y sin permiso.
 - **Términos firmados (#62):** solo el administrador los sube, consulta,
   reemplaza o borra. El alumno no puede dar por firmada su propia autorización.
 - **Videos:** no se suben; son enlaces de Google Drive (`kind = 'video_link'`).
-- Las tablas de preguntas (#30) y de términos (#62) deben ligar sus filas a estas
-  rutas. En reactivos, un PR de seguimiento posterior a #74 liga las políticas a
-  `questions.media_path`: limita a cada profesor a los cursos que imparte (hoy
-  cualquier profesor reemplaza o borra cualquier reactivo) y abre la lectura al
-  alumno durante su intento.
+- **Reactivos (#95):** cada archivo hereda los permisos de la evaluación de su
+  pregunta. `questions.media_path` debe estar en la carpeta de su propia
+  pregunta, para que una pregunta no herede la lectura del archivo de otra. Con
+  intentos, el archivo queda fijo, igual que el resto de la pregunta (`CA024`).
+  Al borrar una pregunta, su archivo queda huérfano: solo el administrador lo ve
+  y lo borra.
+- La tabla de términos (#62) debe ligar sus filas a las rutas de `terminos`.
 
 ## Flujo de un archivo de material
 

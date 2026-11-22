@@ -101,6 +101,27 @@ create policy "reactivos_delete"
   to authenticated
   using (bucket_id = 'reactivos' and app_private.writes_question_object(name));
 
+-- Huérfanos: al borrar una pregunta, su archivo queda sin dueño y las
+-- políticas de arriba ya no lo alcanzan. Solo el administrador puede verlo y
+-- borrarlo; hacen falta las dos porque remove() de Storage también lee.
+create policy "reactivos_select_huerfanos_admin"
+  on storage.objects for select
+  to authenticated
+  using (
+    bucket_id = 'reactivos'
+    and (select app_private.is_admin())
+    and not exists (select 1 from public.questions q where q.id = app_private.question_of_object(objects.name))
+  );
+
+create policy "reactivos_delete_huerfanos_admin"
+  on storage.objects for delete
+  to authenticated
+  using (
+    bucket_id = 'reactivos'
+    and (select app_private.is_admin())
+    and not exists (select 1 from public.questions q where q.id = app_private.question_of_object(objects.name))
+  );
+
 -- La pregunta solo usa archivos de su propia carpeta: apuntar al de otra
 -- pregunta heredaría su permiso de lectura.
 alter table public.questions
