@@ -122,6 +122,19 @@ describe('Material del alumno', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('No se pudo guardar');
   });
 
+  test('con más de un curso deja elegirlo y carga sus áreas', async () => {
+    fake.listMaterialCourses.mockResolvedValue([
+      ...CURSOS,
+      { id: 'c2', name: 'Curso de verano', modules: [{ id: 'm9', title: 'Lectora' }] },
+    ]);
+    render(<Modulos />);
+    await screen.findByText('Ecuaciones');
+    const selector = screen.getByLabelText('Curso');
+    expect(selector).toHaveStyle({ color: 'rgb(var(--c-ink))' });
+    await userEvent.setup().selectOptions(selector, 'c2');
+    await waitFor(() => expect(fake.listModuleSessions).toHaveBeenLastCalledWith('m9'));
+  });
+
   test('cambia de área', async () => {
     const usuario = userEvent.setup();
     render(<Modulos />);

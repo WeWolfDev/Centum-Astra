@@ -196,11 +196,17 @@ export default function MaterialAlumno({ defaultModuleId = null }) {
         {cursos.datos?.length > 1 && (
           <div className="flex items-center gap-2">
             <label htmlFor="modulos-curso" className="text-xs font-medium">Curso</label>
+            {/* Mismos tokens que el selector de VideoLibrary: sigue el tema claro u oscuro. */}
             <select
               id="modulos-curso"
               value={curso?.id ?? ''}
               onChange={e => setCursoId(e.target.value)}
-              className="rounded-[10px] bg-space-navy/50 border border-white/10 px-4 py-2.5 text-sm text-white"
+              className="rounded-[10px] px-4 py-2.5 text-sm outline-none min-h-[44px]"
+              style={{
+                background: 'rgb(var(--c-ink) / 0.05)',
+                border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
+                color: TINTA,
+              }}
             >
               {cursos.datos.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
