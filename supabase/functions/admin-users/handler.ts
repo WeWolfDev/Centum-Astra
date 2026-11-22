@@ -4,6 +4,8 @@
 const ROLES = ['admin', 'teacher', 'student'];
 const BAN_INDEFINIDO = '876000h';
 const ROLE_CHANGE_BLOCKED = 'CA001';
+const ACCOUNT_CHANGED = 'CA030';
+const CUENTA_CAMBIO = 'Otro administrador cambió esta cuenta. Recarga e intenta de nuevo.';
 
 type Result = { status: number; body: Record<string, unknown> };
 // deno-lint-ignore no-explicit-any
@@ -60,23 +62,6 @@ async function exigirPerfil(admin: AdminClient, id: string) {
   return perfil;
 }
 
-async function auditar(
-  admin: AdminClient,
-  actorId: string,
-  action: string,
-  entityId: string,
-  metadata: Record<string, unknown>,
-) {
-  const { error } = await admin.from('audit_logs').insert({
-    actor_id: actorId,
-    action,
-    entity_type: 'profile',
-    entity_id: entityId,
-    metadata,
-  });
-  if (error) throw new HttpError(500, 'El cambio se aplicó, pero no se registró en auditoría.');
-}
-
 async function invitar(admin: AdminClient, callerId: string, body: Record<string, unknown>) {
   const email = texto(body.email).toLowerCase();
   if (!email.includes('@')) throw new HttpError(400, 'Escribe un correo válido.');
@@ -92,16 +77,19 @@ async function invitar(admin: AdminClient, callerId: string, body: Record<string
   }
 
   const userId = data.user.id;
-  const { error: profileError } = await admin
-    .from('profiles')
-    .insert({ id: userId, email, full_name: fullName, role });
+  // El perfil y su auditoría se guardan juntos en create_profile (#67).
+  const { error: profileError } = await admin.rpc('create_profile', {
+    target_profile: userId,
+    new_email: email,
+    new_full_name: fullName,
+    new_role: role,
+    actor: callerId,
+  });
   if (profileError) {
     // Sin perfil la cuenta quedaría huérfana y el correo, bloqueado.
     await admin.auth.admin.deleteUser(userId);
     throw new HttpError(500, 'No se pudo crear la cuenta.');
   }
-
-  await auditar(admin, callerId, 'user.invited', userId, { role });
   return { status: 201, body: { id: userId } };
 }
 
@@ -113,26 +101,37 @@ async function actualizar(admin: AdminClient, callerId: string, body: Record<str
   if (perfil.status === 'deleted') throw new HttpError(409, 'La cuenta está eliminada.');
   if (perfil.role !== role) exigirOtraCuenta(userId, callerId);
 
-  const { error } = await admin
-    .from('profiles')
-    .update({ full_name: fullName, role, updated_at: new Date().toISOString() })
-    .eq('id', userId);
+  // El perfil y su auditoría se guardan juntos en update_profile (#67).
+  const { error } = await admin.rpc('update_profile', {
+    target_profile: userId,
+    new_full_name: fullName,
+    new_role: role,
+    actor: callerId,
+  });
   if (error) {
     if (error.code === ROLE_CHANGE_BLOCKED) {
       throw new HttpError(409, 'Retira primero sus grupos para cambiar el rol.');
     }
+    if (error.code === ACCOUNT_CHANGED) throw new HttpError(409, CUENTA_CAMBIO);
     throw new HttpError(500, 'No se pudo actualizar la cuenta.');
   }
-
-  await auditar(admin, callerId, 'user.updated', userId, { role, previous_role: perfil.role });
   return { status: 200, body: { id: userId } };
+}
+
+// Deja el bloqueo de Auth de acuerdo con el estado que quedó en la base. Si no
+// se puede leer, bloquea: es preferible a dejar entrar una cuenta eliminada.
+async function sincronizarBloqueo(admin: AdminClient, userId: string) {
+  const perfil = await leerPerfil(admin, userId).catch(() => null);
+  const ban = perfil?.status === 'active' ? 'none' : BAN_INDEFINIDO;
+  await admin.auth.admin.updateUserById(userId, { ban_duration: ban });
 }
 
 async function cambiarEstado(
   admin: AdminClient,
   callerId: string,
   userId: string,
-  transicion: { status: string; ban: string; action: string; revertirBan: string },
+  estadoLeido: string,
+  transicion: { status: string; ban: string; action: string },
   metadata: Record<string, unknown>,
 ) {
   const { error: banError } = await admin.auth.admin.updateUserById(userId, {
@@ -140,16 +139,21 @@ async function cambiarEstado(
   });
   if (banError) throw new HttpError(502, 'No se pudo cambiar el acceso de la cuenta.');
 
-  const { error } = await admin
-    .from('profiles')
-    .update({ status: transicion.status, updated_at: new Date().toISOString() })
-    .eq('id', userId);
+  // El estado y su auditoría se guardan juntos, y solo si nadie cambió la cuenta
+  // desde que se leyó (#67).
+  const { error } = await admin.rpc('change_profile_status', {
+    target_profile: userId,
+    expected_status: estadoLeido,
+    new_status: transicion.status,
+    actor: callerId,
+    audit_action: transicion.action,
+    audit_metadata: metadata,
+  });
   if (error) {
-    await admin.auth.admin.updateUserById(userId, { ban_duration: transicion.revertirBan });
+    await sincronizarBloqueo(admin, userId);
+    if (error.code === ACCOUNT_CHANGED) throw new HttpError(409, CUENTA_CAMBIO);
     throw new HttpError(500, 'No se pudo actualizar la cuenta.');
   }
-
-  await auditar(admin, callerId, transicion.action, userId, metadata);
   return { status: 200, body: { id: userId } };
 }
 
@@ -163,7 +167,8 @@ async function suspender(admin: AdminClient, callerId: string, body: Record<stri
     admin,
     callerId,
     userId,
-    { status: 'suspended', ban: BAN_INDEFINIDO, action: 'user.suspended', revertirBan: 'none' },
+    perfil.status,
+    { status: 'suspended', ban: BAN_INDEFINIDO, action: 'user.suspended' },
     { reason },
   );
 }
@@ -178,7 +183,8 @@ async function reactivar(admin: AdminClient, callerId: string, body: Record<stri
     admin,
     callerId,
     userId,
-    { status: 'active', ban: 'none', action: 'user.reactivated', revertirBan: BAN_INDEFINIDO },
+    perfil.status,
+    { status: 'active', ban: 'none', action: 'user.reactivated' },
     {},
   );
 }
@@ -193,12 +199,8 @@ async function eliminar(admin: AdminClient, callerId: string, body: Record<strin
     admin,
     callerId,
     userId,
-    {
-      status: 'deleted',
-      ban: BAN_INDEFINIDO,
-      action: 'user.deleted',
-      revertirBan: perfil.status === 'suspended' ? BAN_INDEFINIDO : 'none',
-    },
+    perfil.status,
+    { status: 'deleted', ban: BAN_INDEFINIDO, action: 'user.deleted' },
     { reason, previous_status: perfil.status },
   );
 }

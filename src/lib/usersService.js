@@ -143,27 +143,14 @@ async function asignarAlumno(userId, groupId) {
   if (error) throw new Error(ACTION_ERROR);
 }
 
-async function asignarProfesor(userId, actuales, nuevos) {
-  const retirar = actuales.filter(id => !nuevos.includes(id));
-  const agregar = nuevos.filter(id => !actuales.includes(id));
-  if (retirar.length > 0) {
-    const { error } = await supabase
-      .from('group_teachers')
-      .delete()
-      .eq('teacher_id', userId)
-      .in('group_id', retirar);
-    if (error) throw new Error(ACTION_ERROR);
-  }
-  if (agregar.length > 0) {
-    const { error } = await supabase
-      .from('group_teachers')
-      .insert(agregar.map(group_id => ({ group_id, teacher_id: userId })));
-    if (error) throw new Error(ACTION_ERROR);
-  }
+// Bajas y altas en una sola transacción (#67): si algo falla, conserva sus grupos.
+async function asignarProfesor(userId, groupIds) {
+  const { error } = await supabase.rpc('set_teacher_groups', { teacher: userId, group_ids: groupIds });
+  if (error) throw new Error(ACTION_ERROR);
 }
 
 export async function setUserGroups(user, groupIds) {
   if (user.role === 'student') return asignarAlumno(user.id, groupIds[0] ?? null);
-  if (user.role === 'teacher') return asignarProfesor(user.id, user.groups.map(g => g.id), groupIds);
+  if (user.role === 'teacher') return asignarProfesor(user.id, groupIds);
   throw new Error('Solo alumnos y profesores se asignan a grupos.');
 }

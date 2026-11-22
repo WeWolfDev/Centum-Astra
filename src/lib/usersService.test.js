@@ -4,6 +4,7 @@ const fake = vi.hoisted(() => {
   const calls = { upsert: [], remove: [], insert: [] };
   const result = { error: null };
   const invoke = vi.fn();
+  const rpc = vi.fn();
   const builder = {
     upsert: (fila, opts) => { calls.upsert.push({ fila, opts }); return Promise.resolve(result); },
     insert: filas => { calls.insert.push(filas); return Promise.resolve(result); },
@@ -31,7 +32,7 @@ const fake = vi.hoisted(() => {
     return chain;
   }
   const from = vi.fn(tabla => ({ ...builder, select: (...args) => consulta(tabla, args) }));
-  return { calls, result, invoke, queries, respuestas, supabase: { from, functions: { invoke } } };
+  return { calls, result, invoke, rpc, queries, respuestas, supabase: { from, rpc, functions: { invoke } } };
 });
 
 vi.mock('./supabaseClient', () => ({ supabase: fake.supabase }));
@@ -46,6 +47,7 @@ beforeEach(() => {
   fake.calls.insert.length = 0;
   fake.result.error = null;
   fake.invoke.mockReset();
+  fake.rpc.mockReset().mockResolvedValue({ error: null });
   fake.queries.length = 0;
   fake.respuestas.length = 0;
 });
@@ -188,10 +190,16 @@ describe('setUserGroups', () => {
     expect(fake.calls.remove[0].filtros).toEqual([['student_id', 's1']]);
   });
 
-  test('aplica solo la diferencia para el profesor', async () => {
+  test('reasigna los grupos del profesor en una sola llamada', async () => {
     await setUserGroups({ id: 't1', role: 'teacher', groups: [{ id: 'g1' }, { id: 'g2' }] }, ['g2', 'g3']);
-    expect(fake.calls.remove[0].filtros).toEqual([['teacher_id', 't1'], ['group_id', ['g1']]]);
-    expect(fake.calls.insert[0]).toEqual([{ group_id: 'g3', teacher_id: 't1' }]);
+    expect(fake.rpc).toHaveBeenCalledWith('set_teacher_groups', { teacher: 't1', group_ids: ['g2', 'g3'] });
+    expect(fake.calls.remove).toHaveLength(0);
+    expect(fake.calls.insert).toHaveLength(0);
+  });
+
+  test('propaga el error al reasignar los grupos del profesor', async () => {
+    fake.rpc.mockResolvedValue({ error: { code: '23503' } });
+    await expect(setUserGroups({ id: 't1', role: 'teacher', groups: [] }, ['g9'])).rejects.toThrow('No se pudo completar');
   });
 
   test('no asigna grupos a un administrador', async () => {
