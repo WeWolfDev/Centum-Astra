@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(69);
+select plan(71);
 
 -- ── Datos de prueba ──────────────────────────────────────────────────────────
 -- 1 admin · 2 y 3 profesores · 4 y 6 alumnos del grupo 1 · 5 alumno del grupo 2
@@ -161,6 +161,25 @@ select throws_ok(
 select isnt_empty(
   $$ select 1 from cron.job where jobname = 'cerrar-intentos-vencidos' and schedule = '* * * * *' $$,
   'pg_cron revisa cada minuto los intentos vencidos'
+);
+
+-- Los permisos no dependen del ACL por omisión de cada versión de Supabase.
+select ok(
+  not has_table_privilege('authenticated', 'public.attempts', 'INSERT, UPDATE, DELETE')
+    and not has_table_privilege('authenticated', 'public.attempt_answers', 'INSERT, UPDATE, DELETE')
+    and has_table_privilege('authenticated', 'public.attempts', 'SELECT'),
+  'authenticated solo lee intentos y respuestas; los cambia el servidor'
+);
+select ok(
+  not (
+    has_table_privilege('anon', 'public.evaluations', 'SELECT, INSERT, UPDATE, DELETE')
+    or has_table_privilege('anon', 'public.questions', 'SELECT, INSERT, UPDATE, DELETE')
+    or has_table_privilege('anon', 'public.question_options', 'SELECT, INSERT, UPDATE, DELETE')
+    or has_table_privilege('anon', 'public.question_keys', 'SELECT, INSERT, UPDATE, DELETE')
+    or has_table_privilege('anon', 'public.attempts', 'SELECT, INSERT, UPDATE, DELETE')
+    or has_table_privilege('anon', 'public.attempt_answers', 'SELECT, INSERT, UPDATE, DELETE')
+  ),
+  'anon no tiene permisos sobre evaluaciones ni intentos'
 );
 
 -- ── Anónimo ──────────────────────────────────────────────────────────────────

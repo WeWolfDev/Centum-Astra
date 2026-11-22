@@ -112,6 +112,13 @@ alter table public.question_keys enable row level security;
 alter table public.attempts enable row level security;
 alter table public.attempt_answers enable row level security;
 
+-- Supabase da todos los permisos a anon y authenticated en cada tabla nueva;
+-- se quitan antes de conceder solo los necesarios.
+revoke all on
+  public.evaluations, public.questions, public.question_options, public.question_keys,
+  public.attempts, public.attempt_answers
+from anon, authenticated;
+
 -- Los intentos solo cambian a través de las funciones de este archivo.
 grant select, insert, update, delete on
   public.evaluations, public.questions, public.question_options, public.question_keys
