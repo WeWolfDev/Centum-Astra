@@ -314,6 +314,41 @@ describe('MaterialCurso', () => {
       expect(await screen.findByText('Archivo publicado.')).toBeInTheDocument();
     });
 
+    test('mientras sube, Cancelar, Escape y la X no cierran el diálogo', async () => {
+      let terminar;
+      fake.addFile.mockReturnValueOnce(new Promise(resolve => { terminar = resolve; }));
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Geometría');
+      await usuario.click(screen.getByRole('button', { name: /Subir archivo/ }));
+      const dialogo = within(screen.getByRole('dialog'));
+      await usuario.type(dialogo.getByLabelText('Título'), 'Resumen');
+      await usuario.upload(dialogo.getByLabelText('Archivo'), archivo('Resumen.pdf'));
+      await usuario.click(dialogo.getByRole('button', { name: 'Subir y publicar' }));
+      expect(dialogo.getByRole('button', { name: 'Cancelar' })).toBeDisabled();
+      await usuario.click(dialogo.getByRole('button', { name: 'Cancelar' }));
+      await usuario.keyboard('{Escape}');
+      await usuario.click(dialogo.getByRole('button', { name: 'Cerrar' }));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      terminar();
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(await screen.findByText('Archivo publicado.')).toBeInTheDocument();
+    });
+
+    test('si el reemplazo falla después de intentar cerrar, el error sigue a la vista', async () => {
+      let fallar;
+      fake.replaceFile.mockReturnValueOnce(new Promise((_, reject) => { fallar = reject; }));
+      fake.listModuleSessions.mockResolvedValue(CLASES_CON_ARCHIVOS);
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Funciones');
+      await usuario.click(screen.getByRole('button', { name: 'Reemplazar' }));
+      const dialogo = within(screen.getByRole('dialog'));
+      await usuario.upload(dialogo.getByLabelText('Archivo'), archivo('guia-v2.pdf'));
+      await usuario.click(dialogo.getByRole('button', { name: 'Reemplazar' }));
+      await usuario.keyboard('{Escape}');
+      fallar(new Error('No se pudo reemplazar el archivo. Intenta de nuevo.'));
+      expect(await dialogo.findByRole('alert')).toHaveTextContent('No se pudo reemplazar el archivo');
+    });
+
     test('rechaza ejecutables y archivos de más de 50 MB sin crear el material', async () => {
       render(<MaterialCurso />);
       const usuario = await abrirClase('Geometría');

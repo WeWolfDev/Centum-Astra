@@ -17,7 +17,7 @@ function ErrorDialogo({ mensaje }) {
 function PieDialogo({ textoConfirmar, guardando, onCancelar }) {
   return (
     <footer className="flex gap-2.5 flex-wrap justify-end">
-      <Boton variant="secundario" type="button" onClick={onCancelar}>Cancelar</Boton>
+      <Boton variant="secundario" type="button" onClick={onCancelar} disabled={guardando}>Cancelar</Boton>
       <Boton variant="primario" type="submit" isLoading={guardando}>{textoConfirmar}</Boton>
     </footer>
   );

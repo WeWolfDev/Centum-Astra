@@ -404,4 +404,3 @@ describe('ayudas de archivos', () => {
     expect(tamanoLegible(undefined)).toBe('');
   });
 });
-

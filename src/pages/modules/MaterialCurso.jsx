@@ -278,7 +278,11 @@ function PanelModulo({ modulo, cursoId }) {
     else setDialogo({ tipo, clase, material });
   }
 
-  const cerrar = useCallback(() => setDialogo(null), []);
+  // Mientras guarda no se cierra: cancelar no detiene la subida y el error
+  // se perdería con el diálogo. Cubre Cancelar, Escape, la X y el clic fuera.
+  const cerrar = useCallback(() => {
+    if (!guardando) setDialogo(null);
+  }, [guardando]);
 
   async function ejecutar(accion, exito) {
     setErrorDialogo('');
