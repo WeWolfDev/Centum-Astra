@@ -1,6 +1,6 @@
 // Material con datos reales de Supabase (#34), para maestro y administrador.
 // Los archivos (PDF, Word) llegan con Storage (#28); por ahora, enlaces.
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Archive, ChevronDown, ExternalLink, Link2, Pencil, Play, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -19,45 +19,16 @@ import {
 import { Aviso } from '../../components/rediseno/Aviso';
 import Boton from '../../components/rediseno/Boton';
 import DialogoConfirmacion from '../../components/rediseno/DialogoConfirmacion';
+import EstadoCarga from '../../components/rediseno/EstadoCarga';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
 import Pestanas from '../../components/rediseno/Pestanas';
 import SelectorAreas from '../../components/rediseno/SelectorAreas';
+import useCarga from '../../hooks/useCarga';
 import { ModalEnlace, ModalNombreClase, ModalNombreTema } from './ModalesMaterial';
 
 const CLASE_SELECT =
   'rounded-[10px] bg-space-navy/50 border border-white/10 px-4 py-2.5 text-sm text-white font-body ' +
   'outline-none focus:border-gold-bright/40';
-
-function useCarga(cargar) {
-  const [estado, setEstado] = useState({ cargando: true, error: '', datos: null });
-
-  const recargar = useCallback(async () => {
-    setEstado(e => ({ ...e, cargando: true, error: '' }));
-    try {
-      setEstado({ cargando: false, error: '', datos: await cargar() });
-    } catch (e) {
-      setEstado({ cargando: false, error: e.message, datos: null });
-    }
-  }, [cargar]);
-
-  useEffect(() => {
-    void recargar();
-  }, [recargar]);
-
-  return { ...estado, recargar };
-}
-
-function EstadoCarga({ cargando, error, onReintentar }) {
-  if (cargando) return <p role="status" className="m-0 text-sm text-white/60">Cargando…</p>;
-  if (!error) return null;
-  return (
-    <EstadoVacio
-      titulo="No se pudo cargar"
-      descripcion={error}
-      accion={<Boton variant="secundario" onClick={onReintentar}>Reintentar</Boton>}
-    />
-  );
-}
 
 function FilaMaterial({ material, esAdmin, onRetirar }) {
   const enlace = enlaceSeguro(material.url);
