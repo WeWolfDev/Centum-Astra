@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(17);
+select plan(19);
 
 -- ── Datos de prueba ──────────────────────────────────────────────────────────
 -- 1 admin · 2 profesor del curso · 3 profesor de otro curso · 4 alumno
@@ -72,6 +72,17 @@ select throws_ok(
 select throws_ok(
   $$ update public.groups set generation = '  ' where id = 'd2000000-0000-0000-0000-000000000001' $$,
   '23514', null, 'la generación no puede quedar en blanco'
+);
+
+-- Los permisos no dependen del ACL por omisión de cada versión de Supabase.
+select ok(
+  not has_table_privilege('authenticated', 'public.topics', 'DELETE')
+    and has_table_privilege('authenticated', 'public.topics', 'SELECT, INSERT, UPDATE'),
+  'authenticated lee, crea y edita temas, pero no los borra'
+);
+select ok(
+  not has_table_privilege('anon', 'public.topics', 'SELECT, INSERT, UPDATE, DELETE'),
+  'anon no tiene permisos sobre los temas'
 );
 
 -- ── Administrador ────────────────────────────────────────────────────────────

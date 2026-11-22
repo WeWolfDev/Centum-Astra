@@ -24,6 +24,9 @@ create index topics_module_id_course_id_idx on public.topics (module_id, course_
 
 alter table public.topics enable row level security;
 
+-- Supabase da todos los permisos a anon y authenticated en cada tabla nueva;
+-- se quitan antes de conceder solo los necesarios (sin delete).
+revoke all on public.topics from anon, authenticated;
 grant select, insert, update on public.topics to authenticated;
 grant all on public.topics to service_role;
 
