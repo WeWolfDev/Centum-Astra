@@ -1,4 +1,6 @@
 // Módulos del alumno (rediseño). Implementa `mockups/Alumno-Modulos.dc.html`.
+// Con Supabase configurado muestra el material real (MaterialAlumno, #82);
+// sin él, los datos de ejemplo de abajo.
 // Reglas del HANDOFF:
 //  - El alumno NO descarga PDFs: PdfCard con canDownload={false}.
 //  - No hay porcentaje de avance por módulo. Sí hay estado por clase.
@@ -8,6 +10,8 @@ import { Lock, ChevronDown } from 'lucide-react';
 import { mockModules, mockSessionsByModule, mockVideos } from '../../data/mockData';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { useAuth } from '../../context/AuthContext';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import MaterialAlumno from './MaterialAlumno';
 import { useMaterial } from '../../context/MaterialContext';
 import { puedeDescargarPdf } from '../../config/rediseno';
 import Pastilla from '../../components/rediseno/Pastilla';
@@ -419,6 +423,11 @@ function ContenidoDeArea({ mod }) {
 }
 
 export default function Modulos({ defaultModuleId = null }) {
+  if (isSupabaseConfigured) return <MaterialAlumno defaultModuleId={defaultModuleId} />;
+  return <ModulosEjemplo defaultModuleId={defaultModuleId} />;
+}
+
+function ModulosEjemplo({ defaultModuleId }) {
   const [selectedId, setSelectedId] = useState(() => {
     if (defaultModuleId && mockModules.some(m => m.id === defaultModuleId)) {
       return defaultModuleId;

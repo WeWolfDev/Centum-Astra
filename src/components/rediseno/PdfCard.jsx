@@ -4,9 +4,11 @@ import BotonSecundario from './BotonSecundario';
 // Tarjeta para un PDF del material de módulos.
 // HANDOFF: el alumno NO descarga. Si canDownload es false, no renderiza el botón de descarga.
 // onEliminar: solo se muestra si viene definido (p.ej. recursos subidos por el maestro).
+// formato: etiqueta junto al tamaño; los archivos de Storage pueden no ser PDF.
 export default function PdfCard({
   nombre,
   tamano,
+  formato = 'PDF',
   onVer,
   canDownload = false,
   onDescargar,
@@ -56,7 +58,7 @@ export default function PdfCard({
         </p>
         {tamano && (
           <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgb(var(--c-ink) / 0.6)' }}>
-            PDF · {tamano}
+            {formato} · {tamano}
           </p>
         )}
       </div>
