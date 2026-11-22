@@ -12,6 +12,8 @@ import { resultadosParaGrafica } from '../../lib/examScoring';
 import { mockStudents, mockModules } from '../../data/mockData';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { AREA_POR_ID } from '../../config/areas';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import SimuladoresAlumno from './SimuladoresAlumno';
 
 // Nota del HANDOFF: "Estimación. No es resultado oficial del Ceneval."
 const NOTA_ESTIMACION = 'Estimación. No es resultado oficial del Ceneval.';
@@ -79,7 +81,14 @@ function buildMateriasConProgreso() {
   });
 }
 
-export default function SimuladoresQuizzes({ customQuizzes, onAddQuiz, onDeleteQuiz }) { // eslint-disable-line no-unused-vars
+// Con Supabase, el alumno resuelve las evaluaciones publicadas y ve sus
+// resultados reales (#36); sin él (modo demo), la pantalla de ejemplo.
+export default function SimuladoresQuizzes() {
+  if (isSupabaseConfigured) return <SimuladoresAlumno />;
+  return <SimuladoresDemo />;
+}
+
+function SimuladoresDemo() {
   const { simuladores: simuladoresMaestro, quizzes: quizzesMaestro } = useMaterial();
   const [metaVisible, setMetaVisible] = useState(!META_OCULTA_POR_DEFECTO);
   // TODO(rediseno): meta real del alumno (viene de su carrera objetivo o la elige él).

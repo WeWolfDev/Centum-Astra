@@ -23,7 +23,6 @@ function AppContent() {
   const { user, isInitializing } = useAuth();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [activeModuleId, setActiveModuleId] = useState(null);
-  const [customQuizzes, setCustomQuizzes] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
@@ -45,14 +44,6 @@ function AppContent() {
     setActiveSection(section);
     setActiveModuleId(moduleId);
     if (isMobile) setSidebarOpen(false);
-  }
-
-  function addCustomQuiz(quiz) {
-    setCustomQuizzes(prev => [...prev, quiz]);
-  }
-
-  function deleteCustomQuiz(quizId) {
-    setCustomQuizzes(prev => prev.filter(q => q.id !== quizId));
   }
 
   const [showLogin, setShowLogin] = useState(false);
@@ -86,7 +77,7 @@ function AppContent() {
       if (activeSection === 'dashboard') return <StudentDashboard setActiveSection={handleNavigation} />;
       if (activeSection === 'modules')   return <Modulos defaultModuleId={activeModuleId} />;
       if (activeSection === 'videos')    return <VideoLibrary />;
-      if (activeSection === 'exam')      return <SimuladoresQuizzes customQuizzes={customQuizzes} onAddQuiz={addCustomQuiz} onDeleteQuiz={deleteCustomQuiz} />;
+      if (activeSection === 'exam')      return <SimuladoresQuizzes />;
     }
 
     if (user.role === 'teacher') {
