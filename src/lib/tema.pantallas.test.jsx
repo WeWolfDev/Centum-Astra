@@ -65,6 +65,23 @@ vi.mock('./evaluacionesService', async () => {
   };
 });
 
+vi.mock('./evaluacionesGestionService', async () => {
+  const real = await vi.importActual('./evaluacionesGestionService');
+  const evaluacion = {
+    id: 'e1', courseId: 'c1', moduleId: null, kind: 'simulador', title: 'Simulador', description: 'Repaso',
+    timeLimitMinutes: 90, status: 'draft', createdBy: 'a1', questionCount: 1, attemptCount: 0,
+  };
+  return {
+    ...real,
+    listCourseEvaluations: vi.fn(async () => [evaluacion]),
+    loadEvaluation: vi.fn(async () => ({
+      ...evaluacion,
+      nextPosition: 1,
+      questions: [{ id: 'q1', prompt: '¿2+2?', explanation: 'Suma.', correctOptionIds: ['o1'], options: [{ id: 'o1', body: '4' }, { id: 'o2', body: '5' }] }],
+    })),
+  };
+});
+
 const { default: Header } = await import('../components/layout/Header');
 const { default: Sidebar } = await import('../components/layout/Sidebar');
 const { default: PublicNav } = await import('../components/layout/PublicNav');
@@ -81,6 +98,7 @@ const { MaterialProvider } = await import('../context/MaterialContext');
 const { CatalogoConectado } = await import('../pages/admin/AdminCursos');
 const { ThemeProvider } = await import('../context/ThemeContext');
 const { default: SimuladoresAlumno } = await import('../pages/exam/SimuladoresAlumno');
+const { default: EvaluacionesCurso } = await import('../pages/exam/EvaluacionesCurso');
 
 // jsdom normaliza los hex de `style` a rgb(r, g, b), así que se buscan ambas formas.
 const COLORES_FIJOS = new RegExp(
@@ -279,6 +297,31 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
   test('Simuladores y quizzes del administrador', () => {
     const { baseElement } = renderizar(<MaestroQuizzes conSimuladores />);
     expect(screen.getByRole('tab', { name: 'Simuladores' })).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Simuladores y quizzes conectados del administrador: lista, editor y diálogos', async () => {
+    usuario.current = { ...PROFESOR, id: 'a1', role: 'admin' };
+    const { baseElement } = renderizar(<EvaluacionesCurso />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Abrir Simulador' }));
+    await screen.findByText('Suma.');
+    expect(coloresFijos(baseElement)).toEqual([]);
+
+    await userEvent.click(screen.getByRole('button', { name: /Agregar pregunta/ }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: /Editar datos/ }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Publicar' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: /Volver a la lista/ }));
+    await userEvent.click(await screen.findByRole('button', { name: /Nueva evaluación/ }));
     expect(coloresFijos(baseElement)).toEqual([]);
   });
 

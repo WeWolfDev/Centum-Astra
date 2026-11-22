@@ -15,6 +15,8 @@ import Pastilla from '../../components/rediseno/Pastilla';
 import Pestanas from '../../components/rediseno/Pestanas';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import EvaluacionesCurso from './EvaluacionesCurso';
 import ModalNuevaEvaluacion from './ModalNuevaEvaluacion';
 import { TIPO_COPY } from './tipoCopy';
 import { AREA_POR_ID } from '../../config/areas';
@@ -177,9 +179,16 @@ function PanelEvaluaciones({ tipo, items, onCrear, onEliminar }) {
   );
 }
 
+// Con Supabase, la versión conectada decide por el rol de la sesión (#52); sin
+// Supabase se conserva la demo con datos de ejemplo.
+export default function MaestroQuizzes({ conSimuladores = false }) {
+  if (isSupabaseConfigured) return <EvaluacionesCurso />;
+  return <MaestroQuizzesDemo conSimuladores={conSimuladores} />;
+}
+
 // El maestro solo arma quizzes: según la matriz de permisos, los simuladores
 // los crea el administrador (#37). `conSimuladores` agrega su pestaña.
-export default function MaestroQuizzes({ conSimuladores = false }) {
+function MaestroQuizzesDemo({ conSimuladores }) {
   const { simuladores, quizzes, agregarEvaluacion, eliminarEvaluacion } = useMaterial();
   const [tabActiva, setTabActiva] = useState(conSimuladores ? 'simuladores' : 'quizzes');
   const [modalTipo, setModalTipo] = useState(null); // 'simulador' | 'quiz' | null
