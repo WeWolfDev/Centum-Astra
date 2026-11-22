@@ -10,8 +10,15 @@ const LOAD_ERROR = 'No pudimos cargar las estadísticas. Intenta de nuevo.';
 const numero = valor => (valor === null || valor === undefined ? null : Number(valor));
 
 // Periodo [desde, hasta): fechas o textos ISO. Sin periodo, todo el curso.
+// Una fecha sin hora ('2026-12-01') es la medianoche de México: JavaScript la
+// leería como medianoche UTC y correría 6 horas el corte. México no tiene
+// horario de verano desde 2022.
 function periodo({ from, to } = {}) {
-  const iso = fecha => (fecha ? new Date(fecha).toISOString() : null);
+  const iso = fecha => {
+    if (!fecha) return null;
+    const soloFecha = typeof fecha === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(fecha);
+    return new Date(soloFecha ? `${fecha}T00:00:00-06:00` : fecha).toISOString();
+  };
   return { p_from: iso(from), p_to: iso(to) };
 }
 

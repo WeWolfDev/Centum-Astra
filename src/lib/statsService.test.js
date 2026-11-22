@@ -41,6 +41,14 @@ describe('statsService', () => {
     });
   });
 
+  test('una fecha sin hora es la medianoche de México, no la de UTC', async () => {
+    await listGroupStats({ from: '2026-11-01', to: '2026-12-01' });
+    expect(fake.rpc).toHaveBeenCalledWith('group_stats', {
+      p_from: '2026-11-01T06:00:00.000Z',
+      p_to: '2026-12-01T06:00:00.000Z',
+    });
+  });
+
   test('el puntaje de una calificación se etiqueta como estimado y el quiz no lleva puntaje', async () => {
     fake.respuesta.data = [
       { evaluation_id: 'e1', title: 'Simulador', kind: 'simulador', percent: '50.00', score: 1000, correct_count: 5, total_questions: 10 },
