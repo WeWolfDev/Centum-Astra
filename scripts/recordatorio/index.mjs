@@ -22,7 +22,7 @@ function listar(tipo, campos) {
 try {
   const mensaje = construirMensaje({
     issues: listar('issue', 'number,title,url,body,assignees,labels,milestone'),
-    prs: listar('pr', 'number,title,url,author,isDraft,reviewDecision,closingIssuesReferences'),
+    prs: listar('pr', 'number,title,url,body,author,isDraft,reviewDecision,closingIssuesReferences'),
     ahora: new Date(),
   });
   if (process.argv.includes('--publicar')) {

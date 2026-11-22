@@ -17,6 +17,12 @@ export function dependencias(cuerpo) {
   return lineas.flatMap(linea => [...linea.matchAll(/#(\d+)/g)].map(([, numero]) => Number(numero)));
 }
 
+// También se lee el cuerpo: GitHub no enlaza el issue si el PR apunta a otra rama.
+function issuesQueCierra(pr) {
+  const enCuerpo = (pr.body ?? '').matchAll(/\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?):?[ \t]+#(\d+)/gi);
+  return [...pr.closingIssuesReferences.map(({ number }) => number), ...Array.from(enCuerpo, ([, numero]) => Number(numero))];
+}
+
 // Sin saltos, formato ni enlaces: un título no puede hacerse pasar por el bot.
 export function textoSeguro(texto) {
   const caracteres = Array.from(texto.replace(/\s+/g, ' ').trim());
@@ -59,7 +65,7 @@ function lineaPr(pr) {
 
 function clasificar(issues, prs, prsEquipo) {
   const abiertos = new Set([...issues, ...prs].map(({ number }) => number));
-  const enPr = new Set(prsEquipo.flatMap(pr => pr.closingIssuesReferences.map(({ number }) => number)));
+  const enPr = new Set(prsEquipo.flatMap(issuesQueCierra));
   return issues.map(issue => {
     if (enPr.has(issue.number)) return { issue, estado: 'pr' };
     const bloqueado =
