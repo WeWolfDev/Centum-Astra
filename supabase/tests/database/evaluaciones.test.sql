@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(57);
+select plan(69);
 
 -- ── Datos de prueba ──────────────────────────────────────────────────────────
 -- 1 admin · 2 y 3 profesores · 4 y 6 alumnos del grupo 1 · 5 alumno del grupo 2
@@ -117,6 +117,46 @@ select throws_ok(
 select throws_ok(
   $$ update public.evaluations set status = 'published' where id = 'e5000000-0000-0000-0000-000000000003' $$,
   'CA020', null, 'no se publica una evaluación sin preguntas'
+);
+select throws_ok(
+  $$ insert into public.evaluations (course_id, kind, title, created_by) values
+     ('e1000000-0000-0000-0000-000000000001', 'quiz', 'Quiz sin módulo', 'e0000000-0000-0000-0000-000000000001') $$,
+  '23514', null, 'un quiz necesita módulo'
+);
+select throws_ok(
+  $$ insert into public.evaluations (course_id, kind, title, created_by) values
+     ('e1000000-0000-0000-0000-000000000001', 'cuestionario', 'Cuestionario sin módulo', 'e0000000-0000-0000-0000-000000000001') $$,
+  '23514', null, 'un cuestionario necesita módulo'
+);
+select throws_ok(
+  $$ insert into public.evaluations (course_id, module_id, kind, title, time_limit_minutes, created_by) values
+     ('e1000000-0000-0000-0000-000000000001', 'e3000000-0000-0000-0000-000000000001', 'cuestionario', 'Con tiempo', 30,
+      'e0000000-0000-0000-0000-000000000001') $$,
+  '23514', null, 'un cuestionario no tiene tiempo límite'
+);
+
+-- Quiz borrador con una pregunta de dos respuestas correctas y simulador borrador (curso 2).
+insert into public.evaluations (id, course_id, module_id, kind, title, time_limit_minutes, created_by) values
+  ('e5000000-0000-0000-0000-000000000005', 'e1000000-0000-0000-0000-000000000002', 'e3000000-0000-0000-0000-000000000003', 'quiz', 'Quiz varias', null, 'e0000000-0000-0000-0000-000000000001'),
+  ('e5000000-0000-0000-0000-000000000006', 'e1000000-0000-0000-0000-000000000002', null, 'simulador', 'Simulador borrador', 60, 'e0000000-0000-0000-0000-000000000001');
+insert into public.questions (id, evaluation_id, position, prompt) values
+  ('e6000000-0000-0000-0000-000000000051', 'e5000000-0000-0000-0000-000000000005', 0, 'Varias correctas');
+insert into public.question_options (id, question_id, position, body) values
+  ('e7000000-0000-0000-0000-000000000511', 'e6000000-0000-0000-0000-000000000051', 0, 'A'),
+  ('e7000000-0000-0000-0000-000000000512', 'e6000000-0000-0000-0000-000000000051', 1, 'B');
+insert into public.question_keys (question_id, correct_option_ids) values
+  ('e6000000-0000-0000-0000-000000000051', array['e7000000-0000-0000-0000-000000000511', 'e7000000-0000-0000-0000-000000000512']::uuid[]);
+
+select throws_ok(
+  $$ update public.evaluations set kind = 'simulador', module_id = null, time_limit_minutes = 60
+     where id = 'e5000000-0000-0000-0000-000000000005' $$,
+  'CA021', null, 'un quiz con varias correctas no se convierte en simulador'
+);
+update public.questions set evaluation_id = 'e5000000-0000-0000-0000-000000000006'
+where id = 'e6000000-0000-0000-0000-000000000051';
+select throws_ok(
+  $$ update public.evaluations set status = 'published' where id = 'e5000000-0000-0000-0000-000000000006' $$,
+  'CA021', null, 'no se publica un simulador con una pregunta de varias correctas'
 );
 select isnt_empty(
   $$ select 1 from cron.job where jobname = 'cerrar-intentos-vencidos' and schedule = '* * * * *' $$,
@@ -390,6 +430,38 @@ select lives_ok(
   $$ insert into public.evaluations (course_id, kind, title, time_limit_minutes, created_by) values
      ('e1000000-0000-0000-0000-000000000001', 'simulador', 'Simulador 2', 90, 'e0000000-0000-0000-0000-000000000001') $$,
   'el administrador crea simuladores'
+);
+-- El quiz 1 ya tiene intentos: sus preguntas, opciones y claves quedan fijas.
+select throws_ok(
+  $$ update public.question_keys set correct_option_ids = array['e7000000-0000-0000-0000-000000000212']::uuid[]
+     where question_id = 'e6000000-0000-0000-0000-000000000021' $$,
+  'CA024', null, 'no se cambia la respuesta correcta de una evaluación con intentos'
+);
+select throws_ok(
+  $$ update public.question_options set body = 'Cambiada' where id = 'e7000000-0000-0000-0000-000000000211' $$,
+  'CA024', null, 'no se cambian las opciones de una evaluación con intentos'
+);
+select throws_ok(
+  $$ delete from public.questions where id = 'e6000000-0000-0000-0000-000000000021' $$,
+  'CA024', null, 'no se borra una pregunta de una evaluación con intentos'
+);
+select throws_ok(
+  $$ insert into public.questions (evaluation_id, position, prompt) values
+     ('e5000000-0000-0000-0000-000000000002', 5, 'Nueva') $$,
+  'CA024', null, 'no se agregan preguntas a una evaluación con intentos'
+);
+select isnt_empty(
+  $$ update public.question_keys set explanation = 'Corregida'
+     where question_id = 'e6000000-0000-0000-0000-000000000041' returning question_id $$,
+  'una evaluación publicada sin intentos se sigue editando'
+);
+select throws_ok(
+  $$ delete from public.evaluations where id = 'e5000000-0000-0000-0000-000000000002' $$,
+  '23503', null, 'no se borra una evaluación con intentos'
+);
+select isnt_empty(
+  $$ delete from public.evaluations where id = 'e5000000-0000-0000-0000-000000000004' returning id $$,
+  'una evaluación sin intentos se borra con sus preguntas'
 );
 select lives_ok(
   $$ update public.evaluations set status = 'archived' where id = 'e5000000-0000-0000-0000-000000000002' $$,

@@ -3,7 +3,8 @@
 -- llama a las funciones start_attempt, save_answer, submit_attempt y attempt_review.
 
 -- ── Tablas ───────────────────────────────────────────────────────────────────
--- Un simulador puede abarcar varias áreas del curso, por eso module_id es opcional.
+-- Un simulador puede abarcar varias áreas del curso, por eso module_id es opcional
+-- solo para él.
 create table public.evaluations (
   id uuid primary key default gen_random_uuid(),
   course_id uuid not null references public.courses (id) on delete restrict,
@@ -18,12 +19,12 @@ create table public.evaluations (
   created_at timestamptz not null default now(),
   constraint evaluations_module_same_course foreign key (module_id, course_id)
     references public.modules (id, course_id) on delete restrict,
-  -- Regla del cliente: el simulador tiene temporizador y el quiz no.
+  -- Regla del cliente: solo el simulador tiene temporizador.
   constraint evaluations_time_limit_by_kind check (
-    (kind = 'simulador' and time_limit_minutes is not null)
-    or (kind = 'quiz' and time_limit_minutes is null)
-    or kind = 'cuestionario'
-  )
+    (kind = 'simulador') = (time_limit_minutes is not null)
+  ),
+  -- Sin módulo, evaluations_select la abriría a todo el curso y saltaría la regla de #49.
+  constraint evaluations_module_by_kind check (kind = 'simulador' or module_id is not null)
 );
 
 create table public.questions (
@@ -62,7 +63,8 @@ create table public.question_keys (
 
 create table public.attempts (
   id uuid primary key default gen_random_uuid(),
-  evaluation_id uuid not null references public.evaluations (id) on delete cascade,
+  -- Borrar la evaluación borraría las calificaciones de los alumnos; se archiva.
+  evaluation_id uuid not null references public.evaluations (id) on delete restrict,
   student_id uuid not null references public.profiles (id) on delete restrict,
   status text not null default 'in_progress' check (status in ('in_progress', 'submitted', 'expired')),
   started_at timestamptz not null default clock_timestamp(),
@@ -379,6 +381,19 @@ begin
       raise exception 'No se cambia el tipo de una evaluación ya publicada.'
         using errcode = 'CA020';
     end if;
+    -- validate_question_key no ve el cambio de tipo ni las preguntas movidas de otra evaluación.
+    if new.kind = 'simulador'
+      and (new.kind <> old.kind or (new.status = 'published' and old.status <> 'published'))
+      and exists (
+        select 1
+        from public.questions q
+        join public.question_keys k on k.question_id = q.id
+        where q.evaluation_id = new.id and cardinality(k.correct_option_ids) <> 1
+      )
+    then
+      raise exception 'En un simulador cada pregunta tiene una sola respuesta correcta.'
+        using errcode = 'CA021';
+    end if;
   end if;
 
   if new.status = 'published' and (tg_op = 'INSERT' or old.status <> 'published') then
@@ -458,6 +473,58 @@ create trigger question_keys_validate
 before insert or update on public.question_keys
 for each row
 execute function app_private.validate_question_key();
+
+-- Con intentos, cambiar preguntas, opciones o claves descuadraría los resultados
+-- guardados y la revisión; un error se corrige creando otra evaluación. El error
+-- explícito le dice a la interfaz por qué no se guardó.
+create function app_private.lock_questions_with_attempts()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_evaluations uuid[];
+begin
+  if tg_table_name = 'questions' then
+    v_evaluations := array[old.evaluation_id, new.evaluation_id];
+  else
+    v_evaluations := array[
+      app_private.evaluation_of_question(old.question_id),
+      app_private.evaluation_of_question(new.question_id)
+    ];
+  end if;
+  -- El join ignora la cascada de una evaluación borrada: ese caso lo frena el
+  -- on delete restrict de attempts.
+  if exists (
+    select 1
+    from public.attempts a
+    join public.evaluations e on e.id = a.evaluation_id
+    where a.evaluation_id = any (v_evaluations)
+  ) then
+    raise exception 'Esta evaluación ya tiene intentos; crea otra para corregirla.'
+      using errcode = 'CA024';
+  end if;
+  return coalesce(new, old);
+end;
+$$;
+
+revoke all on function app_private.lock_questions_with_attempts() from public, authenticated;
+
+create trigger questions_lock_with_attempts
+before insert or update or delete on public.questions
+for each row
+execute function app_private.lock_questions_with_attempts();
+
+create trigger question_options_lock_with_attempts
+before insert or update or delete on public.question_options
+for each row
+execute function app_private.lock_questions_with_attempts();
+
+create trigger question_keys_lock_with_attempts
+before insert or update or delete on public.question_keys
+for each row
+execute function app_private.lock_questions_with_attempts();
 
 -- ── Calificación y cierre de intentos ────────────────────────────────────────
 -- Conserva solo el mejor y el último intento terminado, y marca el mejor.
