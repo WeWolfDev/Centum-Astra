@@ -4,8 +4,9 @@
 //   node scripts/recordatorio/index.mjs --publicar   lo manda a Discord
 //
 // Requiere gh con sesión o GH_TOKEN. Para publicar: DISCORD_WEBHOOK_URL (secreto).
+// Opcional, para etiquetar: DISCORD_USUARIOS (secreto).
 import { execFileSync } from 'node:child_process';
-import { publicar } from './discord.mjs';
+import { leerUsuarios, publicar } from './discord.mjs';
 import { construirMensaje, dividir } from './mensaje.mjs';
 
 const MAXIMO = '1000';
@@ -20,13 +21,15 @@ function listar(tipo, campos) {
 }
 
 try {
+  const usuarios = leerUsuarios(process.env.DISCORD_USUARIOS);
   const mensaje = construirMensaje({
     issues: listar('issue', 'number,title,url,body,assignees,labels,milestone'),
     prs: listar('pr', 'number,title,url,body,author,isDraft,reviewDecision,closingIssuesReferences'),
     ahora: new Date(),
+    usuarios,
   });
   if (process.argv.includes('--publicar')) {
-    await publicar(process.env.DISCORD_WEBHOOK_URL, dividir(mensaje));
+    await publicar(process.env.DISCORD_WEBHOOK_URL, dividir(mensaje), Object.values(usuarios));
     console.log('Recordatorio publicado en Discord.');
   } else {
     console.log(mensaje);
