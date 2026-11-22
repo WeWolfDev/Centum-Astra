@@ -5,11 +5,11 @@ Guía para crear y mantener los ambientes de Centum Astra (issue #38). Cada ambi
 | Ambiente | Dónde vive | Plan sugerido | Build |
 |---|---|---|---|
 | Local | Supabase CLI y Docker | No aplica | `npm run dev` |
-| Desarrollo | Proyecto `centum-astra-dev` | Free | `npm run dev` con `.env.local` |
-| Staging | Proyecto `centum-astra-staging` | Free | `npm run build:staging` |
-| Producción | Proyecto `centum-astra-prod`, en una organización del cliente | Pro | `npm run build` |
+| Desarrollo | Proyecto `Centum-Astra`, organización Wewolf, `us-east-1` | Free | `npm run dev` con `.env.local` |
+| Staging | Proyecto `centum-astra-staging`, organización Wewolf, `us-east-1` | Free | `npm run build:staging` |
+| Producción | Proyecto `centum-astra-prod`, en una organización del cliente. Aún no existe: se crea en #92, después de la aceptación en staging (#41) | Pro | `npm run build` |
 
-El plan Free admite dos proyectos activos por organización, por lo que Producción debe ir en otra organización. Esto también cumple la decisión de que el cliente sea el propietario. Confirma precios y cuotas vigentes antes de contratar: el presupuesto aprobado es de 2,500 MXN al mes.
+El plan Free admite dos proyectos activos por organización: Wewolf ya tiene desarrollo y staging, por lo que Producción debe ir en otra organización. Esto también cumple la decisión de que el cliente sea el propietario. Confirma precios y cuotas vigentes antes de contratar: el presupuesto aprobado es de 2,500 MXN al mes.
 
 ## Crear un ambiente
 
