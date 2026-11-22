@@ -478,6 +478,16 @@ Se indicó que el cliente será propietario y el equipo administrará las cuenta
 - ¿Cómo se revocará el acceso cuando alguien deje el proyecto?
 - ¿El cliente conservará acceso de recuperación a Supabase, Drive, dominio y hosting?
 
+### P-17. Generación y fechas del grupo
+
+**Estado:** pendiente.
+
+El equipo registró la generación en el grupo (#51), mientras que las fechas de inicio y fin siguen en el curso (1.9: todos los alumnos tienen la misma fecha). Falta confirmar:
+
+- Cuando empieza una generación nueva, ¿se abre un curso nuevo con sus fechas, o los grupos de distintas generaciones conviven en el mismo curso?
+
+Si se abre un curso nuevo, el modelo actual no cambia. Si conviven, cada generación necesita sus propias fechas y habrá que moverlas al grupo o a una tabla de generaciones.
+
 ## 3. Decisiones técnicas derivadas
 
 Con las respuestas actuales, el sistema debe implementarse con estas reglas:
