@@ -16,6 +16,10 @@ const fake = vi.hoisted(() => ({
   createTopic: vi.fn(),
   renameTopic: vi.fn(),
   archiveTopic: vi.fn(),
+  addFile: vi.fn(),
+  replaceFile: vi.fn(),
+  retryFile: vi.fn(),
+  openFile: vi.fn(),
 }));
 
 vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ user: fake.usuario.current }) }));
@@ -57,11 +61,34 @@ beforeEach(() => {
   Object.entries(fake).forEach(([nombre, fn]) => { if (nombre !== 'usuario') fn.mockReset(); });
   fake.listMaterialCourses.mockResolvedValue(CURSOS);
   fake.listModuleSessions.mockResolvedValue(CLASES);
-  ['createSession', 'renameSession', 'archiveSession', 'addLink', 'retireMaterial', 'createTopic', 'renameTopic', 'archiveTopic']
+  ['createSession', 'renameSession', 'archiveSession', 'addLink', 'retireMaterial', 'createTopic', 'renameTopic', 'archiveTopic',
+    'addFile', 'replaceFile', 'retryFile']
     .forEach(n => fake[n].mockResolvedValue());
 });
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
+
+// Archivos (#81): uno propio publicado, uno ajeno y una carga que no terminó.
+const ARCHIVOS = [
+  { id: 'doc1', title: 'Guía PDF', kind: 'document', storagePath: 'doc1/guia.pdf', fileName: 'guia.pdf', fileSize: 2048, fileVersion: 1, status: 'published', createdBy: 'u1' },
+  { id: 'doc2', title: 'Mapa ajeno', kind: 'image', storagePath: 'doc2/mapa.png', fileName: 'mapa.png', fileSize: 10, fileVersion: 1, status: 'published', createdBy: 'u9' },
+  { id: 'doc3', title: 'Tarea', kind: 'document', storagePath: 'doc3/tarea.pdf', fileVersion: 0, status: 'draft', createdBy: 'u1' },
+];
+const CLASES_CON_ARCHIVOS = {
+  topics: [{ id: 't1', title: 'Álgebra', sessions: [{ id: 's3', title: 'Funciones', materials: ARCHIVOS }] }],
+  sessions: [],
+  nextPosition: 1,
+  nextTopicPosition: 1,
+};
+
+function archivo(nombre, type = 'application/pdf', size) {
+  const file = new File(['contenido'], nombre, { type });
+  if (size !== undefined) Object.defineProperty(file, 'size', { value: size });
+  return file;
+}
 
 async function abrirClase(nombre) {
   const usuario = userEvent.setup();
@@ -271,5 +298,128 @@ describe('MaterialCurso', () => {
     expect(await screen.findByText('No pudimos cargar el material. Intenta de nuevo.')).toBeInTheDocument();
     await usuario.click(screen.getByRole('button', { name: 'Reintentar' }));
     expect(await screen.findByText('Ecuaciones')).toBeInTheDocument();
+  });
+
+  describe('archivos', () => {
+    test('el profesor sube un archivo y se publica al confirmar', async () => {
+      const pdf = archivo('Resumen.pdf');
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Geometría');
+      await usuario.click(screen.getByRole('button', { name: /Subir archivo/ }));
+      const dialogo = within(screen.getByRole('dialog'));
+      await usuario.type(dialogo.getByLabelText('Título'), 'Resumen');
+      await usuario.upload(dialogo.getByLabelText('Archivo'), pdf);
+      await usuario.click(dialogo.getByRole('button', { name: 'Subir y publicar' }));
+      await waitFor(() => expect(fake.addFile).toHaveBeenCalledWith('s2', { title: 'Resumen', file: pdf }, 'u1'));
+      expect(await screen.findByText('Archivo publicado.')).toBeInTheDocument();
+    });
+
+    test('rechaza ejecutables y archivos de más de 50 MB sin crear el material', async () => {
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Geometría');
+      await usuario.click(screen.getByRole('button', { name: /Subir archivo/ }));
+      const dialogo = within(screen.getByRole('dialog'));
+      await usuario.type(dialogo.getByLabelText('Título'), 'Programa');
+      await usuario.upload(dialogo.getByLabelText('Archivo'), archivo('setup.exe', 'application/x-msdownload'));
+      expect(dialogo.getByRole('alert')).toHaveTextContent('No se permiten archivos ejecutables.');
+      await usuario.click(dialogo.getByRole('button', { name: 'Subir y publicar' }));
+      await usuario.upload(dialogo.getByLabelText('Archivo'), archivo('video.pdf', 'application/pdf', 50 * 1024 * 1024 + 1));
+      expect(dialogo.getByRole('alert')).toHaveTextContent('El archivo pesa más de 50 MB.');
+      await usuario.click(dialogo.getByRole('button', { name: 'Subir y publicar' }));
+      expect(fake.addFile).not.toHaveBeenCalled();
+    });
+
+    test('si la subida falla, deja el error a la vista y recarga para mostrar la carga incompleta', async () => {
+      fake.addFile.mockRejectedValueOnce(new Error('No se pudo subir el archivo. Intenta de nuevo.'));
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Geometría');
+      await usuario.click(screen.getByRole('button', { name: /Subir archivo/ }));
+      const dialogo = within(screen.getByRole('dialog'));
+      await usuario.type(dialogo.getByLabelText('Título'), 'Resumen');
+      await usuario.upload(dialogo.getByLabelText('Archivo'), archivo('Resumen.pdf'));
+      await usuario.click(dialogo.getByRole('button', { name: 'Subir y publicar' }));
+      expect(await dialogo.findByRole('alert')).toHaveTextContent('No se pudo subir el archivo');
+      expect(fake.listModuleSessions).toHaveBeenCalledTimes(2);
+    });
+
+    test('muestra tamaño, carga incompleta y solo deja gestionar los archivos propios al profesor', async () => {
+      fake.listModuleSessions.mockResolvedValue(CLASES_CON_ARCHIVOS);
+      render(<MaterialCurso />);
+      await abrirClase('Funciones');
+      expect(screen.getByText('2 KB')).toBeInTheDocument();
+      expect(screen.getByText('Carga incompleta')).toBeInTheDocument();
+      expect(screen.getAllByRole('button', { name: 'Reemplazar' })).toHaveLength(1);
+      expect(screen.getAllByRole('button', { name: 'Reintentar' })).toHaveLength(1);
+      expect(screen.queryByRole('button', { name: /^Abrir Tarea/ })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Retirar' })).not.toBeInTheDocument();
+    });
+
+    test('abre el archivo con una URL firmada en otra pestaña', async () => {
+      const pestana = { location: { href: '' }, close: vi.fn(), opener: window };
+      vi.spyOn(window, 'open').mockReturnValue(pestana);
+      fake.openFile.mockResolvedValue('https://firmada/guia.pdf');
+      fake.listModuleSessions.mockResolvedValue(CLASES_CON_ARCHIVOS);
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Funciones');
+      await usuario.click(screen.getByRole('button', { name: /^Abrir Guía PDF/ }));
+      await waitFor(() => expect(pestana.location.href).toBe('https://firmada/guia.pdf'));
+      expect(fake.openFile).toHaveBeenCalledWith('doc1');
+      expect(pestana.opener).toBeNull();
+    });
+
+    test('si no se puede abrir, cierra la pestaña y explica el error', async () => {
+      const pestana = { location: { href: '' }, close: vi.fn(), opener: null };
+      vi.spyOn(window, 'open').mockReturnValue(pestana);
+      fake.openFile.mockRejectedValue(new Error('Este archivo ya no está disponible.'));
+      fake.listModuleSessions.mockResolvedValue(CLASES_CON_ARCHIVOS);
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Funciones');
+      await usuario.click(screen.getByRole('button', { name: /^Abrir Guía PDF/ }));
+      expect(await screen.findByText('Este archivo ya no está disponible.')).toBeInTheDocument();
+      expect(pestana.close).toHaveBeenCalled();
+    });
+
+    test('reemplaza con un archivo del mismo formato y rechaza otro formato', async () => {
+      fake.listModuleSessions.mockResolvedValue(CLASES_CON_ARCHIVOS);
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Funciones');
+      await usuario.click(screen.getByRole('button', { name: 'Reemplazar' }));
+      const dialogo = within(screen.getByRole('dialog'));
+      expect(dialogo.getByText(/El archivo anterior se borra/)).toBeInTheDocument();
+      await usuario.upload(dialogo.getByLabelText('Archivo'), archivo('guia.docx', 'application/msword'));
+      expect(dialogo.getByRole('alert')).toHaveTextContent('El archivo nuevo debe ser .pdf, igual que el anterior.');
+      const nuevo = archivo('guia-v2.pdf');
+      await usuario.upload(dialogo.getByLabelText('Archivo'), nuevo);
+      await usuario.click(dialogo.getByRole('button', { name: 'Reemplazar' }));
+      await waitFor(() => expect(fake.replaceFile).toHaveBeenCalledWith(ARCHIVOS[0], nuevo));
+      expect(await screen.findByText('Archivo reemplazado.')).toBeInTheDocument();
+    });
+
+    test('termina una carga incompleta y la publica', async () => {
+      fake.listModuleSessions.mockResolvedValue(CLASES_CON_ARCHIVOS);
+      const pdf = archivo('tarea.pdf');
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Funciones');
+      await usuario.click(screen.getByRole('button', { name: 'Reintentar' }));
+      const dialogo = within(screen.getByRole('dialog'));
+      expect(dialogo.getByText(/La carga anterior no terminó/)).toHaveTextContent('tarea.pdf');
+      await usuario.upload(dialogo.getByLabelText('Archivo'), pdf);
+      await usuario.click(dialogo.getByRole('button', { name: 'Subir y publicar' }));
+      await waitFor(() => expect(fake.retryFile).toHaveBeenCalledWith(ARCHIVOS[2], pdf));
+      expect(await screen.findByText('Archivo publicado.')).toBeInTheDocument();
+    });
+
+    test('el administrador reemplaza cualquier archivo y ve si el borrado falla al retirar', async () => {
+      fake.usuario.current = { id: 'a1', role: 'admin' };
+      fake.listModuleSessions.mockResolvedValue(CLASES_CON_ARCHIVOS);
+      fake.retireMaterial.mockRejectedValueOnce(new Error('El material se retiró, pero el archivo no se pudo borrar. Intenta de nuevo.'));
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Funciones');
+      expect(screen.getAllByRole('button', { name: 'Reemplazar' })).toHaveLength(2);
+      await usuario.click(screen.getAllByRole('button', { name: 'Retirar' })[0]);
+      await usuario.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Retirar' }));
+      await waitFor(() => expect(fake.retireMaterial).toHaveBeenCalledWith('doc1', 'doc1/guia.pdf'));
+      expect(await screen.findByRole('alert')).toHaveTextContent('el archivo no se pudo borrar');
+    });
   });
 });

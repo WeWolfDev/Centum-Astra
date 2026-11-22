@@ -1,42 +1,62 @@
 // Material con datos reales de Supabase (#34), para maestro y administrador.
-// Los archivos (PDF, Word) llegan con Storage (#28); por ahora, enlaces.
+// Enlaces y archivos en Storage privado (#28, #81): los archivos se abren con
+// una URL firmada corta y se reemplazan en su mismo lugar.
 import { useCallback, useState } from 'react';
-import { Archive, ChevronDown, ExternalLink, Link2, Pencil, Play, Plus } from 'lucide-react';
+import { Archive, ChevronDown, ExternalLink, FileText, Image, Link2, Pencil, Play, Plus, Upload } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
+  addFile,
   addLink,
   archiveSession,
   archiveTopic,
+  cargaIncompleta,
   createSession,
   createTopic,
   enlaceSeguro,
   listMaterialCourses,
   listModuleSessions,
+  openFile,
   renameSession,
   renameTopic,
+  replaceFile,
   retireMaterial,
+  retryFile,
+  tamanoLegible,
 } from '../../lib/materialService';
 import { Aviso } from '../../components/rediseno/Aviso';
 import Boton from '../../components/rediseno/Boton';
 import DialogoConfirmacion from '../../components/rediseno/DialogoConfirmacion';
 import EstadoCarga from '../../components/rediseno/EstadoCarga';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
+import Pastilla from '../../components/rediseno/Pastilla';
 import Pestanas from '../../components/rediseno/Pestanas';
 import SelectorAreas from '../../components/rediseno/SelectorAreas';
 import useCarga from '../../hooks/useCarga';
-import { ModalEnlace, ModalNombreClase, ModalNombreTema } from './ModalesMaterial';
+import { ModalArchivo, ModalEnlace, ModalNombreClase, ModalNombreTema } from './ModalesMaterial';
 
 const CLASE_SELECT =
   'rounded-[10px] bg-space-navy/50 border border-white/10 px-4 py-2.5 text-sm text-white font-body ' +
   'outline-none focus:border-gold-bright/40';
 
-function FilaMaterial({ material, esAdmin, onRetirar }) {
+const ICONOS = { video_link: Play, external_link: Link2, document: FileText, image: Image };
+
+// La base deja reemplazar el archivo al administrador y a quien creó el material.
+function FilaMaterial({ material, esAdmin, userId, onAccion }) {
   const enlace = enlaceSeguro(material.url);
-  const Icono = material.kind === 'video_link' ? Play : Link2;
+  const Icono = ICONOS[material.kind] ?? Link2;
+  const esArchivo = Boolean(material.storagePath);
+  const incompleta = cargaIncompleta(material);
+  const gestiona = esAdmin || material.createdBy === userId;
   return (
     <li className="flex items-center gap-3 flex-wrap rounded-xl bg-white/5 border border-white/10 px-4 py-3">
       <Icono size={18} aria-hidden="true" className="text-gold-bright shrink-0" />
-      <span className="flex-1 min-w-[160px] text-sm text-white/90">{material.title}</span>
+      <span className="flex-1 min-w-[160px] text-sm text-white/90">
+        {material.title}
+        {esArchivo && !incompleta && material.fileSize !== undefined && (
+          <span className="ml-2 text-xs text-white/60">{tamanoLegible(material.fileSize)}</span>
+        )}
+      </span>
+      {incompleta && <Pastilla tono="advertencia">Carga incompleta</Pastilla>}
       {enlace && (
         <a
           href={enlace}
@@ -48,14 +68,24 @@ function FilaMaterial({ material, esAdmin, onRetirar }) {
           <span className="sr-only">{material.title} (se abre en otra pestaña)</span>
         </a>
       )}
+      {esArchivo && !incompleta && (
+        <Boton size="sm" variant="ghost" onClick={() => onAccion('abrirArchivo', material)} aria-label={`Abrir ${material.title} (se abre en otra pestaña)`}>
+          Abrir <ExternalLink size={13} aria-hidden="true" />
+        </Boton>
+      )}
+      {esArchivo && gestiona && (
+        <Boton size="sm" variant="secundario" onClick={() => onAccion(incompleta ? 'reintentar' : 'reemplazar', material)}>
+          {incompleta ? 'Reintentar' : 'Reemplazar'}
+        </Boton>
+      )}
       {esAdmin && (
-        <Boton size="sm" variant="secundario" onClick={() => onRetirar(material)}>Retirar</Boton>
+        <Boton size="sm" variant="secundario" onClick={() => onAccion('retirar', material)}>Retirar</Boton>
       )}
     </li>
   );
 }
 
-function TarjetaClase({ clase, numero, esAdmin, onAbrir }) {
+function TarjetaClase({ clase, numero, esAdmin, userId, onAbrir }) {
   const [abierta, setAbierta] = useState(false);
   const total = clase.materials.length;
   const resumen = total === 0 ? 'Sin material' : `${total} recurso${total === 1 ? '' : 's'}`;
@@ -95,13 +125,22 @@ function TarjetaClase({ clase, numero, esAdmin, onAbrir }) {
           {total > 0 && (
             <ul className="list-none m-0 p-0 flex flex-col gap-2">
               {clase.materials.map(m => (
-                <FilaMaterial key={m.id} material={m} esAdmin={esAdmin} onRetirar={mat => onAbrir('retirar', clase, mat)} />
+                <FilaMaterial
+                  key={m.id}
+                  material={m}
+                  esAdmin={esAdmin}
+                  userId={userId}
+                  onAccion={(tipo, mat) => onAbrir(tipo, clase, mat)}
+                />
               ))}
             </ul>
           )}
           <div className="flex gap-2 flex-wrap">
             <Boton size="sm" variant="secundario" onClick={() => onAbrir('enlace', clase)}>
               <Plus size={14} aria-hidden="true" /> Agregar enlace
+            </Boton>
+            <Boton size="sm" variant="secundario" onClick={() => onAbrir('archivo', clase)}>
+              <Upload size={14} aria-hidden="true" /> Subir archivo
             </Boton>
             {esAdmin && (
               <Boton size="sm" variant="secundario" onClick={() => onAbrir('archivar', clase)}>Retirar clase</Boton>
@@ -113,7 +152,7 @@ function TarjetaClase({ clase, numero, esAdmin, onAbrir }) {
   );
 }
 
-function SeccionTema({ tema, esAdmin, onAbrir }) {
+function SeccionTema({ tema, esAdmin, userId, onAbrir }) {
   const total = tema.sessions.length;
   const ayudaId = `tema-${tema.id}-ayuda`;
   return (
@@ -140,7 +179,7 @@ function SeccionTema({ tema, esAdmin, onAbrir }) {
       </div>
       {total === 0 && <p className="m-0 text-sm text-white/60">Este tema todavía no tiene clases.</p>}
       {tema.sessions.map((clase, i) => (
-        <TarjetaClase key={clase.id} clase={clase} numero={i + 1} esAdmin={esAdmin} onAbrir={onAbrir} />
+        <TarjetaClase key={clase.id} clase={clase} numero={i + 1} esAdmin={esAdmin} userId={userId} onAbrir={onAbrir} />
       ))}
     </section>
   );
@@ -187,10 +226,29 @@ function PanelModulo({ modulo, cursoId }) {
   const [guardando, setGuardando] = useState(false);
   const [aviso, setAviso] = useState(null);
 
+  // La pestaña se abre antes de pedir la URL firmada: si se abriera después
+  // del await, el navegador la bloquearía como ventana emergente.
+  async function abrirArchivo(material) {
+    const pestana = window.open('', '_blank');
+    if (pestana) pestana.opener = null;
+    try {
+      const url = await openFile(material.id);
+      if (pestana) pestana.location.href = url;
+      else window.location.assign(url);
+    } catch (e) {
+      pestana?.close();
+      setAviso({ tipo: 'error', mensaje: e.message });
+    }
+  }
+
   // TarjetaClase llama onAbrir(tipo, clase, material); los temas, onAbrir(tipo, { tema }).
   function abrir(tipo, clase = null, material = null) {
     setErrorDialogo('');
     setAviso(null);
+    if (tipo === 'abrirArchivo') {
+      abrirArchivo(material);
+      return;
+    }
     if (clase?.tema) setDialogo({ tipo, tema: clase.tema });
     else setDialogo({ tipo, clase, material });
   }
@@ -209,6 +267,17 @@ function PanelModulo({ modulo, cursoId }) {
       setErrorDialogo(e.message);
     } finally {
       setGuardando(false);
+    }
+  }
+
+  // Si la subida falla después de crear el borrador, se recarga para que
+  // aparezca como carga incompleta con su botón de reintentar.
+  async function subirArchivo(claseId, datosArchivo) {
+    try {
+      await addFile(claseId, datosArchivo, user.id);
+    } catch (e) {
+      await recargar();
+      throw e;
     }
   }
 
@@ -252,7 +321,7 @@ function PanelModulo({ modulo, cursoId }) {
         />
       )}
       {!cargando && !error && temas.map(tema => (
-        <SeccionTema key={tema.id} tema={tema} esAdmin={esAdmin} onAbrir={abrir} />
+        <SeccionTema key={tema.id} tema={tema} esAdmin={esAdmin} userId={user?.id} onAbrir={abrir} />
       ))}
 
       {dialogo?.tipo === 'nueva' && (
@@ -291,6 +360,30 @@ function PanelModulo({ modulo, cursoId }) {
         <ModalEnlace
           clase={dialogo.clase}
           onGuardar={enlace => ejecutar(() => addLink(dialogo.clase.id, enlace, user.id), 'Enlace publicado.')}
+          {...propsDialogo}
+        />
+      )}
+      {dialogo?.tipo === 'archivo' && (
+        <ModalArchivo
+          modo="subir"
+          clase={dialogo.clase}
+          onGuardar={datosArchivo => ejecutar(() => subirArchivo(dialogo.clase.id, datosArchivo), 'Archivo publicado.')}
+          {...propsDialogo}
+        />
+      )}
+      {dialogo?.tipo === 'reemplazar' && (
+        <ModalArchivo
+          modo="reemplazar"
+          material={dialogo.material}
+          onGuardar={archivo => ejecutar(() => replaceFile(dialogo.material, archivo), 'Archivo reemplazado.')}
+          {...propsDialogo}
+        />
+      )}
+      {dialogo?.tipo === 'reintentar' && (
+        <ModalArchivo
+          modo="reintentar"
+          material={dialogo.material}
+          onGuardar={archivo => ejecutar(() => retryFile(dialogo.material, archivo), 'Archivo publicado.')}
           {...propsDialogo}
         />
       )}
@@ -346,9 +439,6 @@ export default function MaterialCurso() {
           </div>
         )}
       </header>
-      <p className="m-0 text-xs text-white/60">
-        Por ahora el material se comparte con enlaces (videos o documentos en Drive). Subir archivos estará disponible pronto.
-      </p>
       <EstadoCarga cargando={cargando} error={error} onReintentar={recargar} />
       {!cargando && !error && !curso && (
         <EstadoVacio titulo="Sin cursos" descripcion="Todavía no tienes cursos activos asignados." />

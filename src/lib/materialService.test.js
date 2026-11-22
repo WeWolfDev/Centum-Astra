@@ -39,7 +39,7 @@ const fake = vi.hoisted(() => {
 vi.mock('./supabaseClient', () => ({ supabase: fake.supabase }));
 
 const {
-  addFile, addLink, archiveSession, createSession, dismissFileNotice, enlaceSeguro, esEjecutable, listFileNotices,
+  addFile, addLink, archiveSession, cargaIncompleta, problemaDeArchivo, retryFile, tamanoLegible, createSession, dismissFileNotice, enlaceSeguro, esEjecutable, listFileNotices,
   listMaterialCourses, listModuleSessions, nombreSeguro, openFile, renameSession, replaceFile, retireMaterial,
   archiveTopic, createTopic, renameTopic,
 } = await import('./materialService');
@@ -366,3 +366,42 @@ describe('avisos de archivos', () => {
     expect(fake.calls.rpc).toEqual([['dismiss_material_notice', { target_material: 'mat1' }]]);
   });
 });
+
+describe('retryFile', () => {
+  test('sube a la ruta del borrador y confirma publicando', async () => {
+    await retryFile({ id: 'mat1', storagePath: 'mat1/guia.pdf' }, pdf('guia.pdf'));
+    expect(fake.calls.storage).toEqual([
+      ['upload', 'materiales', 'mat1/guia.pdf', { upsert: true, contentType: 'application/pdf' }],
+    ]);
+    expect(fake.calls.rpc).toEqual([['confirm_material_file', { target_material: 'mat1', publish: true }]]);
+  });
+
+  test('exige el mismo formato y que el material tenga archivo', async () => {
+    await expect(retryFile({ id: 'mat1', storagePath: 'mat1/guia.pdf' }, pdf('guia.png', 1, 'image/png'))).rejects.toThrow('.pdf');
+    await expect(retryFile({ id: 'mat1' }, pdf())).rejects.toThrow(/no tiene archivo/);
+    expect(fake.calls.storage).toEqual([]);
+  });
+});
+
+describe('ayudas de archivos', () => {
+  test('problemaDeArchivo explica por qué no se puede subir', () => {
+    expect(problemaDeArchivo(null)).toBe('Elige un archivo.');
+    expect(problemaDeArchivo(pdf('a.pdf'))).toBeNull();
+    expect(problemaDeArchivo(pdf('a.pdf'), 'x/b.pdf')).toBeNull();
+    expect(problemaDeArchivo(pdf('a.docx'), 'x/b.pdf')).toMatch('.pdf');
+  });
+
+  test('cargaIncompleta reconoce el borrador sin archivo confirmado', () => {
+    expect(cargaIncompleta({ storagePath: 'x/a.pdf', status: 'draft', fileVersion: 0 })).toBe(true);
+    expect(cargaIncompleta({ storagePath: 'x/a.pdf', status: 'published', fileVersion: 1 })).toBe(false);
+    expect(cargaIncompleta({ status: 'draft' })).toBe(false);
+  });
+
+  test('tamanoLegible', () => {
+    expect(tamanoLegible(500)).toBe('500 B');
+    expect(tamanoLegible(2048)).toBe('2 KB');
+    expect(tamanoLegible(5 * 1024 * 1024)).toBe('5.0 MB');
+    expect(tamanoLegible(undefined)).toBe('');
+  });
+});
+

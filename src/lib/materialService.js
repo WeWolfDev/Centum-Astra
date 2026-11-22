@@ -92,6 +92,7 @@ function toMaterial(m) {
     storagePath: m.storage_path ?? undefined,
     fileName: m.file_name ?? undefined,
     fileSize: m.file_size ?? undefined,
+    fileVersion: m.file_version ?? undefined,
   };
 }
 
@@ -105,7 +106,7 @@ export async function listModuleSessions(moduleId) {
     supabase.from('topics').select('id, title, position, status').eq('module_id', moduleId).order('position'),
     supabase
       .from('sessions')
-      .select('id, title, position, status, topic_id, materials(id, title, kind, external_url, storage_path, file_name, file_size, status, created_by, created_at)')
+      .select('id, title, position, status, topic_id, materials(id, title, kind, external_url, storage_path, file_name, file_size, file_version, status, created_by, created_at)')
       .eq('module_id', moduleId)
       .order('position'),
   ]);
@@ -221,10 +222,26 @@ export function nombreSeguro(nombre) {
   return limpio || 'archivo';
 }
 
-function validarArchivo(file) {
-  if (!file) throw new Error('Elige un archivo.');
-  if (file.size > MAX_FILE_BYTES) throw new Error('El archivo pesa más de 50 MB.');
-  if (esEjecutable(file.name)) throw new Error('No se permiten archivos ejecutables.');
+/**
+ * Motivo por el que el archivo no se puede subir, o null. Con `rutaAnterior`
+ * exige su misma extensión: el reemplazo conserva el nombre y un Word guardado
+ * como `guia.pdf` no abre. La pantalla lo usa para avisar antes de enviar.
+ */
+export function problemaDeArchivo(file, rutaAnterior) {
+  if (!file) return 'Elige un archivo.';
+  if (file.size > MAX_FILE_BYTES) return 'El archivo pesa más de 50 MB.';
+  if (esEjecutable(file.name)) return 'No se permiten archivos ejecutables.';
+  if (rutaAnterior === undefined) return null;
+  const esperada = extension(rutaAnterior);
+  if (extension(file.name) === esperada) return null;
+  return esperada
+    ? `El archivo nuevo debe ser .${esperada}, igual que el anterior.`
+    : 'El archivo nuevo debe tener el mismo formato que el anterior.';
+}
+
+function validarArchivo(file, rutaAnterior) {
+  const problema = problemaDeArchivo(file, rutaAnterior);
+  if (problema) throw new Error(problema);
 }
 
 async function subirObjeto(ruta, file, upsert) {
@@ -268,16 +285,34 @@ export async function addFile(sessionId, { title, file }, userId) {
  * Por eso debe ser del mismo formato: un Word guardado como `guia.pdf` no abre.
  */
 export async function replaceFile(material, file) {
-  validarArchivo(file);
   if (!material?.storagePath) throw new Error('Este material no tiene archivo.');
-  const esperada = extension(material.storagePath);
-  if (extension(file.name) !== esperada) {
-    throw new Error(esperada
-      ? `El archivo nuevo debe ser .${esperada}, igual que el anterior.`
-      : 'El archivo nuevo debe tener el mismo formato que el anterior.');
-  }
+  validarArchivo(file, material.storagePath);
   await subirObjeto(material.storagePath, file, true);
   await confirmar(material.id, false);
+}
+
+/**
+ * Termina una carga que falló en `addFile`: el borrador ya existe con su ruta,
+ * así que se sube ahí y se confirma publicando.
+ */
+export async function retryFile(material, file) {
+  if (!material?.storagePath) throw new Error('Este material no tiene archivo.');
+  validarArchivo(file, material.storagePath);
+  await subirObjeto(material.storagePath, file, true);
+  await confirmar(material.id, true);
+}
+
+/** Material con archivo cuya carga no se confirmó: sigue en borrador sin versión. */
+export function cargaIncompleta(material) {
+  return Boolean(material?.storagePath) && material.status === 'draft' && !material.fileVersion;
+}
+
+/** Tamaño legible para la lista de material. */
+export function tamanoLegible(bytes) {
+  if (!Number.isFinite(bytes)) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 /** Registra la apertura (para avisar si después cambia) y entrega una URL firmada corta. */
