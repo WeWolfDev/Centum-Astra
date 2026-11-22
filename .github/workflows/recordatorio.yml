@@ -1,0 +1,50 @@
+name: Recordatorio en Discord
+
+on:
+  schedule:
+    # 9:07 en Mérida (UTC-6). Fuera de la hora en punto, cuando GitHub más se retrasa
+    - cron: '7 15 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      publicar:
+        description: 'Publicar en Discord (si no, solo se muestra en el log)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: recordatorio-discord
+
+jobs:
+  recordar:
+    name: Recordar pendientes
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Mostrar pendientes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/recordatorio/index.mjs
+
+      - name: Publicar en Discord
+        if: github.event_name == 'schedule' || inputs.publicar
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: node scripts/recordatorio/index.mjs --publicar
