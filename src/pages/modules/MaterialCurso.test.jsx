@@ -367,6 +367,22 @@ describe('MaterialCurso', () => {
       expect(pestana.opener).toBeNull();
     });
 
+    test('si el navegador bloquea la pestaña, ofrece el enlace sin salir de la aplicación', async () => {
+      vi.spyOn(window, 'open').mockReturnValue(null);
+      fake.openFile.mockResolvedValue('https://firmada/guia.pdf');
+      fake.listModuleSessions.mockResolvedValue(CLASES_CON_ARCHIVOS);
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Funciones');
+      await usuario.click(screen.getByRole('button', { name: /^Abrir Guía PDF/ }));
+      const enlace = await screen.findByRole('link', { name: /Abrir Guía PDF/ });
+      expect(enlace).toHaveAttribute('href', 'https://firmada/guia.pdf');
+      expect(enlace).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(screen.getByText(/bloqueó la pestaña nueva/)).toBeInTheDocument();
+      expect(screen.getByText('Funciones')).toBeInTheDocument();
+      await usuario.click(screen.getByRole('button', { name: 'Cerrar' }));
+      expect(screen.queryByText(/bloqueó la pestaña nueva/)).not.toBeInTheDocument();
+    });
+
     test('si no se puede abrir, cierra la pestaña y explica el error', async () => {
       const pestana = { location: { href: '' }, close: vi.fn(), opener: null };
       vi.spyOn(window, 'open').mockReturnValue(pestana);
