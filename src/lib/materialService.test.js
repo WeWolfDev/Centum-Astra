@@ -205,6 +205,9 @@ describe('validación de archivos', () => {
     expect(esEjecutable('tareas.pdf.sh')).toBe(true);
     expect(esEjecutable('virus.exe.')).toBe(true);
     expect(esEjecutable('virus.exe . ')).toBe(true);
+    for (const nombre of ['tarea.js', 'a.jse', 'a.hta', 'acceso.lnk', 'a.reg', 'a.msp', 'a.msix', 'a.appx', 'a.scf', 'a.psm1', 'a.ws', 'a.wsh', 'a.gadget']) {
+      expect(esEjecutable(nombre)).toBe(true);
+    }
     expect(esEjecutable('tareas.zip')).toBe(false);
     expect(esEjecutable('LEEME')).toBe(false);
   });
@@ -261,6 +264,19 @@ describe('replaceFile', () => {
       ['upload', 'materiales', 'mat1/guia.pdf', { upsert: true, contentType: 'application/pdf' }],
     ]);
     expect(fake.calls.rpc).toEqual([['confirm_material_file', { target_material: 'mat1', publish: false }]]);
+  });
+
+  test('rechaza un archivo de otro formato sin subir nada', async () => {
+    await expect(replaceFile({ id: 'mat1', storagePath: 'mat1/guia.pdf' }, pdf('guia.docx')))
+      .rejects.toThrow('El archivo nuevo debe ser .pdf, igual que el anterior.');
+    await expect(replaceFile({ id: 'mat1', storagePath: 'mat1/LEEME' }, pdf('LEEME.txt')))
+      .rejects.toThrow('mismo formato');
+    expect(fake.calls.storage).toEqual([]);
+  });
+
+  test('acepta la misma extensión aunque cambie mayúsculas', async () => {
+    await replaceFile({ id: 'mat1', storagePath: 'mat1/guia.pdf' }, pdf('Guia nueva.PDF'));
+    expect(fake.calls.storage).toHaveLength(1);
   });
 
   test('exige que el material tenga archivo', async () => {

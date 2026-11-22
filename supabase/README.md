@@ -2,7 +2,7 @@
 
 ## Requisitos
 
-- Supabase CLI 2.x.
+- Supabase CLI 2.x (las pruebas de Storage se verificaron con 2.122).
 - Docker Desktop iniciado.
 
 ## Comandos

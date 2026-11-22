@@ -18,9 +18,10 @@ const SIGNED_URL_SECONDS = 300;
 
 // Misma lista que app_private.is_executable_name; la base es la que decide.
 const EXTENSIONES_EJECUTABLES = new Set([
-  'exe', 'msi', 'bat', 'cmd', 'com', 'scr', 'pif', 'cpl', 'ps1', 'vbs', 'vbe',
-  'wsf', 'sh', 'bash', 'command', 'app', 'dmg', 'pkg', 'deb', 'rpm', 'apk',
-  'jar', 'dll', 'so', 'elf', 'run', 'bin',
+  'exe', 'msi', 'msp', 'msix', 'msixbundle', 'appx', 'appxbundle', 'bat', 'cmd',
+  'com', 'scr', 'pif', 'cpl', 'gadget', 'hta', 'lnk', 'scf', 'reg', 'ps1', 'psm1',
+  'vbs', 'vbe', 'js', 'jse', 'ws', 'wsf', 'wsh', 'sh', 'bash', 'command', 'app',
+  'dmg', 'pkg', 'deb', 'rpm', 'apk', 'jar', 'dll', 'so', 'elf', 'run', 'bin',
 ]);
 
 export const TIPOS_ENLACE = [
@@ -223,10 +224,19 @@ export async function addFile(sessionId, { title, file }, userId) {
   await confirmar(id, true);
 }
 
-/** El archivo nuevo ocupa el mismo nombre y ubicación; el anterior desaparece. */
+/**
+ * El archivo nuevo ocupa el mismo nombre y ubicación; el anterior desaparece.
+ * Por eso debe ser del mismo formato: un Word guardado como `guia.pdf` no abre.
+ */
 export async function replaceFile(material, file) {
   validarArchivo(file);
   if (!material?.storagePath) throw new Error('Este material no tiene archivo.');
+  const esperada = extension(material.storagePath);
+  if (extension(file.name) !== esperada) {
+    throw new Error(esperada
+      ? `El archivo nuevo debe ser .${esperada}, igual que el anterior.`
+      : 'El archivo nuevo debe tener el mismo formato que el anterior.');
+  }
   await subirObjeto(material.storagePath, file, true);
   await confirmar(material.id, false);
 }

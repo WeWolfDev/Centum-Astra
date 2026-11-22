@@ -8,7 +8,7 @@ set local search_path = public, extensions;
 -- revisar la política de borrado.
 set local storage.allow_delete_query = 'true';
 
-select plan(41);
+select plan(42);
 
 -- ── Datos de prueba ──────────────────────────────────────────────────────────
 -- 1 admin · 2 profesor del curso · 3 profesor de otro curso · 4 alumno · 5 alumno de otro curso
@@ -46,13 +46,22 @@ insert into public.sessions (id, module_id, title, position) values
   ('e4000000-0000-0000-0000-000000000001', 'e3000000-0000-0000-0000-000000000001', 'Clase 1', 0);
 
 -- Sube o reemplaza un objeto como lo haría la API (cada carga trae otra versión).
+-- Sin ON CONFLICT: el índice único de storage.objects cambia entre versiones
+-- de storage-api y así la prueba corre en cualquiera. Si la RLS oculta la fila,
+-- el UPDATE no toca nada y el INSERT falla con 42501 antes del índice.
 create function pg_temp.subir(bucket text, ruta text, mime text, tamano bigint)
-returns void language sql as $$
-  insert into storage.objects (bucket_id, name, owner, metadata, version)
-  values (bucket, ruta, (select auth.uid()),
-          jsonb_build_object('mimetype', mime, 'size', tamano), gen_random_uuid()::text)
-  on conflict (bucket_id, name) where not is_versioned
-  do update set metadata = excluded.metadata, version = excluded.version
+returns void language plpgsql as $$
+begin
+  update storage.objects
+  set metadata = jsonb_build_object('mimetype', mime, 'size', tamano),
+      version = gen_random_uuid()::text
+  where bucket_id = bucket and name = ruta;
+  if not found then
+    insert into storage.objects (bucket_id, name, owner, metadata, version)
+    values (bucket, ruta, (select auth.uid()),
+            jsonb_build_object('mimetype', mime, 'size', tamano), gen_random_uuid()::text);
+  end if;
+end;
 $$;
 grant execute on function pg_temp.subir(text, text, text, bigint) to authenticated;
 
@@ -140,6 +149,11 @@ select lives_ok(
 select is(
   app_private.is_executable_name('e5000000-0000-0000-0000-000000000002/instalador.msi'), true,
   'la extensión .msi cuenta como ejecutable'
+);
+select is(
+  (select bool_and(app_private.is_executable_name('x/a.' || ext))
+   from unnest(array['js', 'jse', 'hta', 'lnk', 'reg', 'msp', 'msix', 'appx', 'scf', 'psm1', 'ws', 'wsh', 'gadget']) ext),
+  true, 'scripts y accesos directos de Windows cuentan como ejecutables'
 );
 select is(
   app_private.is_executable_name('e5000000-0000-0000-0000-000000000002/virus.exe. .'), true,

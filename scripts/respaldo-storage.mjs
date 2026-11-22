@@ -8,7 +8,7 @@
 // Variables: SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY (clave secreta; nunca en
 // VITE_* ni en Git). Opcional: RESPALDO_RETENER (por omisión 14 respaldos).
 import { createHash } from 'node:crypto';
-import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { access, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { createClient } from '@supabase/supabase-js';
 
@@ -63,9 +63,16 @@ async function respaldar(destinoBase) {
   await podar(destinoBase, Number(process.env.RESPALDO_RETENER ?? 14));
 }
 
+const completo = carpeta => access(join(carpeta, 'manifiesto.json')).then(() => true, () => false);
+
 // Conserva los respaldos más recientes; el nombre lleva la fecha y ordena solo.
+// El manifiesto se escribe al final: una carpeta sin él es un respaldo que falló
+// y no cuenta, para que noches fallidas no desplacen respaldos buenos.
 async function podar(destinoBase, retener) {
-  const respaldos = (await readdir(destinoBase)).filter(n => n.startsWith('storage-')).sort();
+  const respaldos = [];
+  for (const nombre of (await readdir(destinoBase)).filter(n => n.startsWith('storage-')).sort()) {
+    if (await completo(join(destinoBase, nombre))) respaldos.push(nombre);
+  }
   for (const viejo of respaldos.slice(0, Math.max(0, respaldos.length - retener))) {
     await rm(join(destinoBase, viejo), { recursive: true, force: true });
     console.log(`Respaldo antiguo eliminado: ${viejo}`);

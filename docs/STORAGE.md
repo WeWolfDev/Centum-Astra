@@ -2,7 +2,7 @@
 
 Guía del almacenamiento de archivos de Centum Astra (issue #28). Las reglas
 salen de `docs/RESPUESTAS_Y_PREGUNTAS_PENDIENTES_CLIENTE.md`, secciones 1.9 y 1.10.
-La migración es `supabase/migrations/20261121100000_storage_archivos.sql` y sus
+La migración es `supabase/migrations/20261122000000_storage_archivos.sql` y sus
 pruebas por rol están en `supabase/tests/database/storage.test.sql`.
 
 ## Buckets
@@ -12,21 +12,24 @@ Los tres son privados: ningún archivo se lee sin sesión y sin permiso.
 | Bucket | Ruta del objeto | Formatos | Quién sube y reemplaza | Quién lee | Quién borra |
 | --- | --- | --- | --- | --- | --- |
 | `materiales` | `{material_id}/{nombre}` | Todos salvo ejecutables | Administrador; profesor del curso, sobre el material que creó | Quien ve la fila en `materials` (el alumno, solo lo publicado de sus módulos) | Administrador; el profesor solo en sus borradores |
-| `reactivos` | `{pregunta_id}/{nombre}` | Imágenes y audio | Administrador y profesores | Administrador y profesores (la lectura del alumno llega con #30) | Administrador y profesores |
+| `reactivos` | `{pregunta_id}/{nombre}` | Imágenes y audio | Administrador y profesores | Administrador y profesores (la lectura del alumno llega en el seguimiento de #74) | Administrador y profesores |
 | `terminos` | `{alumno_id}/{nombre}` | Imágenes y PDF | Administrador | Administrador | Administrador |
 
 - **Tamaño:** 50 MB por archivo, sin límite total por curso.
 - **Ejecutables:** se rechazan por extensión al subir (`.exe`, `.msi`, `.bat`,
-  `.sh`, `.apk`, `.jar`, `.dmg`, etc.) y por tipo al confirmar. Los puntos y
+  `.js`, `.hta`, `.lnk`, `.reg`, `.sh`, `.apk`, `.jar`, `.dmg`, etc.; la lista
+  está en `app_private.is_executable_name` y en `EXTENSIONES_EJECUTABLES` de
+  `materialService.js`, y cambian juntas) y por tipo al confirmar. Los puntos y
   espacios finales se ignoran (`virus.exe.` cuenta como `.exe`). Un `.zip` se
   acepta: su contenido no se revisa.
 - **Términos firmados (#62):** solo el administrador los sube, consulta,
   reemplaza o borra. El alumno no puede dar por firmada su propia autorización.
 - **Videos:** no se suben; son enlaces de Google Drive (`kind = 'video_link'`).
 - Las tablas de preguntas (#30) y de términos (#62) deben ligar sus filas a estas
-  rutas. En reactivos, #30 debe limitar a cada profesor a los cursos que imparte
-  (hoy cualquier profesor reemplaza o borra cualquier reactivo) y abrir la
-  lectura al alumno durante su intento.
+  rutas. En reactivos, un PR de seguimiento posterior a #74 liga las políticas a
+  `questions.media_path`: limita a cada profesor a los cursos que imparte (hoy
+  cualquier profesor reemplaza o borra cualquier reactivo) y abre la lectura al
+  alumno durante su intento.
 
 ## Flujo de un archivo de material
 
@@ -40,6 +43,8 @@ Un material con archivo no puede quedar publicado sin confirmar (`file_version =
 Los metadatos del archivo solo los escribe esa función.
 
 **Reemplazar:** se sube a la misma ruta con `upsert` y se vuelve a confirmar.
+El archivo nuevo debe tener la misma extensión que el anterior: como conserva el
+nombre, un Word guardado como `guia.pdf` no abriría.
 El bucket no guarda versiones, así que el archivo anterior desaparece. La ruta
 no se puede cambiar.
 
@@ -92,7 +97,9 @@ npm run respaldo:storage -- /ruta/de/respaldos      # crea storage-<fecha>/
 Cada respaldo es una carpeta `storage-<fecha>/` con un subdirectorio por bucket
 y un `manifiesto.json` con ruta, tipo, tamaño y sha256 de cada archivo. Al
 terminar se borran los respaldos más antiguos y se conservan los últimos
-`RESPALDO_RETENER` (por omisión 14).
+`RESPALDO_RETENER` (por omisión 14). El manifiesto se escribe al final: una
+carpeta sin `manifiesto.json` es un respaldo que falló, no cuenta para la poda y
+se puede borrar a mano después de revisar el log.
 
 ### Copia periódica
 

@@ -29,9 +29,10 @@ set search_path = ''
 as $$
   select coalesce(
     lower(substring(rtrim(object_name, '. ') from '\.([^./]+)$')) = any (array[
-      'exe', 'msi', 'bat', 'cmd', 'com', 'scr', 'pif', 'cpl', 'ps1', 'vbs', 'vbe',
-      'wsf', 'sh', 'bash', 'command', 'app', 'dmg', 'pkg', 'deb', 'rpm', 'apk',
-      'jar', 'dll', 'so', 'elf', 'run', 'bin'
+      'exe', 'msi', 'msp', 'msix', 'msixbundle', 'appx', 'appxbundle', 'bat', 'cmd',
+      'com', 'scr', 'pif', 'cpl', 'gadget', 'hta', 'lnk', 'scf', 'reg', 'ps1', 'psm1',
+      'vbs', 'vbe', 'js', 'jse', 'ws', 'wsf', 'wsh', 'sh', 'bash', 'command', 'app',
+      'dmg', 'pkg', 'deb', 'rpm', 'apk', 'jar', 'dll', 'so', 'elf', 'run', 'bin'
     ]),
     false
   )
@@ -51,7 +52,8 @@ as $$
     'application/java-archive', 'application/x-java-archive',
     'application/vnd.android.package-archive', 'application/x-apple-diskimage',
     'application/x-newton-compatible-pkg', 'application/vnd.debian.binary-package',
-    'application/x-rpm'
+    'application/x-rpm', 'application/hta', 'application/x-ms-shortcut',
+    'application/x-ms-installer', 'application/msix', 'application/appx'
   ]), false)
 $$;
 
