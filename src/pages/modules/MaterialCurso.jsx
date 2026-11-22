@@ -1,16 +1,19 @@
 // Material con datos reales de Supabase (#34), para maestro y administrador.
 // Los archivos (PDF, Word) llegan con Storage (#28); por ahora, enlaces.
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronDown, ExternalLink, Link2, Pencil, Play, Plus } from 'lucide-react';
+import { Archive, ChevronDown, ExternalLink, Link2, Pencil, Play, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
   addLink,
   archiveSession,
+  archiveTopic,
   createSession,
+  createTopic,
   enlaceSeguro,
   listMaterialCourses,
   listModuleSessions,
   renameSession,
+  renameTopic,
   retireMaterial,
 } from '../../lib/materialService';
 import { Aviso } from '../../components/rediseno/Aviso';
@@ -19,7 +22,7 @@ import DialogoConfirmacion from '../../components/rediseno/DialogoConfirmacion';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
 import Pestanas from '../../components/rediseno/Pestanas';
 import SelectorAreas from '../../components/rediseno/SelectorAreas';
-import { ModalEnlace, ModalNombreClase } from './ModalesMaterial';
+import { ModalEnlace, ModalNombreClase, ModalNombreTema } from './ModalesMaterial';
 
 const CLASE_SELECT =
   'rounded-[10px] bg-space-navy/50 border border-white/10 px-4 py-2.5 text-sm text-white font-body ' +
@@ -139,6 +142,39 @@ function TarjetaClase({ clase, numero, esAdmin, onAbrir }) {
   );
 }
 
+function SeccionTema({ tema, esAdmin, onAbrir }) {
+  const total = tema.sessions.length;
+  const ayudaId = `tema-${tema.id}-ayuda`;
+  return (
+    <section aria-labelledby={`tema-${tema.id}`} className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <h3 id={`tema-${tema.id}`} className="m-0 flex-1 min-w-[160px] font-display text-lg font-bold text-white">
+          {tema.title}
+          <span className="ml-2 text-sm font-normal text-white/60">{total} clase{total === 1 ? '' : 's'}</span>
+        </h3>
+        <Boton size="sm" variant="ghost" onClick={() => onAbrir('renombrarTema', { tema })} aria-label={`Renombrar tema ${tema.title}`}>
+          <Pencil size={14} aria-hidden="true" /> Renombrar
+        </Boton>
+        <Boton
+          size="sm"
+          variant="ghost"
+          disabled={total > 0}
+          aria-describedby={total > 0 ? ayudaId : undefined}
+          onClick={() => onAbrir('archivarTema', { tema })}
+          aria-label={`Archivar tema ${tema.title}`}
+        >
+          <Archive size={14} aria-hidden="true" /> Archivar
+        </Boton>
+        {total > 0 && <span id={ayudaId} className="sr-only">Para archivarlo, primero retira sus clases.</span>}
+      </div>
+      {total === 0 && <p className="m-0 text-sm text-white/60">Este tema todavía no tiene clases.</p>}
+      {tema.sessions.map((clase, i) => (
+        <TarjetaClase key={clase.id} clase={clase} numero={i + 1} esAdmin={esAdmin} onAbrir={onAbrir} />
+      ))}
+    </section>
+  );
+}
+
 function confirmacionDe(dialogo) {
   if (dialogo?.tipo === 'retirar') {
     return {
@@ -146,6 +182,7 @@ function confirmacionDe(dialogo) {
       mensaje: `Los alumnos dejarán de ver "${dialogo.material.title}".`,
       accion: () => retireMaterial(dialogo.material.id, dialogo.material.storagePath),
       exito: 'Material retirado.',
+      textoConfirmar: 'Retirar',
     };
   }
   if (dialogo?.tipo === 'archivar') {
@@ -154,12 +191,22 @@ function confirmacionDe(dialogo) {
       mensaje: `Los alumnos dejarán de ver "${dialogo.clase.title}" y todo su material.`,
       accion: () => archiveSession(dialogo.clase.id),
       exito: 'Clase retirada.',
+      textoConfirmar: 'Retirar',
+    };
+  }
+  if (dialogo?.tipo === 'archivarTema') {
+    return {
+      titulo: 'Archivar tema',
+      mensaje: `"${dialogo.tema.title}" dejará de aparecer en el módulo.`,
+      accion: () => archiveTopic(dialogo.tema.id),
+      exito: 'Tema archivado.',
+      textoConfirmar: 'Archivar',
     };
   }
   return null;
 }
 
-function PanelModulo({ modulo }) {
+function PanelModulo({ modulo, cursoId }) {
   const { user } = useAuth();
   const esAdmin = user?.role === 'admin';
   const cargar = useCallback(() => listModuleSessions(modulo.id), [modulo.id]);
@@ -169,10 +216,12 @@ function PanelModulo({ modulo }) {
   const [guardando, setGuardando] = useState(false);
   const [aviso, setAviso] = useState(null);
 
+  // TarjetaClase llama onAbrir(tipo, clase, material); los temas, onAbrir(tipo, { tema }).
   function abrir(tipo, clase = null, material = null) {
     setErrorDialogo('');
     setAviso(null);
-    setDialogo({ tipo, clase, material });
+    if (clase?.tema) setDialogo({ tipo, tema: clase.tema });
+    else setDialogo({ tipo, clase, material });
   }
 
   const cerrar = useCallback(() => setDialogo(null), []);
@@ -207,29 +256,56 @@ function PanelModulo({ modulo }) {
   }
 
   const clases = datos?.sessions ?? [];
+  const temas = datos?.topics ?? [];
   const propsDialogo = { guardando, error: errorDialogo, onCerrar: cerrar };
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <p className="m-0 text-sm text-white/70">Tus alumnos ven el material publicado en solo lectura.</p>
-        <Boton size="sm" variant="primario" disabled={cargando || Boolean(error)} onClick={() => abrir('nueva')}>
-          <Plus size={14} aria-hidden="true" /> Nueva clase
-        </Boton>
+        <div className="flex gap-2 flex-wrap">
+          <Boton size="sm" variant="secundario" disabled={cargando || Boolean(error)} onClick={() => abrir('nuevoTema')}>
+            <Plus size={14} aria-hidden="true" /> Nuevo tema
+          </Boton>
+          <Boton size="sm" variant="primario" disabled={cargando || Boolean(error)} onClick={() => abrir('nueva')}>
+            <Plus size={14} aria-hidden="true" /> Nueva clase
+          </Boton>
+        </div>
       </div>
       {aviso && <Aviso tipo={aviso.tipo} mensaje={aviso.mensaje} onCerrar={() => setAviso(null)} />}
       <EstadoCarga cargando={cargando} error={error} onReintentar={recargar} />
-      {!cargando && !error && clases.length === 0 && (
-        <EstadoVacio titulo="Sin clases" descripcion={`${modulo.title} todavía no tiene clases. Crea la primera.`} />
+      {!cargando && !error && clases.length === 0 && temas.length === 0 && (
+        <EstadoVacio
+          titulo="Sin clases"
+          descripcion={`${modulo.title} todavía no tiene clases. Crea la primera; si no eliges tema, queda en "General".`}
+        />
       )}
-      {!cargando && !error && clases.map((clase, i) => (
-        <TarjetaClase key={clase.id} clase={clase} numero={i + 1} esAdmin={esAdmin} onAbrir={abrir} />
+      {!cargando && !error && temas.map(tema => (
+        <SeccionTema key={tema.id} tema={tema} esAdmin={esAdmin} onAbrir={abrir} />
       ))}
 
       {dialogo?.tipo === 'nueva' && (
         <ModalNombreClase
           nombreModulo={modulo.title}
-          onGuardar={nombre => ejecutar(() => createSession(modulo.id, nombre, datos.nextPosition), 'Clase creada.')}
+          temas={temas}
+          onGuardar={(nombre, temaId) => ejecutar(() => createSession(modulo.id, nombre, datos.nextPosition, temaId), 'Clase creada.')}
+          {...propsDialogo}
+        />
+      )}
+      {dialogo?.tipo === 'nuevoTema' && (
+        <ModalNombreTema
+          nombreModulo={modulo.title}
+          onGuardar={nombre => ejecutar(
+            () => createTopic({ courseId: cursoId, moduleId: modulo.id }, nombre, datos.nextTopicPosition),
+            'Tema creado.',
+          )}
+          {...propsDialogo}
+        />
+      )}
+      {dialogo?.tipo === 'renombrarTema' && (
+        <ModalNombreTema
+          tema={dialogo.tema}
+          onGuardar={nombre => ejecutar(() => renameTopic(dialogo.tema.id, nombre), 'Tema renombrado.')}
           {...propsDialogo}
         />
       )}
@@ -252,7 +328,7 @@ function PanelModulo({ modulo }) {
         tono="danger"
         titulo={confirmacion?.titulo ?? ''}
         mensaje={confirmacion?.mensaje ?? ''}
-        textoConfirmar="Retirar"
+        textoConfirmar={confirmacion?.textoConfirmar ?? 'Retirar'}
         onConfirmar={confirmar}
         onCancelar={cerrar}
       />
@@ -273,7 +349,7 @@ function ContenidoCurso({ curso }) {
         <SelectorAreas modulos={curso.modules} />
         {curso.modules.map(m => (
           <Pestanas.Panel key={m.id} valor={m.id}>
-            {m.id === moduloId && <PanelModulo modulo={m} />}
+            {m.id === moduloId && <PanelModulo modulo={m} cursoId={curso.id} />}
           </Pestanas.Panel>
         ))}
       </div>

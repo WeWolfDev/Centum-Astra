@@ -118,8 +118,15 @@ describe('grupos', () => {
     await createGroup({ courseId: 'c1', name: ' Grupo A ', code: ' a1 ', schedule: ' Domingos, 9:00 a 13:00 ' });
     expect(fake.consultas[0].tabla).toBe('groups');
     expect(llamada(fake.consultas[0], 'insert')[0]).toEqual({
-      course_id: 'c1', name: 'Grupo A', code: 'a1', schedule: 'Domingos, 9:00 a 13:00',
+      course_id: 'c1', name: 'Grupo A', code: 'a1', schedule: 'Domingos, 9:00 a 13:00', generation: null,
     });
+  });
+
+  test('guarda la generación del grupo y limita su largo', async () => {
+    await createGroup({ courseId: 'c1', name: 'A', code: 'A', schedule: 'S', generation: ' 2027 ' });
+    expect(llamada(fake.consultas[0], 'insert')[0]).toMatchObject({ generation: '2027' });
+    await expect(createGroup({ courseId: 'c1', name: 'A', code: 'A', schedule: 'S', generation: 'x'.repeat(61) }))
+      .rejects.toThrow('La generación admite hasta 60 caracteres.');
   });
 
   test('pide nombre, código y horario', async () => {

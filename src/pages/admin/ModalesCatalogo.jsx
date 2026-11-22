@@ -76,17 +76,26 @@ export function ModalGrupo({ grupo, guardando, error, onGuardar, onCerrar }) {
   const [name, setName] = useState(grupo?.name ?? '');
   const [code, setCode] = useState(grupo?.code ?? '');
   const [schedule, setSchedule] = useState(grupo?.schedule ?? '');
+  const [generation, setGeneration] = useState(grupo?.generation ?? '');
 
   return (
     <Formulario
       titulo={grupo ? 'Editar grupo' : 'Nuevo grupo'}
       onCerrar={onCerrar}
-      onEnviar={() => onGuardar({ name, code, schedule })}
+      onEnviar={() => onGuardar({ name, code, schedule, generation })}
     >
       <div className="grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-3">
         <Input id="grupo-nombre" label="Nombre del grupo" value={name} onChange={e => setName(e.target.value)} required />
         <Input id="grupo-codigo" label="Código" value={code} onChange={e => setCode(e.target.value)} required />
       </div>
+      <Input
+        id="grupo-generacion"
+        label="Generación (opcional)"
+        placeholder="Por ejemplo, 2027"
+        maxLength={60}
+        value={generation}
+        onChange={e => setGeneration(e.target.value)}
+      />
       <div className="flex flex-col gap-2">
         <Input id="grupo-horario" label="Horario" value={schedule} onChange={e => setSchedule(e.target.value)} required />
         <div className="flex flex-wrap gap-2" aria-label="Horarios sugeridos">

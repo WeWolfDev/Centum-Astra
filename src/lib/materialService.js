@@ -11,6 +11,7 @@ const CHECK_VIOLATION = '23514';
 const FILE_NOT_CONFIRMED = 'CA002';
 const EXECUTABLE_FILE = 'CA003';
 const FILE_UNAVAILABLE = 'CA004';
+const TOPIC_NOT_EMPTY = 'CA031';
 
 const BUCKET = 'materiales';
 export const MAX_FILE_BYTES = 50 * 1024 * 1024;
@@ -35,6 +36,7 @@ function mensajeDeError(error) {
   if (error?.code === EXECUTABLE_FILE) return 'No se permiten archivos ejecutables.';
   if (error?.code === FILE_NOT_CONFIRMED) return 'El archivo no terminó de subirse. Intenta de nuevo.';
   if (error?.code === FILE_UNAVAILABLE) return 'Este archivo ya no está disponible.';
+  if (error?.code === TOPIC_NOT_EMPTY) return 'Mueve o retira sus clases antes de archivar el tema.';
   return ACTION_ERROR;
 }
 
@@ -94,35 +96,49 @@ function toMaterial(m) {
 }
 
 /**
- * Clases activas del módulo con su material vigente. `nextPosition` cuenta
- * también las archivadas, porque la posición es única por módulo.
+ * Temas activos del módulo con sus clases activas y su material vigente.
+ * `sessions` sigue plano para quien no agrupa por tema. `nextPosition` cuenta
+ * también las clases archivadas, porque la posición es única por módulo.
  */
 export async function listModuleSessions(moduleId) {
-  const { data, error } = await supabase
-    .from('sessions')
-    .select('id, title, position, status, materials(id, title, kind, external_url, storage_path, file_name, file_size, status, created_by, created_at)')
-    .eq('module_id', moduleId)
-    .order('position');
-  if (error) throw new Error(LOAD_ERROR);
-  const nextPosition = data.reduce((max, s) => Math.max(max, s.position + 1), 0);
-  const sessions = data
+  const [temas, clases] = await Promise.all([
+    supabase.from('topics').select('id, title, position, status').eq('module_id', moduleId).order('position'),
+    supabase
+      .from('sessions')
+      .select('id, title, position, status, topic_id, materials(id, title, kind, external_url, storage_path, file_name, file_size, status, created_by, created_at)')
+      .eq('module_id', moduleId)
+      .order('position'),
+  ]);
+  if (temas.error || clases.error) throw new Error(LOAD_ERROR);
+
+  const nextPosition = clases.data.reduce((max, s) => Math.max(max, s.position + 1), 0);
+  const nextTopicPosition = temas.data.reduce((max, t) => Math.max(max, t.position + 1), 0);
+  const sessions = clases.data
     .filter(s => s.status === 'active')
     .map(s => ({
       id: s.id,
       title: s.title,
+      topicId: s.topic_id,
       materials: [...(s.materials ?? [])]
         .filter(m => m.status !== 'archived')
         .sort((a, b) => a.created_at.localeCompare(b.created_at))
         .map(toMaterial),
     }));
-  return { sessions, nextPosition };
+  const topics = temas.data
+    .filter(t => t.status === 'active')
+    .sort((a, b) => a.position - b.position || a.title.localeCompare(b.title, 'es'))
+    .map(t => ({ id: t.id, title: t.title, sessions: sessions.filter(s => s.topicId === t.id) }));
+  return { topics, sessions, nextPosition, nextTopicPosition };
 }
 
 // ── Escritura ────────────────────────────────────────────────────────────────
 
-export async function createSession(moduleId, title, position) {
+/** Sin `topicId`, la base la deja en el tema General del módulo. */
+export async function createSession(moduleId, title, position, topicId = null) {
   const nombre = exigir(title, 'Agrega un nombre a la clase.');
-  return ejecutar(supabase.from('sessions').insert({ module_id: moduleId, title: nombre, position }));
+  return ejecutar(
+    supabase.from('sessions').insert({ module_id: moduleId, title: nombre, position, topic_id: topicId }),
+  );
 }
 
 export async function renameSession(sessionId, title) {
@@ -135,6 +151,29 @@ export async function renameSession(sessionId, title) {
 export async function archiveSession(sessionId) {
   return ejecutar(
     supabase.from('sessions').update({ status: 'archived', updated_at: new Date().toISOString() }).eq('id', sessionId),
+  );
+}
+
+// ── Temas ────────────────────────────────────────────────────────────────────
+
+export async function createTopic({ courseId, moduleId }, title, position) {
+  const nombre = exigir(title, 'Agrega un nombre al tema.');
+  return ejecutar(
+    supabase.from('topics').insert({ course_id: courseId, module_id: moduleId, title: nombre, position }),
+  );
+}
+
+export async function renameTopic(topicId, title) {
+  const nombre = exigir(title, 'Agrega un nombre al tema.');
+  return ejecutar(
+    supabase.from('topics').update({ title: nombre, updated_at: new Date().toISOString() }).eq('id', topicId),
+  );
+}
+
+/** La base lo rechaza (CA031) si el tema todavía tiene clases activas. */
+export async function archiveTopic(topicId) {
+  return ejecutar(
+    supabase.from('topics').update({ status: 'archived', updated_at: new Date().toISOString() }).eq('id', topicId),
   );
 }
 

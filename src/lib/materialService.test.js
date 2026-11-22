@@ -4,6 +4,7 @@ const fake = vi.hoisted(() => {
   const calls = { insert: [], update: [], filtros: [], rpc: [], storage: [] };
   const respuestas = {
     lectura: { data: [], error: null },
+    porTabla: {},
     escritura: { error: null },
     rpc: {},
     storage: { upload: { error: null }, remove: { error: null }, createSignedUrl: { data: { signedUrl: 'https://firmada' }, error: null } },
@@ -17,7 +18,7 @@ const fake = vi.hoisted(() => {
     return chain;
   };
   const from = vi.fn(tabla => ({
-    select: () => cadena(() => respuestas.lectura),
+    select: () => cadena(() => respuestas.porTabla[tabla] ?? respuestas.lectura),
     insert: fila => { calls.insert.push([tabla, fila]); return Promise.resolve(respuestas.escritura); },
     update: cambios => { calls.update.push([tabla, cambios]); return cadena(() => respuestas.escritura); },
   }));
@@ -40,6 +41,7 @@ vi.mock('./supabaseClient', () => ({ supabase: fake.supabase }));
 const {
   addFile, addLink, archiveSession, createSession, dismissFileNotice, enlaceSeguro, esEjecutable, listFileNotices,
   listMaterialCourses, listModuleSessions, nombreSeguro, openFile, renameSession, replaceFile, retireMaterial,
+  archiveTopic, createTopic, renameTopic,
 } = await import('./materialService');
 
 beforeEach(() => {
@@ -49,6 +51,7 @@ beforeEach(() => {
   fake.calls.rpc.length = 0;
   fake.calls.storage.length = 0;
   fake.respuestas.lectura = { data: [], error: null };
+  fake.respuestas.porTabla = {};
   fake.respuestas.escritura = { error: null };
   fake.respuestas.rpc = {};
   fake.respuestas.storage.upload = { error: null };
@@ -91,6 +94,7 @@ describe('listMaterialCourses', () => {
 
 describe('listModuleSessions', () => {
   test('devuelve clases activas, material vigente en orden y la siguiente posición', async () => {
+    fake.respuestas.porTabla.topics = { data: [], error: null };
     fake.respuestas.lectura.data = [
       {
         id: 's1', title: 'Clase 1', position: 0, status: 'active',
@@ -110,11 +114,38 @@ describe('listModuleSessions', () => {
       { id: 'a', title: 'Primero', kind: 'video_link', url: 'https://a', status: 'published', createdBy: 'u' },
       { id: 'b', title: 'Segundo', kind: 'external_link', url: 'https://b', status: 'published', createdBy: 'u' },
     ]);
-    expect(fake.calls.filtros).toEqual([['module_id', 'm1']]);
+    expect(fake.calls.filtros).toEqual([['module_id', 'm1'], ['module_id', 'm1']]);
+  });
+
+  test('agrupa las clases por tema activo, en orden', async () => {
+    fake.respuestas.porTabla.topics = {
+      data: [
+        { id: 't2', title: 'Geometría', position: 1, status: 'active' },
+        { id: 't1', title: 'Álgebra', position: 0, status: 'active' },
+        { id: 't3', title: 'Viejo', position: 5, status: 'archived' },
+      ],
+      error: null,
+    };
+    fake.respuestas.porTabla.sessions = {
+      data: [
+        { id: 's1', title: 'Ecuaciones', position: 0, status: 'active', topic_id: 't1', materials: [] },
+        { id: 's2', title: 'Triángulos', position: 1, status: 'active', topic_id: 't2', materials: [] },
+        { id: 's3', title: 'Polinomios', position: 2, status: 'active', topic_id: 't1', materials: [] },
+      ],
+      error: null,
+    };
+
+    const { topics, nextTopicPosition } = await listModuleSessions('m1');
+
+    expect(topics.map(t => [t.title, t.sessions.map(s => s.title)])).toEqual([
+      ['Álgebra', ['Ecuaciones', 'Polinomios']],
+      ['Geometría', ['Triángulos']],
+    ]);
+    expect(nextTopicPosition).toBe(6);
   });
 
   test('un módulo sin clases empieza en la posición 0', async () => {
-    await expect(listModuleSessions('m1')).resolves.toEqual({ sessions: [], nextPosition: 0 });
+    await expect(listModuleSessions('m1')).resolves.toEqual({ topics: [], sessions: [], nextPosition: 0, nextTopicPosition: 0 });
   });
 
   test('informa un error de carga', async () => {
@@ -123,10 +154,32 @@ describe('listModuleSessions', () => {
   });
 });
 
+describe('temas', () => {
+  test('crea, renombra y archiva un tema', async () => {
+    await createTopic({ courseId: 'c1', moduleId: 'm1' }, '  Álgebra ', 2);
+    await renameTopic('t1', 'Álgebra básica');
+    await archiveTopic('t1');
+    expect(fake.calls.insert).toEqual([['topics', { course_id: 'c1', module_id: 'm1', title: 'Álgebra', position: 2 }]]);
+    expect(fake.calls.update[0]).toEqual(['topics', expect.objectContaining({ title: 'Álgebra básica' })]);
+    expect(fake.calls.update[1]).toEqual(['topics', expect.objectContaining({ status: 'archived' })]);
+  });
+
+  test('exige nombre y explica por qué no se archiva un tema con clases', async () => {
+    await expect(createTopic({ courseId: 'c1', moduleId: 'm1' }, ' ', 0)).rejects.toThrow('Agrega un nombre al tema.');
+    await expect(renameTopic('t1', '')).rejects.toThrow('Agrega un nombre al tema.');
+    fake.respuestas.escritura = { error: { code: 'CA031' } };
+    await expect(archiveTopic('t1')).rejects.toThrow('Mueve o retira sus clases antes de archivar el tema.');
+  });
+});
+
 describe('clases', () => {
   test('crea una clase con nombre limpio y posición', async () => {
-    await createSession('m1', '  Clase nueva ', 3);
-    expect(fake.calls.insert).toEqual([['sessions', { module_id: 'm1', title: 'Clase nueva', position: 3 }]]);
+    await createSession('m1', '  Clase nueva ', 3, 't1');
+    await createSession('m1', 'Sin tema', 4);
+    expect(fake.calls.insert).toEqual([
+      ['sessions', { module_id: 'm1', title: 'Clase nueva', position: 3, topic_id: 't1' }],
+      ['sessions', { module_id: 'm1', title: 'Sin tema', position: 4, topic_id: null }],
+    ]);
   });
 
   test('exige nombre', async () => {
