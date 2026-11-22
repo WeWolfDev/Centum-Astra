@@ -61,8 +61,18 @@ describe('construirMensaje', () => {
     expect(texto).not.toContain('Tarea 1');
   });
 
+  // GitHub solo llena closingIssuesReferences si el PR apunta a main.
+  it.each(['Closes #1', 'fixes #1', 'Resolved: #1'])('cuenta como en PR el de un PR encadenado que dice %s', body => {
+    expect(mensaje([issue(1)], [pr(9, { body })])).not.toContain('Tarea 1');
+  });
+
+  it('no cuenta como en PR una simple mención', () => {
+    const texto = mensaje([issue(1), issue(12)], [pr(9, { body: 'Parte de #1. Closes #123' })]);
+    expect(texto).toContain('2 para avanzar');
+  });
+
   it('ignora los PRs ajenos al equipo, también para ocultar issues', () => {
-    const ajeno = pr(9, { author: { login: 'intruso' }, closingIssuesReferences: [{ number: 1 }] });
+    const ajeno = pr(9, { author: { login: 'intruso' }, body: 'Closes #1', closingIssuesReferences: [{ number: 1 }] });
     const texto = mensaje([issue(1)], [ajeno]);
     expect(texto).toContain('Tarea 1');
     expect(texto).not.toContain('Cambio 9');
