@@ -9,7 +9,8 @@ Indicadores de los paneles (#31). Los calculan funciones de PostgreSQL de solo l
   - **Quizzes:** promedio de porcentajes, de 0 a 100.
   - **Simuladores y cuestionarios:** promedio de puntaje estimado, de 700 a 1300. No es un resultado oficial de Ceneval.
 - **Sin datos no es cero.** Si no hay intentos, el promedio llega vacío (`null`) y el conteo en 0. La pantalla debe decir "sin resultados", no "0 %".
-- **Periodo.** Todas las funciones aceptan un periodo `[desde, hasta)`: incluye `desde` y excluye `hasta`, según la fecha de entrega del intento. Sin periodo se usa todo el historial. Dentro de un periodo cuenta el mejor intento de ese periodo. El administrador elige el periodo; el maestro y el alumno ven todo el curso.
+- **Periodo.** Todas las funciones aceptan un periodo `[desde, hasta)`: incluye `desde` y excluye `hasta`, según la fecha de entrega del intento. Sin periodo se usan todos los intentos guardados. Dentro de un periodo cuenta el mejor de los intentos guardados en ese periodo. El administrador elige el periodo; el maestro y el alumno ven todo el curso.
+- **El periodo no recupera intentos borrados.** Por decisión del cliente (1.10) solo se guardan el mejor y el último intento de cada alumno en cada evaluación. Si un alumno sacó 60 % el 1 de noviembre y 90 % el 10, el de 60 % ya no existe: un periodo que solo abarca la primera semana de noviembre no lo muestra. Los periodos sirven para ver lo que se entregó en esas fechas entre lo que se conserva, no como historial completo.
 - **Permisos.** Cada función lee los intentos con los permisos de quien la llama: el alumno solo los suyos, el maestro los de los alumnos de sus grupos y el administrador todos. Un alumno que no le corresponde da resultados vacíos, no un error.
 - **Grupo actual.** Un alumno pertenece a un solo grupo. Sus resultados cuentan en el grupo al que pertenece hoy, aunque los haya obtenido antes de un cambio de grupo.
 

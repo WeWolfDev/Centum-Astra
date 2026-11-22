@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(22);
+select plan(23);
 
 -- ── Datos de prueba ──────────────────────────────────────────────────────────
 -- 1 admin · 2 profe del grupo 1 · 3 profe del grupo 2 · 4 y 5 alumnos del grupo 1 · 6 alumno del grupo 2
@@ -45,18 +45,21 @@ insert into public.evaluations (id, course_id, module_id, kind, title, time_limi
   ('b5000000-0000-0000-0000-000000000003', 'b1000000-0000-0000-0000-000000000001', null, 'simulador', 'Simulador', 120, 'b0000000-0000-0000-0000-000000000001'),
   ('b5000000-0000-0000-0000-000000000004', 'b1000000-0000-0000-0000-000000000001', 'b3000000-0000-0000-0000-000000000001', 'cuestionario', 'Cuestionario', null, 'b0000000-0000-0000-0000-000000000001');
 
--- Ana: quiz 1 con 60 % (1 nov) y 90 % (10 nov, el mejor), quiz 2 con 50 %,
--- simulador 1000 y cuestionario 1200. Beto: quiz 1 con 70 %. Caro (grupo 2):
--- quiz 1 con 100 % y simulador 1300. Un intento en curso no cuenta.
+-- Solo se guardan el mejor y el último intento (keep_best_and_last), así que
+-- los datos imitan eso. Ana: quiz 1 con 90 % (1 nov, el mejor) y 60 % (10 nov,
+-- el último), quiz 2 con 50 %, simulador 1000 y cuestionario 1200. Beto: quiz 1
+-- con 70 % (11 nov, el mejor) y 40 % (16 nov, el último). Caro (grupo 2): quiz 1
+-- con 100 % y simulador 1300. Un intento en curso no cuenta.
 insert into public.attempts
   (evaluation_id, student_id, status, started_at, finished_at, total_questions, correct_count, percent, score, duration_seconds, is_best)
 values
-  ('b5000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000004', 'submitted', '2026-11-01 10:00-06', '2026-11-01 10:10-06', 10, 6, 60, null, 600, false),
-  ('b5000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000004', 'submitted', '2026-11-10 10:00-06', '2026-11-10 10:10-06', 10, 9, 90, null, 600, true),
+  ('b5000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000004', 'submitted', '2026-11-01 10:00-06', '2026-11-01 10:10-06', 10, 9, 90, null, 600, true),
+  ('b5000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000004', 'submitted', '2026-11-10 10:00-06', '2026-11-10 10:10-06', 10, 6, 60, null, 600, false),
   ('b5000000-0000-0000-0000-000000000002', 'b0000000-0000-0000-0000-000000000004', 'submitted', '2026-11-12 10:00-06', '2026-11-12 10:10-06', 10, 5, 50, null, 600, true),
   ('b5000000-0000-0000-0000-000000000003', 'b0000000-0000-0000-0000-000000000004', 'expired',   '2026-11-05 08:00-06', '2026-11-05 10:00-06', 10, 5, 50, 1000, 7200, true),
   ('b5000000-0000-0000-0000-000000000004', 'b0000000-0000-0000-0000-000000000004', 'submitted', '2026-11-15 10:00-06', '2026-11-15 11:00-06', 6, 5, 83.33, 1200, 3600, true),
   ('b5000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000005', 'submitted', '2026-11-11 10:00-06', '2026-11-11 10:10-06', 10, 7, 70, null, 600, true),
+  ('b5000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000005', 'submitted', '2026-11-16 10:00-06', '2026-11-16 10:10-06', 10, 4, 40, null, 600, false),
   ('b5000000-0000-0000-0000-000000000001', 'b0000000-0000-0000-0000-000000000006', 'submitted', '2026-11-11 10:00-06', '2026-11-11 10:10-06', 10, 10, 100, null, 600, true),
   ('b5000000-0000-0000-0000-000000000003', 'b0000000-0000-0000-0000-000000000006', 'submitted', '2026-11-13 08:00-06', '2026-11-13 09:00-06', 10, 10, 100, 1300, 3600, true);
 insert into public.attempts (evaluation_id, student_id, started_at) values
@@ -78,8 +81,8 @@ select results_eq(
 select results_eq(
   $$ select quiz_avg_percent, quiz_count, exam_avg_score, exam_count
      from public.student_stats(null, '2026-11-01 00:00-06', '2026-11-08 00:00-06') $$,
-  $$ values (60.00::numeric, 1, 1000, 1) $$,
-  'el periodo limita los intentos; dentro de él cuenta el mejor de ese periodo'
+  $$ values (90.00::numeric, 1, 1000, 1) $$,
+  'el periodo limita los intentos guardados; dentro de él cuenta el mejor de ese periodo'
 );
 select results_eq(
   $$ select title, percent, score from public.student_results() order by title $$,
@@ -112,6 +115,12 @@ select results_eq(
   $$ select full_name, quiz_avg_percent, exam_avg_score from public.group_student_stats('b2000000-0000-0000-0000-000000000001') $$,
   $$ values ('Ana'::text, 70.00::numeric, 1100), ('Beto', 70.00, null) $$,
   'el profesor ve las calificaciones de cada alumno de su grupo'
+);
+select is(
+  (select last_finished_at from public.group_student_stats('b2000000-0000-0000-0000-000000000001')
+   where full_name = 'Beto'),
+  '2026-11-16 10:10-06'::timestamptz,
+  'la última entrega es la del último intento, aunque no sea el mejor'
 );
 select is_empty(
   $$ select * from public.group_student_stats('b2000000-0000-0000-0000-000000000002') $$,
@@ -156,7 +165,7 @@ select results_eq(
 );
 select results_eq(
   $$ select group_name, quiz_count from public.group_stats('2026-11-12 00:00-06', null) where course_id = 'b1000000-0000-0000-0000-000000000001' $$,
-  $$ values ('Grupo 1'::text, 1), ('Grupo 2', 0) $$,
+  $$ values ('Grupo 1'::text, 2), ('Grupo 2', 0) $$,
   'las estadísticas de grupo respetan el periodo'
 );
 select is(

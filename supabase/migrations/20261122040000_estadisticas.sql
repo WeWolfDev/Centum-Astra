@@ -11,6 +11,9 @@
 -- Tipo, módulo y título de cada evaluación, aunque quien llama ya no la vea
 -- (por ejemplo, el alumno con una evaluación archivada): así su promedio es el
 -- mismo que ven su maestro y el administrador. No expone nada más.
+-- shortcut: lee todas las evaluaciones en cada llamada (una función SECURITY
+-- DEFINER no se integra al plan); filtrar por los evaluation_id de los intentos
+-- si llegan a ser miles.
 create function app_private.evaluation_meta()
 returns table (id uuid, kind text, module_id uuid, title text)
 language sql
@@ -175,7 +178,13 @@ as $$
          (count(b.evaluation_id) filter (where b.kind = 'quiz'))::integer,
          round(avg(b.score) filter (where b.kind <> 'quiz'))::integer,
          (count(b.evaluation_id) filter (where b.kind <> 'quiz'))::integer,
-         max(b.finished_at)
+         -- Última entrega de cualquier intento, no solo de los mejores.
+         (select max(a.finished_at)
+          from public.attempts a
+          where a.student_id = p.id
+            and a.status <> 'in_progress'
+            and (p_from is null or a.finished_at >= p_from)
+            and (p_to is null or a.finished_at < p_to))
   from public.groups g
   join public.group_students gs on gs.group_id = g.id
   join public.profiles p on p.id = gs.student_id
