@@ -6,7 +6,7 @@ set local search_path = public, extensions;
 -- revisar la política de borrado.
 set local storage.allow_delete_query = 'true';
 
-select plan(15);
+select plan(18);
 
 -- Mismo helper que storage.test.sql: sube o reemplaza como la API.
 create function pg_temp.subir(bucket text, ruta text, mime text, tamano bigint)
@@ -140,6 +140,11 @@ select is_empty(
   'el profesor de otro curso no borra reactivos'
 );
 select is_empty(
+  $$ update storage.objects set metadata = '{"mimetype": "image/png", "size": 9}'
+     where bucket_id = 'reactivos' and name = 'a7600000-0000-0000-0000-000000000011/figura.png' returning name $$,
+  'el profesor de otro curso no reemplaza un reactivo existente'
+);
+select is_empty(
   $$ select name from storage.objects where bucket_id = 'reactivos' $$,
   'el profesor de otro curso no ve los reactivos'
 );
@@ -162,6 +167,11 @@ select is_empty(
      and name = 'a7600000-0000-0000-0000-000000000011/figura.png' returning name $$,
   'el alumno no borra reactivos'
 );
+select is_empty(
+  $$ update storage.objects set metadata = '{"mimetype": "image/png", "size": 9}'
+     where bucket_id = 'reactivos' and name = 'a7600000-0000-0000-0000-000000000011/figura.png' returning name $$,
+  'el alumno no reemplaza un reactivo que sí puede ver'
+);
 reset role;
 
 -- ── Alumno sin el módulo ─────────────────────────────────────────────────────
@@ -172,6 +182,13 @@ select is_empty(
   'el alumno sin el módulo no ve los reactivos'
 );
 reset role;
+
+select is(
+  (select (metadata ->> 'size')::integer from storage.objects
+   where bucket_id = 'reactivos' and name = 'a7600000-0000-0000-0000-000000000011/figura.png'),
+  2,
+  'los reemplazos rechazados no cambiaron el archivo'
+);
 
 -- ── Administrador ────────────────────────────────────────────────────────────
 select pg_temp.como('a7000000-0000-0000-0000-000000000001');

@@ -41,6 +41,9 @@ $$;
 
 -- Sube, reemplaza o borra quien puede editar la evaluación, mientras no tenga
 -- intentos: igual que el resto de la pregunta (CA024).
+-- shortcut: no comparte candado con start_attempt; un reemplazo en el mismo
+-- instante en que empieza el primer intento puede pasar (igual que CA024 en
+-- las preguntas). Si importa, bloquear la fila de la evaluación en los dos.
 create function app_private.writes_question_object(object_name text)
 returns boolean
 language sql
