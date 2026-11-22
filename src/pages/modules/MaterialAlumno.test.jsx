@@ -135,6 +135,35 @@ describe('Material del alumno', () => {
     await waitFor(() => expect(fake.listModuleSessions).toHaveBeenLastCalledWith('m9'));
   });
 
+  test('abre el área que llega desde Inicio, aunque sea de otro curso', async () => {
+    fake.listMaterialCourses.mockResolvedValue([
+      ...CURSOS,
+      { id: 'c2', name: 'Curso de verano', modules: [{ id: 'm9', title: 'Lectora' }] },
+    ]);
+    render(<Modulos defaultModuleId="m9" />);
+    await waitFor(() => expect(fake.listModuleSessions).toHaveBeenCalledWith('m9'));
+    expect(fake.listModuleSessions).not.toHaveBeenCalledWith('m1');
+    expect(screen.getByLabelText('Curso')).toHaveValue('c2');
+  });
+
+  test('abre la segunda área si Inicio la pide', async () => {
+    render(<Modulos defaultModuleId="m2" />);
+    await waitFor(() => expect(fake.listModuleSessions).toHaveBeenCalledWith('m2'));
+    expect(screen.getByRole('tab', { name: /Premedicina/ })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  test('si no se pueden revisar los avisos, lo dice y permite reintentar', async () => {
+    fake.listFileNotices
+      .mockRejectedValueOnce(new Error('No pudimos cargar el material. Intenta de nuevo.'))
+      .mockResolvedValue(AVISOS);
+    render(<Modulos />);
+    const aviso = await screen.findByText(/No pudimos revisar si cambió tu material/);
+    expect(aviso).toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Reintentar avisos' }));
+    expect(await screen.findByText(/«Guía» fue reemplazado/)).toBeInTheDocument();
+    expect(screen.queryByText(/No pudimos revisar si cambió tu material/)).not.toBeInTheDocument();
+  });
+
   test('cambia de área', async () => {
     const usuario = userEvent.setup();
     render(<Modulos />);

@@ -172,7 +172,9 @@ export default function MaterialAlumno({ defaultModuleId = null }) {
   // Abrir un archivo registra la apertura: si tenía aviso de reemplazo, desaparece.
   const archivo = useAbrirArchivo({ onError: setError, onAbierto: () => avisos.recargar() });
 
-  const curso = cursos.datos?.find(c => c.id === cursoId) ?? cursos.datos?.[0];
+  // Si Inicio pidió un área, se abre el curso que la contiene.
+  const cursoDelModulo = cursos.datos?.find(c => c.modules.some(m => m.id === defaultModuleId));
+  const curso = cursos.datos?.find(c => c.id === cursoId) ?? cursoDelModulo ?? cursos.datos?.[0];
   const modulos = curso?.modules ?? [];
   const moduloActivo = modulos.some(m => m.id === moduloId) ? moduloId : modulos[0]?.id ?? null;
 
@@ -215,6 +217,16 @@ export default function MaterialAlumno({ defaultModuleId = null }) {
       </header>
 
       <AvisosDeMaterial avisos={avisos.datos} onCerrar={cerrarAviso} />
+      {avisos.error && (
+        <div role="alert" className="flex items-center gap-3 flex-wrap rounded-xl border border-peligro/30 bg-peligro/10 px-4 py-3 text-sm">
+          <p className="m-0 flex-1 min-w-[200px]" style={{ color: TINTA }}>
+            No pudimos revisar si cambió tu material que ya abriste.
+          </p>
+          <Boton size="sm" variant="secundario" onClick={() => { void avisos.recargar(); }} aria-label="Reintentar avisos">
+            Reintentar
+          </Boton>
+        </div>
+      )}
       {error && <Aviso tipo="error" mensaje={error} onCerrar={() => setError('')} />}
       {archivo.enlace && <AvisoEnlaceArchivo {...archivo.enlace} onCerrar={archivo.cerrarEnlace} />}
 
