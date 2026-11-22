@@ -206,6 +206,7 @@ Las automatizaciones mantienen el tablero al día sin trabajo manual. **Cada qui
 | A7 | Se abre o actualiza un PR hacia `main` | Corre **PR Check** (lint → test → build) | `.github/workflows/pr.yml` |
 | A8 | Se mergea un PR | Se borra la rama | Settings → General → *Automatically delete head branches* |
 | A9 | Un PR toca archivos con dueño | Se pide revisión al dueño | `.github/CODEOWNERS` |
+| A10 | Lunes a viernes, cerca de las 9:00 | Se publican los issues y PRs pendientes en Discord | `.github/workflows/recordatorio.yml` y el secreto `DISCORD_WEBHOOK_URL` |
 
 > **Mover a In Progress no está automatizado.** El asignado lo hace a mano al crear su rama.
 
