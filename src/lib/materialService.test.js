@@ -1,8 +1,13 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 const fake = vi.hoisted(() => {
-  const calls = { insert: [], update: [], filtros: [] };
-  const respuestas = { lectura: { data: [], error: null }, escritura: { error: null } };
+  const calls = { insert: [], update: [], filtros: [], rpc: [], storage: [] };
+  const respuestas = {
+    lectura: { data: [], error: null },
+    escritura: { error: null },
+    rpc: {},
+    storage: { upload: { error: null }, remove: { error: null }, createSignedUrl: { data: { signedUrl: 'https://firmada' }, error: null } },
+  };
   const cadena = respuesta => {
     const chain = {
       eq: (c, v) => { calls.filtros.push([c, v]); return chain; },
@@ -16,21 +21,39 @@ const fake = vi.hoisted(() => {
     insert: fila => { calls.insert.push([tabla, fila]); return Promise.resolve(respuestas.escritura); },
     update: cambios => { calls.update.push([tabla, cambios]); return cadena(() => respuestas.escritura); },
   }));
-  return { calls, respuestas, supabase: { from } };
+  const rpc = vi.fn((nombre, args) => {
+    calls.rpc.push([nombre, args]);
+    return Promise.resolve(respuestas.rpc[nombre] ?? { data: null, error: null });
+  });
+  const storage = {
+    from: bucket => ({
+      upload: (ruta, file, opciones) => { calls.storage.push(['upload', bucket, ruta, opciones]); return Promise.resolve(respuestas.storage.upload); },
+      remove: rutas => { calls.storage.push(['remove', bucket, rutas]); return Promise.resolve(respuestas.storage.remove); },
+      createSignedUrl: (ruta, segundos) => { calls.storage.push(['createSignedUrl', bucket, ruta, segundos]); return Promise.resolve(respuestas.storage.createSignedUrl); },
+    }),
+  };
+  return { calls, respuestas, supabase: { from, rpc, storage } };
 });
 
 vi.mock('./supabaseClient', () => ({ supabase: fake.supabase }));
 
 const {
-  addLink, archiveSession, createSession, enlaceSeguro, listMaterialCourses, listModuleSessions, renameSession, retireMaterial,
+  addFile, addLink, archiveSession, createSession, dismissFileNotice, enlaceSeguro, esEjecutable, listFileNotices,
+  listMaterialCourses, listModuleSessions, nombreSeguro, openFile, renameSession, replaceFile, retireMaterial,
 } = await import('./materialService');
 
 beforeEach(() => {
   fake.calls.insert.length = 0;
   fake.calls.update.length = 0;
   fake.calls.filtros.length = 0;
+  fake.calls.rpc.length = 0;
+  fake.calls.storage.length = 0;
   fake.respuestas.lectura = { data: [], error: null };
   fake.respuestas.escritura = { error: null };
+  fake.respuestas.rpc = {};
+  fake.respuestas.storage.upload = { error: null };
+  fake.respuestas.storage.remove = { error: null };
+  fake.respuestas.storage.createSignedUrl = { data: { signedUrl: 'https://firmada' }, error: null };
 });
 
 describe('enlaceSeguro', () => {
@@ -160,5 +183,133 @@ describe('retireMaterial', () => {
     await retireMaterial('mat1');
     expect(fake.calls.update[0]).toEqual(['materials', expect.objectContaining({ status: 'archived' })]);
     expect(fake.calls.filtros).toEqual([['id', 'mat1']]);
+    expect(fake.calls.storage).toEqual([]);
+  });
+
+  test('después de archivar borra el archivo', async () => {
+    await retireMaterial('mat1', 'mat1/guia.pdf');
+    expect(fake.calls.storage).toEqual([['remove', 'materiales', ['mat1/guia.pdf']]]);
+  });
+
+  test('si el archivo no se borra, lo informa', async () => {
+    fake.respuestas.storage.remove = { error: { message: 'x' } };
+    await expect(retireMaterial('mat1', 'mat1/guia.pdf')).rejects.toThrow(/no se pudo borrar/);
+  });
+});
+
+const pdf = (nombre = 'Guía de álgebra.pdf', size = 1024, type = 'application/pdf') => ({ name: nombre, size, type });
+
+describe('validación de archivos', () => {
+  test('reconoce ejecutables por extensión', () => {
+    expect(esEjecutable('setup.EXE')).toBe(true);
+    expect(esEjecutable('tareas.pdf.sh')).toBe(true);
+    expect(esEjecutable('virus.exe.')).toBe(true);
+    expect(esEjecutable('virus.exe . ')).toBe(true);
+    for (const nombre of ['tarea.js', 'a.jse', 'a.hta', 'acceso.lnk', 'a.reg', 'a.msp', 'a.msix', 'a.appx', 'a.scf', 'a.psm1', 'a.ws', 'a.wsh', 'a.gadget']) {
+      expect(esEjecutable(nombre)).toBe(true);
+    }
+    expect(esEjecutable('tareas.zip')).toBe(false);
+    expect(esEjecutable('LEEME')).toBe(false);
+  });
+
+  test('limpia el nombre para la ruta de Storage', () => {
+    expect(nombreSeguro('Guía de álgebra (1).pdf')).toBe('Guia-de-algebra-1-.pdf');
+    expect(nombreSeguro('...')).toBe('archivo');
+    expect(nombreSeguro('virus.exe. ')).toBe('virus.exe');
+  });
+});
+
+describe('addFile', () => {
+  test('registra el borrador, sube y confirma publicando', async () => {
+    await addFile('s1', { title: ' Guía ', file: pdf() }, 'u1');
+    const [tabla, fila] = fake.calls.insert[0];
+    expect(tabla).toBe('materials');
+    expect(fila).toMatchObject({ session_id: 's1', title: 'Guía', kind: 'document', status: 'draft', created_by: 'u1' });
+    expect(fila.storage_path).toBe(`${fila.id}/Guia-de-algebra.pdf`);
+    expect(fake.calls.storage).toEqual([
+      ['upload', 'materiales', fila.storage_path, { upsert: false, contentType: 'application/pdf' }],
+    ]);
+    expect(fake.calls.rpc).toEqual([['confirm_material_file', { target_material: fila.id, publish: true }]]);
+  });
+
+  test('una imagen se registra como imagen', async () => {
+    await addFile('s1', { title: 'Mapa', file: pdf('mapa.png', 10, 'image/png') }, 'u1');
+    expect(fake.calls.insert[0][1].kind).toBe('image');
+  });
+
+  test('rechaza ejecutables, archivos de más de 50 MB y la falta de archivo antes de tocar la base', async () => {
+    await expect(addFile('s1', { title: 'X', file: pdf('setup.exe') }, 'u1')).rejects.toThrow(/ejecutables/);
+    await expect(addFile('s1', { title: 'X', file: pdf('setup.exe.') }, 'u1')).rejects.toThrow(/ejecutables/);
+    await expect(addFile('s1', { title: 'X', file: pdf('a.pdf', 50 * 1024 * 1024 + 1) }, 'u1')).rejects.toThrow(/50 MB/);
+    await expect(addFile('s1', { title: 'X' }, 'u1')).rejects.toThrow('Elige un archivo.');
+    expect(fake.calls.insert).toHaveLength(0);
+  });
+
+  test('si la carga falla no se confirma ni se publica', async () => {
+    fake.respuestas.storage.upload = { error: { message: 'x' } };
+    await expect(addFile('s1', { title: 'Guía', file: pdf() }, 'u1')).rejects.toThrow(/subir el archivo/);
+    expect(fake.calls.rpc).toEqual([]);
+  });
+
+  test('traduce el rechazo de un ejecutable al confirmar', async () => {
+    fake.respuestas.rpc.confirm_material_file = { error: { code: 'CA003' } };
+    await expect(addFile('s1', { title: 'Guía', file: pdf('a.zip', 1, 'application/zip') }, 'u1')).rejects.toThrow(/ejecutables/);
+  });
+});
+
+describe('replaceFile', () => {
+  test('sobrescribe en la misma ruta y confirma sin cambiar el estado', async () => {
+    await replaceFile({ id: 'mat1', storagePath: 'mat1/guia.pdf' }, pdf('otra.pdf'));
+    expect(fake.calls.storage).toEqual([
+      ['upload', 'materiales', 'mat1/guia.pdf', { upsert: true, contentType: 'application/pdf' }],
+    ]);
+    expect(fake.calls.rpc).toEqual([['confirm_material_file', { target_material: 'mat1', publish: false }]]);
+  });
+
+  test('rechaza un archivo de otro formato sin subir nada', async () => {
+    await expect(replaceFile({ id: 'mat1', storagePath: 'mat1/guia.pdf' }, pdf('guia.docx')))
+      .rejects.toThrow('El archivo nuevo debe ser .pdf, igual que el anterior.');
+    await expect(replaceFile({ id: 'mat1', storagePath: 'mat1/LEEME' }, pdf('LEEME.txt')))
+      .rejects.toThrow('mismo formato');
+    expect(fake.calls.storage).toEqual([]);
+  });
+
+  test('acepta la misma extensión aunque cambie mayúsculas', async () => {
+    await replaceFile({ id: 'mat1', storagePath: 'mat1/guia.pdf' }, pdf('Guia nueva.PDF'));
+    expect(fake.calls.storage).toHaveLength(1);
+  });
+
+  test('exige que el material tenga archivo', async () => {
+    await expect(replaceFile({ id: 'mat1' }, pdf())).rejects.toThrow(/no tiene archivo/);
+  });
+});
+
+describe('openFile', () => {
+  test('registra la apertura y devuelve una URL firmada de corta duración', async () => {
+    fake.respuestas.rpc.open_material_file = { data: 'mat1/guia.pdf', error: null };
+    await expect(openFile('mat1')).resolves.toBe('https://firmada');
+    expect(fake.calls.rpc).toEqual([['open_material_file', { target_material: 'mat1' }]]);
+    expect(fake.calls.storage).toEqual([['createSignedUrl', 'materiales', 'mat1/guia.pdf', 300]]);
+  });
+
+  test('avisa si el archivo ya no está disponible', async () => {
+    fake.respuestas.rpc.open_material_file = { data: null, error: { code: 'CA004' } };
+    await expect(openFile('mat1')).rejects.toThrow(/ya no está disponible/);
+  });
+});
+
+describe('avisos de archivos', () => {
+  test('lista los avisos de reemplazo o borrado', async () => {
+    fake.respuestas.rpc.my_material_notices = {
+      data: [{ material_id: 'mat1', title: 'Guía', change: 'replaced', changed_at: '2026-11-21' }], error: null,
+    };
+    await expect(listFileNotices()).resolves.toEqual([
+      { materialId: 'mat1', title: 'Guía', change: 'replaced', changedAt: '2026-11-21' },
+    ]);
+  });
+
+  test('cierra un aviso', async () => {
+    await dismissFileNotice('mat1');
+    expect(fake.calls.rpc).toEqual([['dismiss_material_notice', { target_material: 'mat1' }]]);
   });
 });

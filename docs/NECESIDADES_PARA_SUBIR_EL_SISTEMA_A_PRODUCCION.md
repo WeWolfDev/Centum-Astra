@@ -79,7 +79,7 @@ Resolver y documentar antes de cerrar el diseño de datos y los flujos:
 
 - [ ] Usar Supabase Storage u otro proveedor aprobado para guardar PDFs, imágenes de reactivos y adjuntos en buckets privados; la decisión debe considerar cuota, región, costo y salida de datos.
 - [ ] Subir archivos mediante el backend o URLs firmadas de corta duración, autorizadas para el usuario y recurso correspondientes.
-- [ ] Configurar y probar políticas RLS de `storage.objects` para carga, lectura, reemplazo y eliminación por rol; no habilitar buckets públicos para materiales restringidos.
+- [x] Configurar y probar políticas RLS de `storage.objects` para carga, lectura, reemplazo y eliminación por rol; no habilitar buckets públicos para materiales restringidos.
 - [ ] Validar en servidor tamaño, extensión y tipo real del archivo; aplicar el límite acordado de 50 MB por archivo. Definir por separado las cuotas totales por curso/proyecto y los formatos permitidos; los videos se manejan como enlaces de Drive.
 - [ ] Definir análisis antimalware y procedimiento para archivos no válidos o sospechosos antes de publicarlos.
 - [ ] Evitar buckets públicos y URLs permanentes; registrar quién publica, edita, elimina o descarga material cuando corresponda.
@@ -87,7 +87,7 @@ Resolver y documentar antes de cerrar el diseño de datos y los flujos:
 - [ ] Definir acceso, proveedor y experiencia de reproducción de video; medir progreso solo si se necesita y se informa al usuario.
 - [ ] Implementar visibilidad de clases y recursos por curso/grupo/alumno en servidor.
 - [ ] Mostrar estados de carga, éxito y error basados en respuestas reales; actualmente varios modales solo guardan metadatos localmente.
-- [ ] Definir respaldos y recuperación de objetos por separado de PostgreSQL: las copias de la base no sustituyen las copias de archivos almacenados en Storage.
+- [x] Definir respaldos y recuperación de objetos por separado de PostgreSQL: las copias de la base no sustituyen las copias de archivos almacenados en Storage. Procedimiento en `docs/STORAGE.md`; falta programarlo en el servidor de producción.
 
 ## 7. Evaluaciones y resultados — bloqueante para publicar exámenes reales
 

@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "respaldo:storage": "node scripts/respaldo-storage.mjs respaldar"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

@@ -2,7 +2,7 @@
 
 ## Requisitos
 
-- Supabase CLI 2.x.
+- Supabase CLI 2.x (las pruebas de Storage se verificaron con 2.122).
 - Docker Desktop iniciado.
 
 ## Comandos
@@ -61,4 +61,5 @@ supabase functions serve         # Sirve admin-users en local
 
 Un cambio de esquema o de políticas debe acompañarse de su prueba en
 `supabase/tests/database/`. Los ambientes remotos se describen en
-`docs/AMBIENTES.md`.
+`docs/AMBIENTES.md`; los buckets, sus permisos y el respaldo de archivos, en
+`docs/STORAGE.md`.

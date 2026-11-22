@@ -144,7 +144,7 @@ function confirmacionDe(dialogo) {
     return {
       titulo: 'Retirar material',
       mensaje: `Los alumnos dejarán de ver "${dialogo.material.title}".`,
-      accion: () => retireMaterial(dialogo.material.id),
+      accion: () => retireMaterial(dialogo.material.id, dialogo.material.storagePath),
       exito: 'Material retirado.',
     };
   }
