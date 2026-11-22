@@ -54,7 +54,7 @@ function toCatalogCourse(curso) {
     endsOn: curso.ends_on ?? '',
     groups: [...(curso.groups ?? [])]
       .sort((a, b) => a.name.localeCompare(b.name, 'es'))
-      .map(g => ({ id: g.id, name: g.name, code: g.code, schedule: g.schedule ?? '', status: g.status })),
+      .map(g => ({ id: g.id, name: g.name, code: g.code, schedule: g.schedule ?? '', generation: g.generation ?? '', status: g.status })),
     modules: [...(curso.modules ?? [])]
       .sort((a, b) => a.position - b.position)
       .map(m => ({ id: m.id, title: m.title, description: m.description ?? '', position: m.position, status: m.status })),
@@ -67,7 +67,7 @@ export async function listCatalog({ includeArchived = false } = {}) {
     .from('courses')
     .select(
       'id, name, description, status, starts_on, ends_on, ' +
-      'groups(id, name, code, schedule, status), modules(id, title, description, position, status)',
+      'groups(id, name, code, schedule, generation, status), modules(id, title, description, position, status)',
     )
     .order('name');
   if (error) throw new Error(LOAD_ERROR);
@@ -111,11 +111,18 @@ export async function updateCourse(id, curso) {
 
 const GRUPO_DUPLICADO = 'Ya existe un grupo con ese código en este curso.';
 
-function datosGrupo({ name, code, schedule }) {
+const GENERACION_MAX = 60;
+
+function datosGrupo({ name, code, schedule, generation }) {
+  const generacion = texto(generation);
+  if (generacion && generacion.length > GENERACION_MAX) {
+    throw new Error(`La generación admite hasta ${GENERACION_MAX} caracteres.`);
+  }
   return {
     name: exigir(name, 'Escribe el nombre del grupo.'),
     code: exigir(code, 'Escribe el código del grupo.'),
     schedule: exigir(schedule, 'Escribe el horario del grupo.'),
+    generation: generacion,
   };
 }
 

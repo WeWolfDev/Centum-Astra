@@ -1,7 +1,7 @@
 // Administración de cursos, grupos y módulos (#50). Solo el administrador escribe
 // (RLS) y se archiva en lugar de borrar.
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { BookOpen, CalendarDays, Clock, Plus } from 'lucide-react';
+import { BookOpen, CalendarDays, Clock, GraduationCap, Plus } from 'lucide-react';
 import {
   createCourse, createGroup, createModule, listCatalog, setStatus, updateCourse, updateGroup, updateModule,
 } from '../../lib/catalogoService';
@@ -138,7 +138,14 @@ function TarjetaCurso({ curso, onAbrir }) {
             <Fila
               key={g.id}
               titulo={<>{g.name} <span className="text-white/60 font-normal">· {g.code}</span></>}
-              detalle={<><Clock size={12} aria-hidden="true" /><span>{g.schedule || 'Sin horario'}</span></>}
+              detalle={
+                <>
+                  {g.generation && (
+                    <><GraduationCap size={12} aria-hidden="true" /><span>Generación {g.generation}</span><span aria-hidden="true">·</span></>
+                  )}
+                  <Clock size={12} aria-hidden="true" /><span>{g.schedule || 'Sin horario'}</span>
+                </>
+              }
               archivado={g.status === 'archived'}
             >
               <Acciones

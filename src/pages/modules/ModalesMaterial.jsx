@@ -1,4 +1,4 @@
-// Diálogos de Material conectado (#34): nombre de una clase y enlace nuevo.
+// Diálogos de Material conectado (#34, #85): tema, clase y enlace nuevo.
 import { useState } from 'react';
 import { TIPOS_ENLACE } from '../../lib/materialService';
 import Boton from '../../components/rediseno/Boton';
@@ -23,9 +23,9 @@ function PieDialogo({ textoConfirmar, guardando, onCancelar }) {
   );
 }
 
-/** Crea una clase o renombra la que llega en `clase`. */
-export function ModalNombreClase({ clase = null, nombreModulo, guardando, error, onGuardar, onCerrar }) {
-  const [nombre, setNombre] = useState(clase?.title ?? '');
+/** Crea un tema o renombra el que llega en `tema`. */
+export function ModalNombreTema({ tema = null, nombreModulo, guardando, error, onGuardar, onCerrar }) {
+  const [nombre, setNombre] = useState(tema?.title ?? '');
 
   function enviar(e) {
     e.preventDefault();
@@ -33,8 +33,40 @@ export function ModalNombreClase({ clase = null, nombreModulo, guardando, error,
   }
 
   return (
+    <Modal abierto onCerrar={onCerrar} titulo={tema ? 'Renombrar tema' : `Nuevo tema de ${nombreModulo}`} ancho="sm">
+      <form onSubmit={enviar} className="flex flex-col gap-4">
+        <Input id="tema-nombre" label="Nombre del tema" value={nombre} onChange={e => setNombre(e.target.value)} required />
+        <ErrorDialogo mensaje={error} />
+        <PieDialogo textoConfirmar={tema ? 'Guardar' : 'Crear tema'} guardando={guardando} onCancelar={onCerrar} />
+      </form>
+    </Modal>
+  );
+}
+
+/**
+ * Crea una clase dentro de un tema o renombra la que llega en `clase`. Sin
+ * temas en el módulo, la base la deja en el tema General.
+ */
+export function ModalNombreClase({ clase = null, nombreModulo, temas = [], guardando, error, onGuardar, onCerrar }) {
+  const [nombre, setNombre] = useState(clase?.title ?? '');
+  const [temaId, setTemaId] = useState(temas[0]?.id ?? '');
+
+  function enviar(e) {
+    e.preventDefault();
+    onGuardar(nombre, temaId || null);
+  }
+
+  return (
     <Modal abierto onCerrar={onCerrar} titulo={clase ? 'Renombrar clase' : `Nueva clase de ${nombreModulo}`} ancho="sm">
       <form onSubmit={enviar} className="flex flex-col gap-4">
+        {!clase && temas.length > 0 && (
+          <div>
+            <label htmlFor="clase-tema" className="block mb-1.5 text-xs font-medium text-white/70 tracking-wide">Tema</label>
+            <select id="clase-tema" className={CLASE_SELECT} value={temaId} onChange={e => setTemaId(e.target.value)}>
+              {temas.map(t => <option key={t.id} value={t.id}>{t.title}</option>)}
+            </select>
+          </div>
+        )}
         <Input id="clase-nombre" label="Nombre de la clase" value={nombre} onChange={e => setNombre(e.target.value)} required />
         <ErrorDialogo mensaje={error} />
         <PieDialogo textoConfirmar={clase ? 'Guardar' : 'Crear clase'} guardando={guardando} onCancelar={onCerrar} />

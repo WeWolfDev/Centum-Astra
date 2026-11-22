@@ -63,7 +63,7 @@ select lives_ok(
 select lives_ok(
   $$ insert into public.sessions (module_id, title, position) values
      ('d3000000-0000-0000-0000-000000000001', 'Clase sin tema', 1) $$,
-  'por ahora una sesión puede no tener tema'
+  'una sesión sin tema se crea y queda en el tema General (#85)'
 );
 select throws_ok(
   $$ delete from public.topics where id = 'd5000000-0000-0000-0000-000000000001' $$,
@@ -141,7 +141,7 @@ select set_config('request.jwt.claims', '{"sub":"d0000000-0000-0000-0000-0000000
 set local role authenticated;
 select results_eq(
   $$ select title from public.topics order by position, title $$,
-  array['Álgebra básica', 'Geometría'],
+  array['Álgebra básica', 'General', 'Geometría'],
   'el alumno ve solo los temas activos de sus módulos habilitados'
 );
 select throws_ok(

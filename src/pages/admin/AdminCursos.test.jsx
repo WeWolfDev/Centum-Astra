@@ -30,7 +30,7 @@ const { default: AdminCursos } = await import('./AdminCursos');
 const CURSO = {
   id: 'c1', name: 'EXANI-II 2027', description: 'Generación de enero', status: 'active',
   startsOn: '2027-01-11', endsOn: '2027-06-26',
-  groups: [{ id: 'g1', name: 'Grupo A', code: 'A', schedule: 'Sabatino: sábados, 8:00 a. m. a 12:00 p. m.', status: 'active' }],
+  groups: [{ id: 'g1', name: 'Grupo A', code: 'A', schedule: 'Sabatino: sábados, 8:00 a. m. a 12:00 p. m.', generation: '2027', status: 'active' }],
   modules: [
     { id: 'm1', title: 'Pensamiento Matemático', description: '', position: 0, status: 'active' },
     { id: 'm2', title: 'Comprensión Lectora', description: '', position: 1, status: 'active' },
@@ -114,11 +114,18 @@ describe('AdminCursos', () => {
     await userEvent.type(dialogo.getByLabelText('Código'), 'B');
     await userEvent.click(dialogo.getByRole('button', { name: /Entre semana/ }));
     expect(dialogo.getByLabelText('Horario')).toHaveValue('Entre semana: martes y jueves, 7:00 a 9:00 p. m.');
+    await userEvent.type(dialogo.getByLabelText('Generación (opcional)'), '2028');
     await userEvent.click(dialogo.getByRole('button', { name: 'Crear grupo' }));
 
     expect(fake.createGroup).toHaveBeenCalledWith({
-      courseId: 'c1', name: 'Grupo B', code: 'B', schedule: 'Entre semana: martes y jueves, 7:00 a 9:00 p. m.',
+      courseId: 'c1', name: 'Grupo B', code: 'B', schedule: 'Entre semana: martes y jueves, 7:00 a 9:00 p. m.', generation: '2028',
     });
+  });
+
+  test('muestra la generación de cada grupo en la lista', async () => {
+    render(<AdminCursos />);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    expect(curso.getByText('Generación 2027')).toBeInTheDocument();
   });
 
   test('edita el horario de un grupo con texto libre', async () => {
@@ -128,9 +135,14 @@ describe('AdminCursos', () => {
     const horario = within(screen.getByRole('dialog')).getByLabelText('Horario');
     await userEvent.clear(horario);
     await userEvent.type(horario, 'Domingos, 9:00 a 13:00');
+
+    const generacion = within(screen.getByRole('dialog')).getByLabelText('Generación (opcional)');
+    expect(generacion).toHaveValue('2027');
+    await userEvent.clear(generacion);
+    await userEvent.type(generacion, '2028');
     await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Guardar' }));
 
-    expect(fake.updateGroup).toHaveBeenCalledWith('g1', { name: 'Grupo A', code: 'A', schedule: 'Domingos, 9:00 a 13:00' });
+    expect(fake.updateGroup).toHaveBeenCalledWith('g1', { name: 'Grupo A', code: 'A', schedule: 'Domingos, 9:00 a 13:00', generation: '2028' });
   });
 
   test('agrega un módulo al curso', async () => {

@@ -36,10 +36,15 @@ vi.mock('./materialService', async () => {
   return {
     ...real,
     listMaterialCourses: vi.fn(async () => [{ id: 'c1', name: 'Curso', modules: [{ id: 'm1', title: 'Pensamiento matemático' }] }]),
-    listModuleSessions: vi.fn(async () => ({
-      sessions: [{ id: 's1', title: 'Clase 1', materials: [{ id: 'x', title: 'Video', kind: 'video_link', url: 'https://a.mx' }] }],
-      nextPosition: 1,
-    })),
+    listModuleSessions: vi.fn(async () => {
+      const sessions = [{ id: 's1', title: 'Clase 1', materials: [{ id: 'x', title: 'Video', kind: 'video_link', url: 'https://a.mx' }] }];
+      return {
+        topics: [{ id: 't1', title: 'Álgebra', sessions }, { id: 't2', title: 'Vacío', sessions: [] }],
+        sessions,
+        nextPosition: 1,
+        nextTopicPosition: 2,
+      };
+    }),
   };
 });
 
@@ -163,6 +168,9 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
       }
       expect(coloresFijos(baseElement)).toEqual([]);
     },
+    // Contesta todo el simulador de prueba con clics reales: con cobertura
+    // rebasaba a veces los 5 s por defecto.
+    15000,
   );
 
   test('inicio del alumno', () => {
@@ -249,6 +257,14 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
     await userEvent.keyboard('{Escape}');
 
     await userEvent.click(screen.getByRole('button', { name: 'Retirar' }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: /Nuevo tema/ }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Archivar tema Vacío' }));
     expect(coloresFijos(baseElement)).toEqual([]);
   });
 

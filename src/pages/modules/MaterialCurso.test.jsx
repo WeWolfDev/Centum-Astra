@@ -13,6 +13,9 @@ const fake = vi.hoisted(() => ({
   archiveSession: vi.fn(),
   addLink: vi.fn(),
   retireMaterial: vi.fn(),
+  createTopic: vi.fn(),
+  renameTopic: vi.fn(),
+  archiveTopic: vi.fn(),
 }));
 
 vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ user: fake.usuario.current }) }));
@@ -28,19 +31,25 @@ const CURSOS = [
   { id: 'c1', name: 'Curso 2027', modules: [{ id: 'm1', title: 'Pensamiento matemático' }, { id: 'm2', title: 'Premedicina' }] },
   { id: 'c2', name: 'Curso sin áreas', modules: [] },
 ];
+const SESIONES = [
+  {
+    id: 's1',
+    title: 'Ecuaciones',
+    materials: [
+      { id: 'mat1', title: 'Video de ecuaciones', kind: 'video_link', url: 'https://drive.google.com/v' },
+      { id: 'mat2', title: 'Guía', kind: 'external_link', url: 'javascript:alert(1)' },
+    ],
+  },
+  { id: 's2', title: 'Geometría', materials: [] },
+];
 const CLASES = {
-  sessions: [
-    {
-      id: 's1',
-      title: 'Ecuaciones',
-      materials: [
-        { id: 'mat1', title: 'Video de ecuaciones', kind: 'video_link', url: 'https://drive.google.com/v' },
-        { id: 'mat2', title: 'Guía', kind: 'external_link', url: 'javascript:alert(1)' },
-      ],
-    },
-    { id: 's2', title: 'Geometría', materials: [] },
+  topics: [
+    { id: 't1', title: 'Álgebra', sessions: SESIONES },
+    { id: 't2', title: 'Probabilidad', sessions: [] },
   ],
+  sessions: SESIONES,
   nextPosition: 2,
+  nextTopicPosition: 2,
 };
 
 beforeEach(() => {
@@ -48,7 +57,8 @@ beforeEach(() => {
   Object.entries(fake).forEach(([nombre, fn]) => { if (nombre !== 'usuario') fn.mockReset(); });
   fake.listMaterialCourses.mockResolvedValue(CURSOS);
   fake.listModuleSessions.mockResolvedValue(CLASES);
-  ['createSession', 'renameSession', 'archiveSession', 'addLink', 'retireMaterial'].forEach(n => fake[n].mockResolvedValue());
+  ['createSession', 'renameSession', 'archiveSession', 'addLink', 'retireMaterial', 'createTopic', 'renameTopic', 'archiveTopic']
+    .forEach(n => fake[n].mockResolvedValue());
 });
 
 afterEach(cleanup);
@@ -95,11 +105,73 @@ describe('MaterialCurso', () => {
     await screen.findByText('Ecuaciones');
     await usuario.click(screen.getByRole('button', { name: /Nueva clase/ }));
     const dialogo = within(screen.getByRole('dialog'));
-    await usuario.type(dialogo.getByLabelText('Nombre de la clase'), 'Probabilidad');
+    await usuario.selectOptions(dialogo.getByLabelText('Tema'), 't2');
+    await usuario.type(dialogo.getByLabelText('Nombre de la clase'), 'Eventos');
     await usuario.click(dialogo.getByRole('button', { name: 'Crear clase' }));
-    await waitFor(() => expect(fake.createSession).toHaveBeenCalledWith('m1', 'Probabilidad', 2));
+    await waitFor(() => expect(fake.createSession).toHaveBeenCalledWith('m1', 'Eventos', 2, 't2'));
     expect(await screen.findByText('Clase creada.')).toBeInTheDocument();
     expect(fake.listModuleSessions).toHaveBeenCalledTimes(2);
+  });
+
+  test('agrupa las clases por tema', async () => {
+    render(<MaterialCurso />);
+    const algebra = await screen.findByRole('region', { name: /Álgebra/ });
+    expect(within(algebra).getByText('2 clases')).toBeInTheDocument();
+    expect(within(algebra).getByRole('button', { name: /^Ecuaciones/ })).toBeInTheDocument();
+    const probabilidad = screen.getByRole('region', { name: /Probabilidad/ });
+    expect(within(probabilidad).getByText('Este tema todavía no tiene clases.')).toBeInTheDocument();
+  });
+
+  test('crea y renombra temas del módulo', async () => {
+    const usuario = userEvent.setup();
+    render(<MaterialCurso />);
+    await screen.findByText('Ecuaciones');
+    await usuario.click(screen.getByRole('button', { name: /Nuevo tema/ }));
+    await usuario.type(within(screen.getByRole('dialog')).getByLabelText('Nombre del tema'), 'Geometría analítica');
+    await usuario.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Crear tema' }));
+    await waitFor(() => expect(fake.createTopic).toHaveBeenCalledWith({ courseId: 'c1', moduleId: 'm1' }, 'Geometría analítica', 2));
+    expect(await screen.findByText('Tema creado.')).toBeInTheDocument();
+
+    await usuario.click(screen.getByRole('button', { name: 'Renombrar tema Álgebra' }));
+    const campo = within(screen.getByRole('dialog')).getByLabelText('Nombre del tema');
+    expect(campo).toHaveValue('Álgebra');
+    await usuario.clear(campo);
+    await usuario.type(campo, 'Álgebra básica');
+    await usuario.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Guardar' }));
+    await waitFor(() => expect(fake.renameTopic).toHaveBeenCalledWith('t1', 'Álgebra básica'));
+  });
+
+  test('solo se archiva un tema sin clases, tras confirmar', async () => {
+    const usuario = userEvent.setup();
+    render(<MaterialCurso />);
+    await screen.findByText('Ecuaciones');
+    expect(screen.getByRole('button', { name: 'Archivar tema Álgebra' })).toBeDisabled();
+    await usuario.click(screen.getByRole('button', { name: 'Archivar tema Probabilidad' }));
+    await usuario.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Archivar' }));
+    await waitFor(() => expect(fake.archiveTopic).toHaveBeenCalledWith('t2'));
+    expect(await screen.findByText('Tema archivado.')).toBeInTheDocument();
+  });
+
+  test('si la base rechaza archivar el tema, lo explica', async () => {
+    const usuario = userEvent.setup();
+    fake.archiveTopic.mockRejectedValueOnce(new Error('Mueve o retira sus clases antes de archivar el tema.'));
+    render(<MaterialCurso />);
+    await screen.findByText('Ecuaciones');
+    await usuario.click(screen.getByRole('button', { name: 'Archivar tema Probabilidad' }));
+    await usuario.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Archivar' }));
+    expect(await screen.findByText('Mueve o retira sus clases antes de archivar el tema.')).toBeInTheDocument();
+  });
+
+  test('un módulo sin temas crea su primera clase sin elegir tema', async () => {
+    const usuario = userEvent.setup();
+    fake.listModuleSessions.mockResolvedValue({ topics: [], sessions: [], nextPosition: 0, nextTopicPosition: 0 });
+    render(<MaterialCurso />);
+    expect(await screen.findByText(/si no eliges tema, queda en "General"/)).toBeInTheDocument();
+    await usuario.click(screen.getByRole('button', { name: /Nueva clase/ }));
+    expect(within(screen.getByRole('dialog')).queryByLabelText('Tema')).not.toBeInTheDocument();
+    await usuario.type(within(screen.getByRole('dialog')).getByLabelText('Nombre de la clase'), 'Introducción');
+    await usuario.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Crear clase' }));
+    await waitFor(() => expect(fake.createSession).toHaveBeenCalledWith('m1', 'Introducción', 0, null));
   });
 
   test('renombra una clase', async () => {
