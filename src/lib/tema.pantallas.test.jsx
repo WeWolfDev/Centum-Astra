@@ -43,6 +43,23 @@ vi.mock('./materialService', async () => {
   };
 });
 
+vi.mock('./evaluacionesService', async () => {
+  const real = await vi.importActual('./evaluacionesService');
+  const intento = { id: 'a1', evaluationId: 'e1', status: 'in_progress', expiresAt: '2099-01-01T00:00:00Z' };
+  return {
+    ...real,
+    listMyEvaluations: vi.fn(async () => [{
+      id: 'e1', kind: 'simulador', title: 'Simulador', description: 'Repaso', questionCount: 1, timeLimitMinutes: 90,
+      enCurso: null,
+      terminados: [{ ...intento, status: 'submitted', totalQuestions: 1, correctCount: 1, percent: 100, score: 1300, durationSeconds: 60, isBest: true }],
+    }]),
+    startAttempt: vi.fn(async () => intento),
+    loadQuestions: vi.fn(async () => [{ id: 'q1', prompt: '¿2+2?', options: [{ id: 'o1', body: '4' }, { id: 'o2', body: '5' }] }]),
+    loadAnswers: vi.fn(async () => ({ q1: ['o1'] })),
+    reviewAttempt: vi.fn(async () => [{ questionId: 'q1', selected: ['o2'], correct: ['o1'], isCorrect: false, explanation: 'Suma.' }]),
+  };
+});
+
 const { default: Header } = await import('../components/layout/Header');
 const { default: Sidebar } = await import('../components/layout/Sidebar');
 const { default: PublicNav } = await import('../components/layout/PublicNav');
@@ -58,6 +75,7 @@ const { default: MaterialCurso } = await import('../pages/modules/MaterialCurso'
 const { MaterialProvider } = await import('../context/MaterialContext');
 const { CatalogoConectado } = await import('../pages/admin/AdminCursos');
 const { ThemeProvider } = await import('../context/ThemeContext');
+const { default: SimuladoresAlumno } = await import('../pages/exam/SimuladoresAlumno');
 
 // jsdom normaliza los hex de `style` a rgb(r, g, b), así que se buscan ambas formas.
 const COLORES_FIJOS = new RegExp(
@@ -186,7 +204,23 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
 
   test('Simuladores y quizzes del alumno', () => {
     usuario.current = ALUMNO;
-    const { baseElement } = renderizar(<SimuladoresQuizzes customQuizzes={[]} onAddQuiz={() => {}} onDeleteQuiz={() => {}} />);
+    const { baseElement } = renderizar(<SimuladoresQuizzes />);
+    expect(coloresFijos(baseElement)).toEqual([]);
+  });
+
+  test('Simuladores conectados: lista, intento con reloj, entrega y resultado', async () => {
+    usuario.current = { ...ALUMNO, id: 'alumno' };
+    const { baseElement } = renderizar(<SimuladoresAlumno />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Volver a intentar: Simulador' }));
+    expect(coloresFijos(baseElement)).toEqual([]);
+
+    await userEvent.click(screen.getByRole('button', { name: 'Iniciar ahora' }));
+    await screen.findByRole('timer');
+    expect(coloresFijos(baseElement)).toEqual([]);
+
+    await userEvent.click(screen.getByRole('button', { name: /Salir/ }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Ver respuestas de Simulador' }));
+    await screen.findByText('Suma.');
     expect(coloresFijos(baseElement)).toEqual([]);
   });
 
