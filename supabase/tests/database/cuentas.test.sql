@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(23);
+select plan(25);
 
 -- ── Datos de prueba ──────────────────────────────────────────────────────────
 -- 1 admin · 2 profesor · 3 alumno activo · 4 alumno eliminado · 5 y 6 por invitar
@@ -159,6 +159,15 @@ select results_eq(
   $$ select group_id from public.group_teachers where teacher_id = 'c0000000-0000-0000-0000-000000000002' $$,
   $$ values ('c2000000-0000-0000-0000-000000000001'::uuid) $$,
   'si falla una alta, el profesor conserva sus grupos anteriores'
+);
+select throws_ok(
+  $$ select public.set_teacher_groups('c0000000-0000-0000-0000-000000000002', null) $$,
+  '22004', null, 'sin lista de grupos la reasignación falla en lugar de parecer guardada'
+);
+select results_eq(
+  $$ select group_id from public.group_teachers where teacher_id = 'c0000000-0000-0000-0000-000000000002' $$,
+  $$ values ('c2000000-0000-0000-0000-000000000001'::uuid) $$,
+  'sin lista de grupos el profesor conserva los suyos'
 );
 select lives_ok(
   $$ select public.set_teacher_groups('c0000000-0000-0000-0000-000000000002',

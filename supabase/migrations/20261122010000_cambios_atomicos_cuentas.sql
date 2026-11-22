@@ -106,6 +106,14 @@ language plpgsql
 set search_path = ''
 as $$
 begin
+  -- Un null no debe parecer guardado; un arreglo vacío sí retira todos los grupos.
+  if group_ids is null then
+    raise exception 'Faltan los grupos del profesor.' using errcode = '22004';
+  end if;
+  -- Dos reasignaciones del mismo profesor a la vez se sumarían si el profesor
+  -- no tiene filas que bloquear; el candado las hace esperar una a la otra.
+  perform pg_advisory_xact_lock(hashtextextended(teacher::text, 0));
+
   delete from public.group_teachers gt
   where gt.teacher_id = teacher and gt.group_id <> all (group_ids);
 

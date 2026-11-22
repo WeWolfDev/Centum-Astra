@@ -19,7 +19,12 @@ function fakeAdmin(perfiles: Record<string, { role: string; status: string }>) {
     rpc(fn: string, args: Record<string, unknown>) {
       antesDeRpc.fn();
       log.rpcs.push({ fn, args });
-      return Promise.resolve({ error: errores.rpc ?? null });
+      const error = errores.rpc ?? null;
+      // Como la base: el estado cambia solo si la llamada sale bien.
+      if (!error && fn === 'change_profile_status') {
+        perfiles[args.target_profile as string].status = args.new_status as string;
+      }
+      return Promise.resolve({ error });
     },
     from() {
       return {
@@ -178,6 +183,25 @@ describe('suspend, reactivate y delete', () => {
     expect(r.status).toBe(409);
     expect(ctx.log.rpcs[0].args).toMatchObject({ expected_status: 'suspended', new_status: 'active' });
     expect(ctx.auth.updateUserById).toHaveBeenLastCalledWith(TARGET, { ban_duration: '876000h' });
+  });
+
+  test('si otro administrador reactiva mientras se compensa, la cuenta queda desbloqueada', async () => {
+    // A falla al reactivar y lee "suspended"; justo cuando A bloquea, B ya había
+    // reactivado con éxito. A vuelve a leer y corrige.
+    ctx.perfiles[TARGET].status = 'suspended';
+    ctx.errores.rpc = { code: 'XX000' };
+    ctx.auth.updateUserById.mockImplementation((_id: string, { ban_duration }: { ban_duration: string }) => {
+      if (ban_duration === '876000h') ctx.perfiles[TARGET].status = 'active';
+      return Promise.resolve({ error: null });
+    });
+    const r = await handleAdminUsers({ action: 'reactivate', userId: TARGET }, ADMIN, ctx.admin);
+    expect(r.status).toBe(500);
+    expect(ctx.auth.updateUserById).toHaveBeenLastCalledWith(TARGET, { ban_duration: 'none' });
+  });
+
+  test('tras un cambio exitoso no vuelve a escribir en Auth si ya coincide', async () => {
+    await handleAdminUsers({ action: 'suspend', userId: TARGET, reason: 'x' }, ADMIN, ctx.admin);
+    expect(ctx.auth.updateUserById).toHaveBeenCalledTimes(1);
   });
 
   test('si no puede leer la cuenta tras un fallo, la deja bloqueada', async () => {

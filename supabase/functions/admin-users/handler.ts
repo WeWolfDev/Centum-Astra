@@ -118,12 +118,19 @@ async function actualizar(admin: AdminClient, callerId: string, body: Record<str
   return { status: 200, body: { id: userId } };
 }
 
-// Deja el bloqueo de Auth de acuerdo con el estado que quedó en la base. Si no
-// se puede leer, bloquea: es preferible a dejar entrar una cuenta eliminada.
-async function sincronizarBloqueo(admin: AdminClient, userId: string) {
-  const perfil = await leerPerfil(admin, userId).catch(() => null);
-  const ban = perfil?.status === 'active' ? 'none' : BAN_INDEFINIDO;
-  await admin.auth.admin.updateUserById(userId, { ban_duration: ban });
+// Deja el bloqueo de Auth de acuerdo con el estado de la base y vuelve a leer:
+// si otro administrador lo cambió mientras se escribía, repite. Quien escribe al
+// final siempre lo hace con el estado más reciente. Si no se puede leer,
+// bloquea: es preferible a dejar entrar una cuenta eliminada.
+async function sincronizarBloqueo(admin: AdminClient, userId: string, banEscrito: string) {
+  let ban = banEscrito;
+  for (let intento = 0; intento < 3; intento += 1) {
+    const perfil = await leerPerfil(admin, userId).catch(() => null);
+    const esperado = perfil?.status === 'active' ? 'none' : BAN_INDEFINIDO;
+    if (esperado === ban) return;
+    await admin.auth.admin.updateUserById(userId, { ban_duration: esperado });
+    ban = esperado;
+  }
 }
 
 async function cambiarEstado(
@@ -149,8 +156,10 @@ async function cambiarEstado(
     audit_action: transicion.action,
     audit_metadata: metadata,
   });
+  // También tras un cambio exitoso: otro administrador pudo escribir en Auth con
+  // una lectura vieja mientras esta llamada guardaba.
+  await sincronizarBloqueo(admin, userId, transicion.ban);
   if (error) {
-    await sincronizarBloqueo(admin, userId);
     if (error.code === ACCOUNT_CHANGED) throw new HttpError(409, CUENTA_CAMBIO);
     throw new HttpError(500, 'No se pudo actualizar la cuenta.');
   }
