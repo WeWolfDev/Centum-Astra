@@ -8,7 +8,7 @@ set local search_path = public, extensions;
 -- revisar la política de borrado.
 set local storage.allow_delete_query = 'true';
 
-select plan(37);
+select plan(41);
 
 -- ── Datos de prueba ──────────────────────────────────────────────────────────
 -- 1 admin · 2 profesor del curso · 3 profesor de otro curso · 4 alumno · 5 alumno de otro curso
@@ -141,6 +141,17 @@ select is(
   app_private.is_executable_name('e5000000-0000-0000-0000-000000000002/instalador.msi'), true,
   'la extensión .msi cuenta como ejecutable'
 );
+select is(
+  app_private.is_executable_name('e5000000-0000-0000-0000-000000000002/virus.exe. .'), true,
+  'los puntos y espacios finales no esconden un ejecutable'
+);
+select throws_ok(
+  $$ insert into public.materials (id, session_id, title, kind, storage_path, status, created_by) values
+     ('e5000000-0000-0000-0000-000000000004', 'e4000000-0000-0000-0000-000000000001', 'Disfrazado',
+      'document', 'e5000000-0000-0000-0000-000000000004/virus.exe.', 'draft',
+      'e0000000-0000-0000-0000-000000000002') $$,
+  '23514', null, 'un material con ejecutable terminado en punto se rechaza'
+);
 reset role;
 -- Un ejecutable disfrazado de .zip: el tipo real lo delata al confirmar.
 update storage.objects set metadata = jsonb_build_object('mimetype', 'application/x-msdownload', 'size', 10)
@@ -270,16 +281,33 @@ select results_eq(
 );
 reset role;
 
--- ── Términos firmados ────────────────────────────────────────────────────────
-select pg_temp.como('e0000000-0000-0000-0000-000000000004');
+-- ── Términos firmados (#62: solo el administrador) ───────────────────────────
+select pg_temp.como('e0000000-0000-0000-0000-000000000001');
 set local role authenticated;
 select lives_ok(
   $$ select pg_temp.subir('terminos', 'e0000000-0000-0000-0000-000000000004/firma.pdf', 'application/pdf', 500) $$,
-  'el alumno sube sus términos firmados en su carpeta'
+  'el administrador sube los términos firmados del alumno'
+);
+select results_eq(
+  $$ select name from storage.objects where bucket_id = 'terminos' $$,
+  $$ values ('e0000000-0000-0000-0000-000000000004/firma.pdf'::text) $$,
+  'el administrador ve los términos firmados'
+);
+reset role;
+
+select pg_temp.como('e0000000-0000-0000-0000-000000000004');
+set local role authenticated;
+select throws_ok(
+  $$ select pg_temp.subir('terminos', 'e0000000-0000-0000-0000-000000000004/otra.pdf', 'application/pdf', 500) $$,
+  '42501', null, 'el alumno no sube términos, ni en su propia carpeta'
 );
 select throws_ok(
-  $$ select pg_temp.subir('terminos', 'e0000000-0000-0000-0000-000000000005/firma.pdf', 'application/pdf', 500) $$,
-  '42501', null, 'el alumno no sube en la carpeta de otro'
+  $$ select pg_temp.subir('terminos', 'e0000000-0000-0000-0000-000000000004/firma.pdf', 'application/pdf', 1) $$,
+  '42501', null, 'el alumno no reemplaza el documento que subió el administrador'
+);
+select is_empty(
+  $$ select name from storage.objects where bucket_id = 'terminos' $$,
+  'el alumno no lee los términos firmados, ni los suyos'
 );
 reset role;
 
@@ -288,15 +316,6 @@ set local role authenticated;
 select is_empty(
   $$ select name from storage.objects where bucket_id = 'terminos' $$,
   'el profesor no ve los términos firmados'
-);
-reset role;
-
-select pg_temp.como('e0000000-0000-0000-0000-000000000001');
-set local role authenticated;
-select results_eq(
-  $$ select name from storage.objects where bucket_id = 'terminos' $$,
-  $$ values ('e0000000-0000-0000-0000-000000000004/firma.pdf'::text) $$,
-  'el administrador ve los términos firmados'
 );
 reset role;
 

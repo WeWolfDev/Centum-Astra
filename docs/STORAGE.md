@@ -13,15 +13,20 @@ Los tres son privados: ningún archivo se lee sin sesión y sin permiso.
 | --- | --- | --- | --- | --- | --- |
 | `materiales` | `{material_id}/{nombre}` | Todos salvo ejecutables | Administrador; profesor del curso, sobre el material que creó | Quien ve la fila en `materials` (el alumno, solo lo publicado de sus módulos) | Administrador; el profesor solo en sus borradores |
 | `reactivos` | `{pregunta_id}/{nombre}` | Imágenes y audio | Administrador y profesores | Administrador y profesores (la lectura del alumno llega con #30) | Administrador y profesores |
-| `terminos` | `{alumno_id}/{nombre}` | Imágenes y PDF | El alumno en su carpeta; administrador | El alumno su carpeta; administrador | Administrador |
+| `terminos` | `{alumno_id}/{nombre}` | Imágenes y PDF | Administrador | Administrador | Administrador |
 
 - **Tamaño:** 50 MB por archivo, sin límite total por curso.
 - **Ejecutables:** se rechazan por extensión al subir (`.exe`, `.msi`, `.bat`,
-  `.sh`, `.apk`, `.jar`, `.dmg`, etc.) y por tipo al confirmar. Un `.zip` se
+  `.sh`, `.apk`, `.jar`, `.dmg`, etc.) y por tipo al confirmar. Los puntos y
+  espacios finales se ignoran (`virus.exe.` cuenta como `.exe`). Un `.zip` se
   acepta: su contenido no se revisa.
+- **Términos firmados (#62):** solo el administrador los sube, consulta,
+  reemplaza o borra. El alumno no puede dar por firmada su propia autorización.
 - **Videos:** no se suben; son enlaces de Google Drive (`kind = 'video_link'`).
 - Las tablas de preguntas (#30) y de términos (#62) deben ligar sus filas a estas
-  rutas y, en el caso de reactivos, abrir la lectura al alumno durante su intento.
+  rutas. En reactivos, #30 debe limitar a cada profesor a los cursos que imparte
+  (hoy cualquier profesor reemplaza o borra cualquier reactivo) y abrir la
+  lectura al alumno durante su intento.
 
 ## Flujo de un archivo de material
 
@@ -47,6 +52,26 @@ después se reemplazaron (`replaced`) o se retiraron (`deleted`).
 
 **Retirar:** el administrador archiva el material y después borra el objeto con
 la API de Storage. Storage no permite borrar objetos con SQL directo.
+
+**Pendiente: archivos huérfanos.** Pueden quedar dos casos:
+
+- Si la subida falla en `addFile`, queda un borrador con `storage_path` y sin
+  archivo. El alumno no lo ve. #81 debe mostrarlo al profesor para reintentar
+  con `replaceFile`.
+- Si `remove()` falla en `retireMaterial`, el material ya quedó archivado y el
+  objeto sigue en el bucket. Como nadie puede leerlo (la fila está archivada),
+  no es un riesgo de acceso, pero ocupa espacio. Para encontrarlos:
+
+  ```sql
+  select o.name from storage.objects o
+  where o.bucket_id = 'materiales'
+    and not exists (
+      select 1 from public.materials m
+      where m.storage_path = o.name and m.status <> 'archived'
+    );
+  ```
+
+  El administrador o un proceso con la clave secreta los borra con la API de Storage.
 
 En el frontend todo esto está en `src/lib/materialService.js`: `addFile`,
 `replaceFile`, `openFile`, `listFileNotices`, `dismissFileNotice` y `retireMaterial`.

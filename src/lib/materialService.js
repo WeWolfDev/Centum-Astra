@@ -160,8 +160,10 @@ export async function addLink(sessionId, { title, url, kind }, userId) {
 
 // ── Archivos ─────────────────────────────────────────────────────────────────
 
+// Igual que en la base: Windows quita puntos y espacios finales al guardar,
+// así que `virus.exe.` cuenta como `.exe`.
 function extension(nombre) {
-  const match = /\.([^./]+)$/.exec(nombre ?? '');
+  const match = /\.([^./]+)$/.exec((nombre ?? '').replace(/[. ]+$/, ''));
   return match ? match[1].toLowerCase() : '';
 }
 
@@ -175,7 +177,7 @@ export function nombreSeguro(nombre) {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^A-Za-z0-9._-]+/g, '-')
-    .replace(/^[-.]+|-+$/g, '');
+    .replace(/^[-.]+|[-.]+$/g, '');
   return limpio || 'archivo';
 }
 

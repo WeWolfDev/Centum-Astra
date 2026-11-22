@@ -19,6 +19,8 @@ insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_typ
 -- ── Ejecutables ──────────────────────────────────────────────────────────────
 -- La extensión se revisa en la política de carga; el tipo declarado, al
 -- confirmar el archivo. Un .zip se acepta aunque no se pueda revisar su interior.
+-- Windows quita los puntos y espacios finales al guardar: `virus.exe.` termina
+-- como `virus.exe`, así que se ignoran antes de leer la extensión.
 create function app_private.is_executable_name(object_name text)
 returns boolean
 language sql
@@ -26,7 +28,7 @@ immutable
 set search_path = ''
 as $$
   select coalesce(
-    lower(substring(object_name from '\.([^./]+)$')) = any (array[
+    lower(substring(rtrim(object_name, '. ') from '\.([^./]+)$')) = any (array[
       'exe', 'msi', 'bat', 'cmd', 'com', 'scr', 'pif', 'cpl', 'ps1', 'vbs', 'vbe',
       'wsf', 'sh', 'bash', 'command', 'app', 'dmg', 'pkg', 'deb', 'rpm', 'apk',
       'jar', 'dll', 'so', 'elf', 'run', 'bin'
@@ -262,60 +264,31 @@ create policy "reactivos_delete"
   );
 
 -- ── Políticas de storage.objects: términos firmados ──────────────────────────
--- El alumno sube el escaneo firmado por su adulto responsable en su propia
--- carpeta; solo él y el administrador lo ven. Borrar queda para el administrador.
-create policy "terminos_select"
+-- #62: solo el administrador sube, consulta, reemplaza o borra el escaneo
+-- firmado por el adulto responsable. El alumno no puede dar por firmada su
+-- propia autorización.
+create policy "terminos_select_admin"
   on storage.objects for select
   to authenticated
-  using (
-    bucket_id = 'terminos'
-    and (
-      (select app_private.is_admin())
-      or (
-        (storage.foldername(name))[1] = (select auth.uid())::text
-        and (select app_private.current_app_role()) = 'student'
-      )
-    )
-  );
+  using (bucket_id = 'terminos' and (select app_private.is_admin()));
 
-create policy "terminos_insert"
+create policy "terminos_insert_admin"
   on storage.objects for insert
   to authenticated
   with check (
     bucket_id = 'terminos'
     and not app_private.is_executable_name(name)
-    and (
-      (select app_private.is_admin())
-      or (
-        (storage.foldername(name))[1] = (select auth.uid())::text
-        and (select app_private.current_app_role()) = 'student'
-      )
-    )
+    and (select app_private.is_admin())
   );
 
-create policy "terminos_update"
+create policy "terminos_update_admin"
   on storage.objects for update
   to authenticated
-  using (
-    bucket_id = 'terminos'
-    and (
-      (select app_private.is_admin())
-      or (
-        (storage.foldername(name))[1] = (select auth.uid())::text
-        and (select app_private.current_app_role()) = 'student'
-      )
-    )
-  )
+  using (bucket_id = 'terminos' and (select app_private.is_admin()))
   with check (
     bucket_id = 'terminos'
     and not app_private.is_executable_name(name)
-    and (
-      (select app_private.is_admin())
-      or (
-        (storage.foldername(name))[1] = (select auth.uid())::text
-        and (select app_private.current_app_role()) = 'student'
-      )
-    )
+    and (select app_private.is_admin())
   );
 
 create policy "terminos_delete_admin"

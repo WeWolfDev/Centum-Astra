@@ -203,6 +203,8 @@ describe('validación de archivos', () => {
   test('reconoce ejecutables por extensión', () => {
     expect(esEjecutable('setup.EXE')).toBe(true);
     expect(esEjecutable('tareas.pdf.sh')).toBe(true);
+    expect(esEjecutable('virus.exe.')).toBe(true);
+    expect(esEjecutable('virus.exe . ')).toBe(true);
     expect(esEjecutable('tareas.zip')).toBe(false);
     expect(esEjecutable('LEEME')).toBe(false);
   });
@@ -210,6 +212,7 @@ describe('validación de archivos', () => {
   test('limpia el nombre para la ruta de Storage', () => {
     expect(nombreSeguro('Guía de álgebra (1).pdf')).toBe('Guia-de-algebra-1-.pdf');
     expect(nombreSeguro('...')).toBe('archivo');
+    expect(nombreSeguro('virus.exe. ')).toBe('virus.exe');
   });
 });
 
@@ -233,6 +236,7 @@ describe('addFile', () => {
 
   test('rechaza ejecutables, archivos de más de 50 MB y la falta de archivo antes de tocar la base', async () => {
     await expect(addFile('s1', { title: 'X', file: pdf('setup.exe') }, 'u1')).rejects.toThrow(/ejecutables/);
+    await expect(addFile('s1', { title: 'X', file: pdf('setup.exe.') }, 'u1')).rejects.toThrow(/ejecutables/);
     await expect(addFile('s1', { title: 'X', file: pdf('a.pdf', 50 * 1024 * 1024 + 1) }, 'u1')).rejects.toThrow(/50 MB/);
     await expect(addFile('s1', { title: 'X' }, 'u1')).rejects.toThrow('Elige un archivo.');
     expect(fake.calls.insert).toHaveLength(0);
