@@ -51,7 +51,9 @@ describe('EstadisticasAdmin', () => {
     const rango = { from: '2026-11-01', to: '2026-12-01' };
     await waitFor(() => expect(fake.getStatsOverview).toHaveBeenLastCalledWith(rango));
     expect(fake.listGroupStats).toHaveBeenLastCalledWith(rango);
-    expect(screen.getByText(/^Del 1 nov 2026 al 30 nov 2026\./)).toBeInTheDocument();
+    expect(screen.getByText(/^Del 1 nov 2026 al 30 nov 2026\./)).toHaveTextContent(
+      'si en el periodo solo cae el último intento de un alumno, cuenta ese aunque no sea su mejor',
+    );
     await usuario.click(screen.getByRole('button', { name: 'Todo el curso' }));
     await waitFor(() => expect(fake.getStatsOverview).toHaveBeenLastCalledWith(undefined));
     expect(screen.getByLabelText('Desde')).toHaveValue('');

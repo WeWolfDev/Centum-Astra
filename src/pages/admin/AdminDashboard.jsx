@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, CheckCircle, Users, TrendingUp, ChevronRight } from 'lucide-react';
 import { mockStudents, mockStats } from '../../data/mockData';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import AdminUsers, { AdminOverview } from './AdminUsers';
 import { cn } from '../../lib/utils';
 import { useBreakpoint } from '../../hooks/useBreakpoint';
@@ -255,6 +256,11 @@ function PageShell({ children }) {
           zIndex: 0,
         }}
       />
+      <div className="relative z-10">
+        <AvisoDatosEjemplo>
+          Las cifras y los alumnos de esta pantalla son de demostración; no son información real.
+        </AvisoDatosEjemplo>
+      </div>
       {children}
     </div>
   );

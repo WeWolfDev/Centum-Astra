@@ -19,6 +19,12 @@ function diaSiguiente(texto) {
   return siguiente.toISOString().slice(0, 10);
 }
 
+// Solo se guardan el mejor y el último intento (decisión 1.9): dentro de un
+// periodo cuenta el mejor de los que caen en él, que puede ser solo el último.
+const NOTA_TODO_EL_CURSO = 'Cuenta el mejor intento de cada alumno en cada evaluación.';
+const NOTA_PERIODO =
+  'Cuenta el mejor intento entregado en esas fechas: si en el periodo solo cae el último intento de un alumno, cuenta ese aunque no sea su mejor.';
+
 function problemaDePeriodo(desde, hasta) {
   if (!desde || !hasta) return 'Elige la fecha de inicio y la de fin.';
   if (desde > hasta) return 'La fecha de inicio debe ser anterior o igual a la de fin.';
@@ -52,7 +58,7 @@ export default function EstadisticasAdmin() {
       <div className="flex flex-col gap-1">
         <h2 id="admin-estadisticas" className="m-0 font-display font-bold text-xl text-white tracking-tight">Estadísticas</h2>
         <p className="m-0 text-sm text-white/70">
-          {periodo ? `Del ${dia(periodo.desde)} al ${dia(periodo.hasta)}` : 'Todo el curso'}. Cuenta el mejor intento de cada alumno en cada evaluación.
+          {periodo ? `Del ${dia(periodo.desde)} al ${dia(periodo.hasta)}. ${NOTA_PERIODO}` : `Todo el curso. ${NOTA_TODO_EL_CURSO}`}
         </p>
       </div>
 

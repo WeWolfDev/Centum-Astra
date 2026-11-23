@@ -15,7 +15,7 @@ Los requisitos de esta fase se contrastaron con los componentes montados en `App
 - La aplicación es un prototipo navegable: autenticación, alumnos, métricas, publicaciones y progreso usan datos mock o estado en memoria; no hay API ni persistencia.
 - Las rutas que se muestran dependen del rol y del estado de navegación en `App.jsx`. La existencia de un componente no significa que el usuario pueda llegar a él desde la interfaz.
 - El menú de cada rol sigue la matriz de permisos aprobada (#37): el profesor solo arma quizzes, el administrador además simuladores, y Pagos muestra "disponible pronto" hasta #53. Videoteca aparece solo en el menú de alumno.
-- Las pantallas que todavía leen `mockData.js` (dashboard del alumno, Módulos, Material, Videoteca y evaluaciones) muestran el aviso "Datos de ejemplo".
+- Con Supabase configurado, Inicio del alumno, Mis alumnos, el panel del administrador y las estadísticas usan datos reales (#31, #37). Sin Supabase, el modo demo lee `mockData.js` y cada pantalla que lo usa (paneles de alumno, profesor y administrador, Módulos, Material, Videoteca y evaluaciones) muestra el aviso "Datos de ejemplo".
 - `Statistics.jsx`, `ExamSimulator.jsx`, `FileManager.jsx` y `Whiteboard.jsx` se retiraron en #37 porque no se podían abrir desde ningún menú; siguen en el historial de git.
 - Los controles de “Ver”, “Aprobar”, subida, creación y reproducción no deben interpretarse como operaciones completadas: varios solo modifican estado local o muestran una interfaz sin persistir/enviar el archivo.
 
@@ -34,7 +34,7 @@ Los requisitos de esta fase se contrastaron con los componentes montados en `App
   - Admin: “Mis alumnos” (resumen; el listado completo se abre desde “Ver todos”), Material, Simuladores y quizzes, Pagos (marcado como pendiente/sin pantalla funcional).
   - Profesor: Mis alumnos, Material, Simuladores y quizzes.
   - Alumno: Inicio, Módulos, Videoteca, Simuladores y quizzes.
-- Estadísticas está conectada como sección en `App.jsx`, pero no tiene acceso visible desde los menús actuales ni un enlace desde los dashboards.
+- Estadísticas no es una sección aparte: el profesor las ve en Mis alumnos y el administrador en Cuentas (`docs/ESTADISTICAS.md`).
 - En **móvil** (< 768 px): sidebar se oculta como drawer con overlay de cierre al tap.
 - **Header** con título de sección, navegación móvil y fecha dinámica.
 - Transición animada entre secciones con Framer Motion (`AnimatePresence`). Los elementos decorativos descritos en mockups no deben contarse como capacidades funcionales.
@@ -53,7 +53,7 @@ Los requisitos de esta fase se contrastaron con los componentes montados en `App
 - Vista “Mis alumnos” con búsqueda por nombre y filtro “Todos / Requieren atención”.
 - Resumen mock del grupo: cantidad de alumnos, promedio del último simulador y variación; lista con serie histórica sintética, avance de quizzes y señal de atención.
 - Los datos se derivan de `mockStudents`; actualmente no se filtran por profesor o grupo y la serie no es historial real.
-- No hay enlace visible a Estadísticas desde el menú del profesor.
+- Con Supabase, Mis alumnos muestra arriba las estadísticas de sus grupos (#31).
 
 ### RF-05 · Dashboard Alumno
 
@@ -86,7 +86,7 @@ Los requisitos de esta fase se contrastaron con los componentes montados en `App
 
 ### RF-09 · Estadísticas Admin/Profesor
 
-- No hay página de estadísticas: la anterior (`Statistics.jsx`) usaba cifras mock y no se podía abrir; se retiró en #37. Las métricas reales dependen de #31.
+- Las estadísticas reales están en Mis alumnos (profesor, sus grupos, todo el curso) y en Cuentas (administrador, todos los alumnos y periodo Desde/Hasta). Qué significa cada cifra: `docs/ESTADISTICAS.md`. La página anterior (`Statistics.jsx`) usaba cifras mock y se retiró en #37.
 
 ### RF-10 · Responsividad
 

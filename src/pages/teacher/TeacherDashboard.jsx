@@ -8,6 +8,7 @@ import { Search, ChevronRight, ArrowUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { mockStudents } from '../../data/mockData';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import TeacherRoster from './TeacherRoster';
 import {
   aciertosACeneval,
@@ -313,6 +314,10 @@ function TeacherDashboardDemo() {
           />
         </label>
       </header>
+
+      <AvisoDatosEjemplo>
+        Los alumnos y sus promedios de esta pantalla son de demostración; no son información real.
+      </AvisoDatosEjemplo>
 
       {/* Resumen del grupo */}
       <section

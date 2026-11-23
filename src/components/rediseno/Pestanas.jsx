@@ -168,7 +168,7 @@ function Tab({ valor, children, className = '', apariencia = 'chip' }) {
         'rounded-lg font-body text-sm font-semibold transition-colors ' +
         FOCUS_RING + ' ' +
         (activa
-          ? 'bg-white/10 text-white'
+          ? 'pestana-activa bg-white/10 text-white'
           : 'text-white/70 hover:text-white hover:bg-white/5');
 
   return (
