@@ -40,7 +40,7 @@ vi.mock('./supabaseClient', () => ({ supabase: fake.supabase }));
 
 const {
   addFile, addLink, esEnlaceDrive, archiveSession, cargaIncompleta, problemaDeArchivo, retryFile, tamanoLegible, createSession, dismissFileNotice, enlaceSeguro, esEjecutable, listFileNotices,
-  listMaterialCourses, listModuleSessions, nombreSeguro, openFile, renameSession, replaceFile, retireMaterial,
+  listMaterialCourses, listModuleSessions, nombreSeguro, openFile, renameSession, replaceFile, retireMaterial, updateLink,
   archiveTopic, createTopic, renameTopic,
 } = await import('./materialService');
 
@@ -243,6 +243,32 @@ describe('addLink', () => {
     await expect(addLink('s1', ENLACE, 'u1')).rejects.toThrow('Revisa los datos');
     fake.respuestas.escritura = { error: { code: 'XX' } };
     await expect(addLink('s1', ENLACE, 'u1')).rejects.toThrow('No se pudo guardar');
+  });
+});
+
+describe('updateLink', () => {
+  const VIDEO = { id: 'mat1', kind: 'video_link' };
+
+  test('corrige el título y el enlace sin cambiar el tipo', async () => {
+    await updateLink(VIDEO, { title: ' Video nuevo ', url: 'https://drive.google.com/nuevo' });
+    const [tabla, cambios] = fake.calls.update[0];
+    expect(tabla).toBe('materials');
+    expect(cambios).toEqual({ title: 'Video nuevo', external_url: 'https://drive.google.com/nuevo', updated_at: expect.any(String) });
+    expect(fake.calls.filtros).toEqual([['id', 'mat1']]);
+  });
+
+  test('aplica las mismas reglas que al agregar', async () => {
+    await expect(updateLink(VIDEO, { title: '', url: 'https://drive.google.com/v' })).rejects.toThrow('Agrega un título.');
+    await expect(updateLink(VIDEO, { title: 'Video', url: 'javascript:alert(1)' })).rejects.toThrow(/enlace válido/);
+    await expect(updateLink(VIDEO, { title: 'Video', url: 'https://www.youtube.com/watch?v=x' })).rejects.toThrow('Google Drive');
+    expect(fake.calls.update).toHaveLength(0);
+    await updateLink({ id: 'mat2', kind: 'external_link' }, { title: 'Guía', url: 'https://es.khanacademy.org/x' });
+    expect(fake.calls.update).toHaveLength(1);
+  });
+
+  test('traduce el permiso denegado', async () => {
+    fake.respuestas.escritura = { error: { code: '42501' } };
+    await expect(updateLink(VIDEO, { title: 'Video', url: 'https://drive.google.com/v' })).rejects.toThrow('No tienes permiso');
   });
 });
 

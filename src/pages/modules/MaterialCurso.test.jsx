@@ -12,6 +12,7 @@ const fake = vi.hoisted(() => ({
   renameSession: vi.fn(),
   archiveSession: vi.fn(),
   addLink: vi.fn(),
+  updateLink: vi.fn(),
   retireMaterial: vi.fn(),
   createTopic: vi.fn(),
   renameTopic: vi.fn(),
@@ -68,7 +69,7 @@ beforeEach(() => {
   fake.listMaterialCourses.mockResolvedValue(CURSOS);
   fake.listModuleSessions.mockResolvedValue(CLASES);
   fake.listOpenReports.mockResolvedValue([]);
-  ['createSession', 'renameSession', 'archiveSession', 'addLink', 'retireMaterial', 'createTopic', 'renameTopic', 'archiveTopic',
+  ['createSession', 'renameSession', 'archiveSession', 'addLink', 'updateLink', 'retireMaterial', 'createTopic', 'renameTopic', 'archiveTopic',
     'addFile', 'replaceFile', 'retryFile', 'resolveReports']
     .forEach(n => fake[n].mockResolvedValue());
 });
@@ -236,6 +237,54 @@ describe('MaterialCurso', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(fake.addLink).toHaveBeenLastCalledWith('s2', { title: 'Resumen', url: 'https://docs.google.com/r', kind: 'external_link' }, 'u1');
     expect(await screen.findByText('Enlace publicado.')).toBeInTheDocument();
+  });
+
+  test('el administrador corrige un enlace con sus datos actuales y deja el error a la vista si falla', async () => {
+    fake.usuario.current = { id: 'a1', role: 'admin' };
+    fake.updateLink.mockRejectedValueOnce(new Error('Los videos deben ser enlaces de Google Drive (https://drive.google.com/…).'));
+    render(<MaterialCurso />);
+    const usuario = await abrirClase('Ecuaciones');
+    await usuario.click(screen.getByRole('button', { name: 'Editar Video de ecuaciones' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    expect(dialogo.queryByLabelText('Tipo')).not.toBeInTheDocument();
+    expect(dialogo.getByLabelText('Título')).toHaveValue('Video de ecuaciones');
+    const enlace = dialogo.getByLabelText('Enlace');
+    expect(enlace).toHaveValue('https://drive.google.com/v');
+    await usuario.clear(enlace);
+    await usuario.type(enlace, 'https://drive.google.com/nuevo');
+    await usuario.click(dialogo.getByRole('button', { name: 'Guardar' }));
+    expect(await dialogo.findByRole('alert')).toHaveTextContent('Google Drive');
+    await usuario.click(dialogo.getByRole('button', { name: 'Guardar' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(fake.updateLink).toHaveBeenLastCalledWith(
+      expect.objectContaining({ id: 'mat1', kind: 'video_link' }),
+      { title: 'Video de ecuaciones', url: 'https://drive.google.com/nuevo' },
+    );
+    expect(await screen.findByText('Enlace actualizado.')).toBeInTheDocument();
+  });
+
+  test('el profesor edita solo los enlaces que agregó, y nunca un archivo', async () => {
+    fake.listModuleSessions.mockResolvedValue({
+      ...CLASES,
+      topics: [{
+        id: 't1',
+        title: 'Álgebra',
+        sessions: [{
+          id: 's1',
+          title: 'Ecuaciones',
+          materials: [
+            { id: 'mat1', title: 'Mi video', kind: 'video_link', url: 'https://drive.google.com/v', createdBy: 'u1' },
+            { id: 'mat2', title: 'Video ajeno', kind: 'video_link', url: 'https://drive.google.com/w', createdBy: 'otro' },
+            { id: 'mat3', title: 'Mi guía', kind: 'document', storagePath: 'mat3/guia.pdf', createdBy: 'u1' },
+          ],
+        }],
+      }],
+    });
+    render(<MaterialCurso />);
+    await abrirClase('Ecuaciones');
+    expect(screen.getByRole('button', { name: 'Editar Mi video' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Editar Video ajeno' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Editar Mi guía' })).not.toBeInTheDocument();
   });
 
   test('el profesor no ve las acciones para retirar', async () => {

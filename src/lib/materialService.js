@@ -190,7 +190,7 @@ export function esEnlaceDrive(url) {
   }
 }
 
-export async function addLink(sessionId, { title, url, kind }, userId) {
+function validarEnlace({ title, url, kind }) {
   const titulo = exigir(title, 'Agrega un título.');
   const enlace = enlaceSeguro(url);
   if (!enlace) throw new Error('Escribe un enlace válido que empiece con https://');
@@ -198,6 +198,11 @@ export async function addLink(sessionId, { title, url, kind }, userId) {
   if (kind === 'video_link' && !esEnlaceDrive(enlace)) {
     throw new Error('Los videos deben ser enlaces de Google Drive (https://drive.google.com/…).');
   }
+  return { titulo, enlace };
+}
+
+export async function addLink(sessionId, { title, url, kind }, userId) {
+  const { titulo, enlace } = validarEnlace({ title, url, kind });
   const ahora = new Date().toISOString();
   return ejecutar(
     supabase.from('materials').insert({
@@ -210,6 +215,20 @@ export async function addLink(sessionId, { title, url, kind }, userId) {
       published_by: userId,
       published_at: ahora,
     }),
+  );
+}
+
+/**
+ * Corrige el título o la URL de un enlace sin cambiar su tipo. Conserva su id,
+ * así que no se pierden las aperturas ni los reportes del video (#35).
+ */
+export async function updateLink(material, { title, url }) {
+  const { titulo, enlace } = validarEnlace({ title, url, kind: material.kind });
+  return ejecutar(
+    supabase
+      .from('materials')
+      .update({ title: titulo, external_url: enlace, updated_at: new Date().toISOString() })
+      .eq('id', material.id),
   );
 }
 

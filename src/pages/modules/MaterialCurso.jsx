@@ -19,6 +19,7 @@ import {
   renameTopic,
   replaceFile,
   retireMaterial,
+  updateLink,
   retryFile,
   tamanoLegible,
 } from '../../lib/materialService';
@@ -42,7 +43,7 @@ const CLASE_SELECT =
 
 const ICONOS = { video_link: Play, external_link: Link2, document: FileText, image: Image };
 
-// La base deja reemplazar el archivo al administrador y a quien creó el material.
+// La base deja editar el enlace o reemplazar el archivo al administrador y a quien creó el material.
 // `reportes` cuenta los reportes abiertos del material; solo llegan al administrador (#29).
 function FilaMaterial({ material, esAdmin, userId, reportes = 0, onAccion }) {
   const enlace = enlaceSeguro(material.url);
@@ -80,6 +81,11 @@ function FilaMaterial({ material, esAdmin, userId, reportes = 0, onAccion }) {
       {esArchivo && !incompleta && (
         <Boton size="sm" variant="ghost" onClick={() => onAccion('abrirArchivo', material)} aria-label={`Abrir ${material.title} (se abre en otra pestaña)`}>
           Abrir <ExternalLink size={13} aria-hidden="true" />
+        </Boton>
+      )}
+      {!esArchivo && gestiona && (
+        <Boton size="sm" variant="secundario" onClick={() => onAccion('editarEnlace', material)} aria-label={`Editar ${material.title}`}>
+          <Pencil size={14} aria-hidden="true" /> Editar
         </Boton>
       )}
       {esArchivo && gestiona && (
@@ -385,6 +391,13 @@ function PanelModulo({ modulo, cursoId }) {
         <ModalEnlace
           clase={dialogo.clase}
           onGuardar={enlace => ejecutar(() => addLink(dialogo.clase.id, enlace, user.id), 'Enlace publicado.')}
+          {...propsDialogo}
+        />
+      )}
+      {dialogo?.tipo === 'editarEnlace' && (
+        <ModalEnlace
+          material={dialogo.material}
+          onGuardar={enlace => ejecutar(() => updateLink(dialogo.material, enlace), 'Enlace actualizado.')}
           {...propsDialogo}
         />
       )}
