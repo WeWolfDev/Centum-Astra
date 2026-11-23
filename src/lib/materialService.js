@@ -179,11 +179,25 @@ export async function archiveTopic(topicId) {
 }
 
 /** El maestro publica sin aprobación previa (decisión del cliente, 1.8). */
+// Los videos son enlaces de Google Drive (decisión del cliente, #29). La base
+// tiene la misma regla (materials_video_link_drive).
+export function esEnlaceDrive(url) {
+  try {
+    const parsed = new URL((url ?? '').trim());
+    return parsed.protocol === 'https:' && parsed.hostname === 'drive.google.com';
+  } catch {
+    return false;
+  }
+}
+
 export async function addLink(sessionId, { title, url, kind }, userId) {
   const titulo = exigir(title, 'Agrega un título.');
   const enlace = enlaceSeguro(url);
   if (!enlace) throw new Error('Escribe un enlace válido que empiece con https://');
   if (!TIPOS_ENLACE.some(t => t.valor === kind)) throw new Error('Elige el tipo de enlace.');
+  if (kind === 'video_link' && !esEnlaceDrive(enlace)) {
+    throw new Error('Los videos deben ser enlaces de Google Drive (https://drive.google.com/…).');
+  }
   const ahora = new Date().toISOString();
   return ejecutar(
     supabase.from('materials').insert({

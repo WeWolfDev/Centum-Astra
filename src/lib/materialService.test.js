@@ -39,7 +39,7 @@ const fake = vi.hoisted(() => {
 vi.mock('./supabaseClient', () => ({ supabase: fake.supabase }));
 
 const {
-  addFile, addLink, archiveSession, cargaIncompleta, problemaDeArchivo, retryFile, tamanoLegible, createSession, dismissFileNotice, enlaceSeguro, esEjecutable, listFileNotices,
+  addFile, addLink, esEnlaceDrive, archiveSession, cargaIncompleta, problemaDeArchivo, retryFile, tamanoLegible, createSession, dismissFileNotice, enlaceSeguro, esEjecutable, listFileNotices,
   listMaterialCourses, listModuleSessions, nombreSeguro, openFile, renameSession, replaceFile, retireMaterial,
   archiveTopic, createTopic, renameTopic,
 } = await import('./materialService');
@@ -221,6 +221,21 @@ describe('addLink', () => {
     await expect(addLink('s1', { ...ENLACE, title: '' }, 'u1')).rejects.toThrow('Agrega un título.');
     await expect(addLink('s1', { ...ENLACE, kind: 'document' }, 'u1')).rejects.toThrow('Elige el tipo de enlace.');
     expect(fake.calls.insert).toHaveLength(0);
+  });
+
+  test('un video debe ser de Google Drive; un enlace de página no', async () => {
+    await expect(addLink('s1', { ...ENLACE, url: 'https://www.youtube.com/watch?v=x' }, 'u1')).rejects.toThrow('Google Drive');
+    await expect(addLink('s1', { ...ENLACE, url: 'https://drive.google.com.evil.mx/x' }, 'u1')).rejects.toThrow('Google Drive');
+    expect(fake.calls.insert).toHaveLength(0);
+    await addLink('s1', { ...ENLACE, kind: 'external_link', url: 'https://es.khanacademy.org/x' }, 'u1');
+    expect(fake.calls.insert).toHaveLength(1);
+  });
+
+  test('esEnlaceDrive solo acepta https://drive.google.com', () => {
+    expect(esEnlaceDrive('https://drive.google.com/file/d/a/view')).toBe(true);
+    expect(esEnlaceDrive('http://drive.google.com/x')).toBe(false);
+    expect(esEnlaceDrive('https://docs.google.com/x')).toBe(false);
+    expect(esEnlaceDrive('no es enlace')).toBe(false);
   });
 
   test('traduce un valor inválido y un error genérico', async () => {
