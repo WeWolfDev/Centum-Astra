@@ -20,13 +20,19 @@ const fake = vi.hoisted(() => ({
   replaceFile: vi.fn(),
   retryFile: vi.fn(),
   openFile: vi.fn(),
+  listOpenReports: vi.fn(),
+  resolveReports: vi.fn(),
 }));
 
 vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ user: fake.usuario.current }) }));
 vi.mock('../../lib/materialService', async () => {
   const real = await vi.importActual('../../lib/materialService');
-  const { usuario: _usuario, ...servicio } = fake;
+  const { usuario: _usuario, listOpenReports: _l, resolveReports: _r, ...servicio } = fake;
   return { ...real, ...servicio };
+});
+vi.mock('../../lib/videoService', async () => {
+  const real = await vi.importActual('../../lib/videoService');
+  return { ...real, listOpenReports: fake.listOpenReports, resolveReports: fake.resolveReports };
 });
 
 const { default: MaterialCurso } = await import('./MaterialCurso');
@@ -61,8 +67,9 @@ beforeEach(() => {
   Object.entries(fake).forEach(([nombre, fn]) => { if (nombre !== 'usuario') fn.mockReset(); });
   fake.listMaterialCourses.mockResolvedValue(CURSOS);
   fake.listModuleSessions.mockResolvedValue(CLASES);
+  fake.listOpenReports.mockResolvedValue([]);
   ['createSession', 'renameSession', 'archiveSession', 'addLink', 'retireMaterial', 'createTopic', 'renameTopic', 'archiveTopic',
-    'addFile', 'replaceFile', 'retryFile']
+    'addFile', 'replaceFile', 'retryFile', 'resolveReports']
     .forEach(n => fake[n].mockResolvedValue());
 });
 
@@ -471,6 +478,42 @@ describe('MaterialCurso', () => {
       await usuario.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Retirar' }));
       await waitFor(() => expect(fake.retireMaterial).toHaveBeenCalledWith('doc1', 'doc1/guia.pdf'));
       expect(await screen.findByRole('alert')).toHaveTextContent('el archivo no se pudo borrar');
+    });
+  });
+
+  describe('reportes de videos (#29)', () => {
+    const REPORTES = [
+      { materialId: 'mat1', reason: 'no_carga', createdAt: '2026-11-22' },
+      { materialId: 'mat1', reason: 'sin_permiso', createdAt: '2026-11-22' },
+    ];
+
+    test('el administrador ve cuántos reportes tiene un video y los marca resueltos', async () => {
+      fake.usuario.current = { id: 'a1', role: 'admin' };
+      fake.listOpenReports.mockResolvedValueOnce(REPORTES).mockResolvedValue([]);
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Ecuaciones');
+      expect(screen.getByText('Reportado (2)')).toBeInTheDocument();
+      await usuario.click(screen.getByRole('button', { name: 'Marcar resueltos los reportes de Video de ecuaciones' }));
+      await waitFor(() => expect(fake.resolveReports).toHaveBeenCalledWith('mat1', 'a1'));
+      expect(await screen.findByText('Reportes marcados como resueltos.')).toBeInTheDocument();
+      expect(screen.queryByText('Reportado (2)')).not.toBeInTheDocument();
+    });
+
+    test('si no se pueden resolver, lo explica', async () => {
+      fake.usuario.current = { id: 'a1', role: 'admin' };
+      fake.listOpenReports.mockResolvedValue(REPORTES);
+      fake.resolveReports.mockRejectedValue(new Error('No tienes permiso para hacer este cambio.'));
+      render(<MaterialCurso />);
+      const usuario = await abrirClase('Ecuaciones');
+      await usuario.click(screen.getByRole('button', { name: /Marcar resueltos los reportes/ }));
+      expect(await screen.findByRole('alert')).toHaveTextContent('No tienes permiso');
+    });
+
+    test('el profesor no pide ni ve reportes', async () => {
+      render(<MaterialCurso />);
+      await abrirClase('Ecuaciones');
+      expect(fake.listOpenReports).not.toHaveBeenCalled();
+      expect(screen.queryByText(/Reportado/)).not.toBeInTheDocument();
     });
   });
 });
