@@ -12,6 +12,10 @@ import {
 } from 'recharts';
 import { useAuth } from '../../context/AuthContext';
 import { mockModules } from '../../data/mockData';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import { listMaterialCourses } from '../../lib/materialService';
+import useCarga from '../../hooks/useCarga';
+import EstadoCarga from '../../components/rediseno/EstadoCarga';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import {
   SIMULADOR_RANGO_CENEVAL,
@@ -21,7 +25,7 @@ import {
 import BotonSecundario from '../../components/rediseno/BotonSecundario';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import TarjetaArea from '../../components/rediseno/TarjetaArea';
-import { AREA_POR_ID } from '../../config/areas';
+import { areaDeModulo } from '../../config/areas';
 
 
 // Historial Ceneval del alumno. HANDOFF: lo primero que ve es cuánto subió desde
@@ -696,28 +700,48 @@ function EvolucionBlock({
 
 /* ──────────────────────────────────────────────────────────────────────────── */
 
+// Con Supabase, las tarjetas son las áreas habilitadas para el grupo del alumno
+// (#82): Módulos espera esos ids, no los de mockModules.
 function TuMaterial({ onAbrirModulo }) {
   return (
     <section aria-label="Tu material">
       <h2 className="m-0 mb-4 font-display font-bold text-xl text-white tracking-tight">
         Tu material
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        {mockModules.map((mod) => {
-          const area = AREA_POR_ID[mod.id];
-          return (
-            <TarjetaArea
-              key={mod.id}
-              titulo={mod.title}
-              icono={area?.icono ?? 'math'}
-              imagen={area?.imagen}
-              intensidadTinte={area?.intensidadTinte ?? 'media'}
-              onClick={() => onAbrirModulo(mod.id)}
-              ariaLabel={`Abrir módulo ${mod.title}`}
-            />
-          );
-        })}
-      </div>
+      {isSupabaseConfigured
+        ? <AreasReales onAbrirModulo={onAbrirModulo} />
+        : <TarjetasAreas modulos={mockModules} onAbrirModulo={onAbrirModulo} />}
     </section>
+  );
+}
+
+function AreasReales({ onAbrirModulo }) {
+  const { cargando, error, datos, recargar } = useCarga(listMaterialCourses);
+  const modulos = [...new Map((datos ?? []).flatMap(c => c.modules).map(m => [m.id, m])).values()];
+  if (cargando || error) return <EstadoCarga cargando={cargando} error={error} onReintentar={recargar} />;
+  if (modulos.length === 0) {
+    return <p className="m-0 text-sm text-white/60">Tu grupo todavía no tiene áreas habilitadas.</p>;
+  }
+  return <TarjetasAreas modulos={modulos} onAbrirModulo={onAbrirModulo} />;
+}
+
+function TarjetasAreas({ modulos, onAbrirModulo }) {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      {modulos.map((mod) => {
+        const area = areaDeModulo(mod);
+        return (
+          <TarjetaArea
+            key={mod.id}
+            titulo={mod.title}
+            icono={area?.icono ?? 'math'}
+            imagen={area?.imagen}
+            intensidadTinte={area?.intensidadTinte ?? 'media'}
+            onClick={() => onAbrirModulo(mod.id)}
+            ariaLabel={`Abrir módulo ${mod.title}`}
+          />
+        );
+      })}
+    </div>
   );
 }

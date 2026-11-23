@@ -15,7 +15,6 @@ import {
   enlaceSeguro,
   listMaterialCourses,
   listModuleSessions,
-  openFile,
   renameSession,
   renameTopic,
   replaceFile,
@@ -24,6 +23,7 @@ import {
   tamanoLegible,
 } from '../../lib/materialService';
 import { Aviso } from '../../components/rediseno/Aviso';
+import AvisoEnlaceArchivo from '../../components/rediseno/AvisoEnlaceArchivo';
 import Boton from '../../components/rediseno/Boton';
 import DialogoConfirmacion from '../../components/rediseno/DialogoConfirmacion';
 import EstadoCarga from '../../components/rediseno/EstadoCarga';
@@ -31,6 +31,7 @@ import EstadoVacio from '../../components/rediseno/EstadoVacio';
 import Pastilla from '../../components/rediseno/Pastilla';
 import Pestanas from '../../components/rediseno/Pestanas';
 import SelectorAreas from '../../components/rediseno/SelectorAreas';
+import useAbrirArchivo from '../../hooks/useAbrirArchivo';
 import useCarga from '../../hooks/useCarga';
 import { ModalArchivo, ModalEnlace, ModalNombreClase, ModalNombreTema } from './ModalesMaterial';
 
@@ -185,28 +186,6 @@ function SeccionTema({ tema, esAdmin, userId, onAbrir }) {
   );
 }
 
-// El navegador bloqueó la pestaña nueva: un clic del usuario sí la abre.
-function AvisoEnlaceArchivo({ titulo, url, onCerrar }) {
-  return (
-    <div role="status" className="flex items-center gap-3 flex-wrap rounded-xl border border-info/30 bg-info/10 px-4 py-3 text-sm">
-      <p className="m-0 flex-1 min-w-[200px] text-white/80">
-        Tu navegador bloqueó la pestaña nueva. El enlace vence en 5 minutos.
-      </p>
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={onCerrar}
-        className="inline-flex items-center gap-1 text-xs font-semibold text-gold-bright"
-      >
-        Abrir {titulo} <ExternalLink size={13} aria-hidden="true" />
-        <span className="sr-only">(se abre en otra pestaña)</span>
-      </a>
-      <Boton size="sm" variant="ghost" onClick={onCerrar}>Cerrar</Boton>
-    </div>
-  );
-}
-
 function confirmacionDe(dialogo) {
   if (dialogo?.tipo === 'retirar') {
     return {
@@ -247,31 +226,14 @@ function PanelModulo({ modulo, cursoId }) {
   const [errorDialogo, setErrorDialogo] = useState('');
   const [guardando, setGuardando] = useState(false);
   const [aviso, setAviso] = useState(null);
-  const [enlaceArchivo, setEnlaceArchivo] = useState(null);
-
-  // La pestaña se abre antes de pedir la URL firmada: si se abriera después
-  // del await, el navegador la bloquearía como ventana emergente. Si aun así
-  // la bloquea, se ofrece el enlace en vez de salir de la aplicación.
-  async function abrirArchivo(material) {
-    setEnlaceArchivo(null);
-    const pestana = window.open('', '_blank');
-    if (pestana) pestana.opener = null;
-    try {
-      const url = await openFile(material.id);
-      if (pestana) pestana.location.href = url;
-      else setEnlaceArchivo({ titulo: material.title, url });
-    } catch (e) {
-      pestana?.close();
-      setAviso({ tipo: 'error', mensaje: e.message });
-    }
-  }
+  const archivo = useAbrirArchivo({ onError: mensaje => setAviso({ tipo: 'error', mensaje }) });
 
   // TarjetaClase llama onAbrir(tipo, clase, material); los temas, onAbrir(tipo, { tema }).
   function abrir(tipo, clase = null, material = null) {
     setErrorDialogo('');
     setAviso(null);
     if (tipo === 'abrirArchivo') {
-      void abrirArchivo(material);
+      void archivo.abrir(material);
       return;
     }
     if (clase?.tema) setDialogo({ tipo, tema: clase.tema });
@@ -342,7 +304,7 @@ function PanelModulo({ modulo, cursoId }) {
         </div>
       </div>
       {aviso && <Aviso tipo={aviso.tipo} mensaje={aviso.mensaje} onCerrar={() => setAviso(null)} />}
-      {enlaceArchivo && <AvisoEnlaceArchivo {...enlaceArchivo} onCerrar={() => setEnlaceArchivo(null)} />}
+      {archivo.enlace && <AvisoEnlaceArchivo {...archivo.enlace} onCerrar={archivo.cerrarEnlace} />}
       <EstadoCarga cargando={cargando} error={error} onReintentar={recargar} />
       {!cargando && !error && clases.length === 0 && temas.length === 0 && (
         <EstadoVacio
