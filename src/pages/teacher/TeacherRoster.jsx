@@ -1,5 +1,5 @@
 // Mis alumnos con datos reales: RLS limita la lista a los grupos del profesor (#33).
-// Puntajes y evolución se agregan cuando existan intentos reales (#30, #31).
+// Arriba, los promedios de sus grupos y alumnos de todo el curso (#31).
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { useDebounce } from '../../hooks/useDebounce';
@@ -8,6 +8,7 @@ import Boton from '../../components/rediseno/Boton';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
 import Paginacion from '../../components/rediseno/Paginacion';
 import Pastilla from '../../components/rediseno/Pastilla';
+import EstadisticasGrupos from '../estadisticas/EstadisticasGrupos';
 
 const SEARCH_DELAY_MS = 300;
 
@@ -65,6 +66,14 @@ export default function TeacherRoster() {
           />
         </div>
       </header>
+
+      <section aria-labelledby="maestro-estadisticas" className="flex flex-col gap-3">
+        <h2 id="maestro-estadisticas" className="m-0 font-display font-bold text-xl text-white tracking-tight">Estadísticas de tus grupos</h2>
+        <p className="m-0 text-sm text-white/70">
+          Todo el curso. Cuenta el mejor intento de cada alumno en cada evaluación; el puntaje estimado no es un resultado oficial de Ceneval.
+        </p>
+        <EstadisticasGrupos vacio="Todavía no tienes grupos asignados." />
+      </section>
 
       {cargando && <p role="status" className="m-0 text-sm text-white/60">Cargando…</p>}
       {!cargando && error && (
