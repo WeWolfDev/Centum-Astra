@@ -1,6 +1,6 @@
-// Diálogos de Material conectado (#34, #85): tema, clase y enlace nuevo.
+// Diálogos de Material conectado (#34, #85, #81): tema, clase, enlace y archivo.
 import { useState } from 'react';
-import { TIPOS_ENLACE } from '../../lib/materialService';
+import { problemaDeArchivo, TIPOS_ENLACE } from '../../lib/materialService';
 import Boton from '../../components/rediseno/Boton';
 import Input from '../../components/rediseno/Input';
 import Modal from '../../components/rediseno/Modal';
@@ -17,7 +17,7 @@ function ErrorDialogo({ mensaje }) {
 function PieDialogo({ textoConfirmar, guardando, onCancelar }) {
   return (
     <footer className="flex gap-2.5 flex-wrap justify-end">
-      <Boton variant="secundario" type="button" onClick={onCancelar}>Cancelar</Boton>
+      <Boton variant="secundario" type="button" onClick={onCancelar} disabled={guardando}>Cancelar</Boton>
       <Boton variant="primario" type="submit" isLoading={guardando}>{textoConfirmar}</Boton>
     </footer>
   );
@@ -110,6 +110,75 @@ export function ModalEnlace({ clase, guardando, error, onGuardar, onCerrar }) {
         </p>
         <ErrorDialogo mensaje={error} />
         <PieDialogo textoConfirmar="Publicar" guardando={guardando} onCancelar={onCerrar} />
+      </form>
+    </Modal>
+  );
+}
+
+const TEXTOS_ARCHIVO = {
+  subir: { confirmar: 'Subir y publicar', ocupado: 'Subiendo…' },
+  reemplazar: { confirmar: 'Reemplazar', ocupado: 'Reemplazando…' },
+  reintentar: { confirmar: 'Subir y publicar', ocupado: 'Subiendo…' },
+};
+
+/**
+ * Sube un archivo nuevo (`clase`) o reemplaza o termina el de `material`.
+ * Revisa tamaño, ejecutables y extensión antes de enviar; la base vuelve a
+ * revisarlos al subir y al confirmar.
+ */
+export function ModalArchivo({ modo, clase = null, material = null, guardando, error, onGuardar, onCerrar }) {
+  const [titulo, setTitulo] = useState('');
+  const [archivo, setArchivo] = useState(null);
+  const [problema, setProblema] = useState('');
+  const rutaAnterior = modo === 'subir' ? undefined : material.storagePath;
+  const textos = TEXTOS_ARCHIVO[modo];
+  const nombreAnterior = material?.fileName ?? material?.storagePath?.split('/').pop();
+  const titulos = {
+    subir: `Subir archivo a ${clase?.title}`,
+    reemplazar: `Reemplazar ${material?.title}`,
+    reintentar: `Terminar la carga de ${material?.title}`,
+  };
+
+  function elegir(e) {
+    const elegido = e.target.files?.[0] ?? null;
+    setArchivo(elegido);
+    setProblema(elegido ? problemaDeArchivo(elegido, rutaAnterior) ?? '' : '');
+  }
+
+  function enviar(e) {
+    e.preventDefault();
+    const motivo = problemaDeArchivo(archivo, rutaAnterior);
+    if (motivo) {
+      setProblema(motivo);
+      return;
+    }
+    onGuardar(modo === 'subir' ? { title: titulo, file: archivo } : archivo);
+  }
+
+  return (
+    <Modal abierto onCerrar={onCerrar} titulo={titulos[modo]}>
+      <form onSubmit={enviar} className="flex flex-col gap-4">
+        {modo === 'subir' && (
+          <Input id="archivo-titulo" label="Título" value={titulo} onChange={e => setTitulo(e.target.value)} required />
+        )}
+        <div>
+          <label htmlFor="archivo-elegir" className="block mb-1.5 text-xs font-medium text-white/70 tracking-wide">Archivo</label>
+          <input
+            id="archivo-elegir"
+            type="file"
+            onChange={elegir}
+            aria-describedby="archivo-ayuda"
+            className="block w-full text-sm text-white/80 file:mr-3 file:rounded-[10px] file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:text-white"
+          />
+        </div>
+        <p id="archivo-ayuda" className="m-0 text-xs text-white/60">
+          {modo === 'subir' && 'Hasta 50 MB. Se aceptan documentos, imágenes y comprimidos; no se aceptan programas ejecutables. Se publica en cuanto termina de subirse.'}
+          {modo === 'reemplazar' && `Debe ser del mismo formato (${nombreAnterior}). El archivo anterior se borra y los alumnos que ya lo abrieron verán un aviso.`}
+          {modo === 'reintentar' && `La carga anterior no terminó. Elige de nuevo el archivo (${nombreAnterior}); se publica en cuanto termina de subirse.`}
+        </p>
+        {guardando && <p role="status" className="m-0 text-xs text-white/70">{textos.ocupado}</p>}
+        <ErrorDialogo mensaje={problema || error} />
+        <PieDialogo textoConfirmar={textos.confirmar} guardando={guardando} onCancelar={onCerrar} />
       </form>
     </Modal>
   );
