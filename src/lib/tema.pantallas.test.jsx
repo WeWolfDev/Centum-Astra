@@ -224,7 +224,9 @@ describe('pantallas migradas al tema no usan colores fijos', () => {
     usuario.current = PROFESOR;
     const { baseElement } = renderizar(<VideoLibrary />);
     await userEvent.click(screen.getByRole('button', { name: /subir sesión/i }));
-    expect(screen.getByText('Duración')).toBeInTheDocument();
+    // El modal ya no pide duración: Drive no la informa (#29).
+    expect(screen.getByRole('dialog', { name: 'Subir sesión' })).toBeInTheDocument();
+    expect(screen.queryByText('Duración')).not.toBeInTheDocument();
     expect(coloresFijos(baseElement)).toEqual([]);
   });
 

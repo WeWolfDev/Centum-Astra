@@ -1,7 +1,7 @@
 // Material con datos reales de Supabase (#34), para maestro y administrador.
 // Enlaces y archivos en Storage privado (#28, #81): los archivos se abren con
 // una URL firmada corta y se reemplazan en su mismo lugar.
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Archive, ChevronDown, ExternalLink, FileText, Image, Link2, Pencil, Play, Plus, Upload } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -31,6 +31,7 @@ import EstadoVacio from '../../components/rediseno/EstadoVacio';
 import Pastilla from '../../components/rediseno/Pastilla';
 import Pestanas from '../../components/rediseno/Pestanas';
 import SelectorAreas from '../../components/rediseno/SelectorAreas';
+import { listOpenReports, resolveReports } from '../../lib/videoService';
 import useAbrirArchivo from '../../hooks/useAbrirArchivo';
 import useCarga from '../../hooks/useCarga';
 import { ModalArchivo, ModalEnlace, ModalNombreClase, ModalNombreTema } from './ModalesMaterial';
@@ -42,7 +43,8 @@ const CLASE_SELECT =
 const ICONOS = { video_link: Play, external_link: Link2, document: FileText, image: Image };
 
 // La base deja reemplazar el archivo al administrador y a quien creó el material.
-function FilaMaterial({ material, esAdmin, userId, onAccion }) {
+// `reportes` cuenta los reportes abiertos del material; solo llegan al administrador (#29).
+function FilaMaterial({ material, esAdmin, userId, reportes = 0, onAccion }) {
   const enlace = enlaceSeguro(material.url);
   const Icono = ICONOS[material.kind] ?? Link2;
   const esArchivo = Boolean(material.storagePath);
@@ -58,6 +60,12 @@ function FilaMaterial({ material, esAdmin, userId, onAccion }) {
         )}
       </span>
       {incompleta && <Pastilla tono="advertencia">Carga incompleta</Pastilla>}
+      {reportes > 0 && <Pastilla tono="advertencia">Reportado ({reportes})</Pastilla>}
+      {reportes > 0 && (
+        <Boton size="sm" variant="secundario" onClick={() => onAccion('resolver', material)} aria-label={`Marcar resueltos los reportes de ${material.title}`}>
+          Marcar resuelto
+        </Boton>
+      )}
       {enlace && (
         <a
           href={enlace}
@@ -86,7 +94,7 @@ function FilaMaterial({ material, esAdmin, userId, onAccion }) {
   );
 }
 
-function TarjetaClase({ clase, numero, esAdmin, userId, onAbrir }) {
+function TarjetaClase({ clase, numero, esAdmin, userId, reportes, onAbrir }) {
   const [abierta, setAbierta] = useState(false);
   const total = clase.materials.length;
   const resumen = total === 0 ? 'Sin material' : `${total} recurso${total === 1 ? '' : 's'}`;
@@ -131,6 +139,7 @@ function TarjetaClase({ clase, numero, esAdmin, userId, onAbrir }) {
                   material={m}
                   esAdmin={esAdmin}
                   userId={userId}
+                  reportes={reportes.get(m.id)}
                   onAccion={(tipo, mat) => onAbrir(tipo, clase, mat)}
                 />
               ))}
@@ -153,7 +162,7 @@ function TarjetaClase({ clase, numero, esAdmin, userId, onAbrir }) {
   );
 }
 
-function SeccionTema({ tema, esAdmin, userId, onAbrir }) {
+function SeccionTema({ tema, esAdmin, userId, reportes, onAbrir }) {
   const total = tema.sessions.length;
   const ayudaId = `tema-${tema.id}-ayuda`;
   return (
@@ -180,7 +189,7 @@ function SeccionTema({ tema, esAdmin, userId, onAbrir }) {
       </div>
       {total === 0 && <p className="m-0 text-sm text-white/60">Este tema todavía no tiene clases.</p>}
       {tema.sessions.map((clase, i) => (
-        <TarjetaClase key={clase.id} clase={clase} numero={i + 1} esAdmin={esAdmin} userId={userId} onAbrir={onAbrir} />
+        <TarjetaClase key={clase.id} clase={clase} numero={i + 1} esAdmin={esAdmin} userId={userId} reportes={reportes} onAbrir={onAbrir} />
       ))}
     </section>
   );
@@ -228,12 +237,36 @@ function PanelModulo({ modulo, cursoId }) {
   const [aviso, setAviso] = useState(null);
   const archivo = useAbrirArchivo({ onError: mensaje => setAviso({ tipo: 'error', mensaje }) });
 
+  // Reportes de enlaces que no cargan (#29): solo el administrador los atiende.
+  // Si no cargan, la lista de material sigue funcionando sin la etiqueta.
+  const cargarReportes = useCallback(() => (esAdmin ? listOpenReports() : Promise.resolve([])), [esAdmin]);
+  const reportesAbiertos = useCarga(cargarReportes);
+  const reportes = useMemo(() => {
+    const cuenta = new Map();
+    (reportesAbiertos.datos ?? []).forEach(r => cuenta.set(r.materialId, (cuenta.get(r.materialId) ?? 0) + 1));
+    return cuenta;
+  }, [reportesAbiertos.datos]);
+
+  async function resolver(material) {
+    try {
+      await resolveReports(material.id, user.id);
+      setAviso({ tipo: 'exito', mensaje: 'Reportes marcados como resueltos.' });
+      await reportesAbiertos.recargar();
+    } catch (e) {
+      setAviso({ tipo: 'error', mensaje: e.message });
+    }
+  }
+
   // TarjetaClase llama onAbrir(tipo, clase, material); los temas, onAbrir(tipo, { tema }).
   function abrir(tipo, clase = null, material = null) {
     setErrorDialogo('');
     setAviso(null);
     if (tipo === 'abrirArchivo') {
       void archivo.abrir(material);
+      return;
+    }
+    if (tipo === 'resolver') {
+      void resolver(material);
       return;
     }
     if (clase?.tema) setDialogo({ tipo, tema: clase.tema });
@@ -313,7 +346,7 @@ function PanelModulo({ modulo, cursoId }) {
         />
       )}
       {!cargando && !error && temas.map(tema => (
-        <SeccionTema key={tema.id} tema={tema} esAdmin={esAdmin} userId={user?.id} onAbrir={abrir} />
+        <SeccionTema key={tema.id} tema={tema} esAdmin={esAdmin} userId={user?.id} reportes={reportes} onAbrir={abrir} />
       ))}
 
       {dialogo?.tipo === 'nueva' && (

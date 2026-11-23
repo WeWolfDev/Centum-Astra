@@ -1,5 +1,10 @@
+// Videoteca. Con Supabase configurado muestra los videos reales de Drive
+// (VideotecaAlumno, #29); sin él, los datos de ejemplo de abajo. Drive no da
+// vistas ni duración, así que tampoco se muestran en el ejemplo.
 import { useMemo, useState } from 'react';
 import { Upload, X, Search } from 'lucide-react';
+import { isSupabaseConfigured } from '../../lib/supabaseClient';
+import VideotecaAlumno from './VideotecaAlumno';
 import { mockVideos } from '../../data/mockData';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { useMaterial } from '../../context/MaterialContext';
@@ -25,7 +30,6 @@ function UploadVideoModal({ onClose, onUpload }) {
   const { user } = useAuth();
   const [title, setTitle]       = useState('');
   const [subject, setSubject]   = useState(SUBJECTS[0].id);
-  const [duration, setDuration] = useState('');
   const [fileName, setFileName] = useState('');
 
   function handleFileChange(e) {
@@ -42,8 +46,6 @@ function UploadVideoModal({ onClose, onUpload }) {
       title: title.trim(),
       subject,
       instructor: user?.name || '—',
-      duration: duration || '—',
-      views: '0',
       thumbnail: 'PM',
       date: new Date().toISOString().slice(0, 10),
     });
@@ -141,7 +143,7 @@ function UploadVideoModal({ onClose, onUpload }) {
               }}
             />
           </label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: 12 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 12 }}>
             <label>
               <span style={{ display: 'block', color: 'rgb(var(--c-ink) / 0.6)', fontSize: 12, marginBottom: 6 }}>Materia</span>
               <select
@@ -160,21 +162,6 @@ function UploadVideoModal({ onClose, onUpload }) {
                   <option key={s.id} value={s.id} style={{ background: 'rgb(var(--c-navy))' }}>{s.id}</option>
                 ))}
               </select>
-            </label>
-            <label>
-              <span style={{ display: 'block', color: 'rgb(var(--c-ink) / 0.6)', fontSize: 12, marginBottom: 6 }}>Duración</span>
-              <input
-                type="text" value={duration} onChange={e => setDuration(e.target.value)}
-                placeholder="45:00"
-                style={{
-                  width: '100%', boxSizing: 'border-box',
-                  background: 'rgb(var(--c-ink) / 0.05)',
-                  border: '1px solid rgb(var(--c-ink) / calc(0.13 * var(--borde-k)))',
-                  borderRadius: 10, padding: '12px 14px',
-                  color: 'rgb(var(--c-ink))', fontSize: 14, outline: 'none',
-                  minHeight: 44,
-                }}
-              />
             </label>
           </div>
         </div>
@@ -265,19 +252,6 @@ function VideoCard({ video, onClick }) {
             <path d="M5 2.5v11l9-5.5z" fill="rgb(var(--c-on-gold))" />
           </svg>
         </span>
-        <span
-          style={{
-            position: 'absolute',
-            right: 12, bottom: 12,
-            padding: '3px 9px',
-            borderRadius: 6,
-            background: 'rgb(var(--c-void) / 0.85)',
-            color: 'rgb(var(--c-ink))',
-            fontSize: 13, fontWeight: 600,
-          }}
-        >
-          {video.duration}
-        </span>
       </div>
 
       <div
@@ -312,6 +286,10 @@ function VideoCard({ video, onClick }) {
 }
 
 export default function VideoLibrary() {
+  return isSupabaseConfigured ? <VideotecaAlumno /> : <VideotecaEjemplo />;
+}
+
+function VideotecaEjemplo() {
   const { user } = useAuth();
   const isStaff = user?.role === 'admin' || user?.role === 'teacher';
   const { videosDeVideoteca } = useMaterial();

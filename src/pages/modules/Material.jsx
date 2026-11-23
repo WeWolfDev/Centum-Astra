@@ -209,7 +209,6 @@ function ClaseCard({
             <VideoCard
               key={`${session.id}-videobase-${v.id}`}
               titulo={v.title}
-              duracion={v.duration}
               instructor={v.instructor}
               onVer={() => onVerVideo(v)}
               canManage={canDownload}
@@ -220,7 +219,6 @@ function ClaseCard({
             <VideoCard
               key={`${session.id}-videoex-${v.id}`}
               titulo={v.title}
-              duracion={v.duration}
               instructor={v.instructor}
               onVer={() => onVerVideo(v)}
               canManage={canDownload}

@@ -272,7 +272,6 @@ function ClassRow({ session, index, status, canDownload, videos, pdfsExtra, vide
             <VideoCard
               key={`${session.id}-video-${v.id}`}
               titulo={v.title}
-              duracion={v.duration}
               instructor={v.instructor}
               onVer={() => onVerVideo(v)}
             />
