@@ -25,13 +25,22 @@ Recomienda con datos: milestone del sprint actual, etiqueta `priority:*` y la l�
 
 - Cada tarea va en su propio worktree, con una rama corta creada desde `origin/main` actualizado y nombrada según `CONTRIBUTING.md`. Créalo en `.claude/worktrees/<rama>` o usa el que abrió el usuario (por ejemplo, con "New worktree" de Deska). Nunca edites en la carpeta de `main`.
 - Dentro del worktree corre `npm run lint`, `npm run test:coverage` y `npm run build` antes de entregar.
-- El usuario hace `git add`, `git commit` y `git push`. Tú no. Al terminar, di qué archivos cambiaron, el resultado de las verificaciones y un mensaje de commit sugerido.
+- En su computadora, el usuario hace `git add`, `git commit` y `git push`. Tú no (en la nube, ver abajo). Al terminar, di qué archivos cambiaron, el resultado de las verificaciones y un mensaje de commit sugerido.
 - Sin atribución de IA: ni `Co-Authored-By` de Claude o Copilot en commits, ni "Generated with Claude Code" en PRs o comentarios. Si rebasas o propones un mensaje de squash, quita esas líneas.
 - No uses "Commit suggestion" ni "Implement suggestion" de Copilot: los hallazgos válidos se corrigen en una rama propia.
 - Después del merge, borra el worktree y la rama local.
 
+## Sesiones en la nube
+
+En una sesión de Claude Code en la nube (`CLAUDE_CODE_REMOTE=true`) el usuario no tiene la rama en su computadora:
+
+- Haces `git commit` y `git push` solo en una rama nueva tuya: la que asigna la sesión o una creada desde `origin/main` con el formato de `CONTRIBUTING.md`. Nunca en `main` ni en ramas existentes o de otras personas, y nunca `--force`.
+- Antes del push corre `npm run lint`, `npm run test:coverage` y `npm run build`. Si algo falla, no subas; reporta la salida.
+- El PR lo abre el usuario. Al terminar, deja el texto del PR (con su tabla de criterios) y los comandos que no pudiste correr. Supabase local no está disponible: dilo si el cambio toca `supabase/`.
+- Sigue sin atribución de IA en commits, ramas y textos.
+
 ## Pregunta antes de
 
-- Hacer push, mergear un PR, cerrar un issue o mover tarjetas del tablero.
+- Hacer push (salvo tu propia rama en una sesión en la nube), mergear un PR, cerrar un issue o mover tarjetas del tablero.
 - Agregar una dependencia.
 - Cambiar CI o la configuración de Supabase.
