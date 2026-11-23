@@ -27,3 +27,9 @@ Indicadores de los paneles (#31). Los calculan funciones de PostgreSQL de solo l
 | `getStatsOverview` (`stats_overview`) | Solo el administrador | Alumnos con resultados y los dos promedios de todo el sistema. Para otros roles devuelve `null`. |
 
 Las rachas semanales del alumno son de #57 y no están aquí. Los conteos de cuentas y grupos del panel del administrador vienen de `getDirectorySummary` (`usersService.js`).
+
+## Dónde se ven
+
+- **Alumno:** Inicio, con sus dos promedios, las áreas a repasar y sus últimas calificaciones (#37).
+- **Maestro:** Mis alumnos > Estadísticas de tus grupos. Promedios de cada grupo suyo y, al desplegarlo, de cada alumno. Siempre todo el curso.
+- **Administrador:** Cuentas > Estadísticas. Resumen de todos los alumnos y promedios por grupo y por alumno. Elige el periodo con **Desde** y **Hasta**; la fecha final se incluye.

@@ -23,6 +23,11 @@ vi.mock('../../lib/areasExtraService', () => ({
   setStudentAreas: fake.setStudentAreas,
 }));
 vi.mock('../../lib/supabaseClient', () => ({ supabase: {} }));
+vi.mock('../../lib/statsService', () => ({
+  getStatsOverview: vi.fn().mockResolvedValue(null),
+  listGroupStats: vi.fn().mockResolvedValue([]),
+  listGroupStudentStats: vi.fn(),
+}));
 vi.mock('../../context/AuthContext', () => ({ useAuth: () => ({ user: { id: 'yo' } }) }));
 
 const { default: AdminUsers, AdminOverview } = await import('./AdminUsers');

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 const listMyStudents = vi.hoisted(() => vi.fn());
@@ -11,15 +11,34 @@ vi.mock('../../lib/usersService', async () => {
   return { ...real, listMyStudents };
 });
 vi.mock('../../lib/supabaseClient', () => ({ supabase: {} }));
+const listGroupStats = vi.hoisted(() => vi.fn());
+vi.mock('../../lib/statsService', () => ({ listGroupStats, listGroupStudentStats: vi.fn() }));
 
 const { default: TeacherRoster } = await import('./TeacherRoster');
 
 const ANA = { id: 'a', name: 'Ana', email: 'ana@x.mx', status: 'active', groups: [{ id: 'g1', name: 'Grupo A' }] };
 
-beforeEach(() => listMyStudents.mockReset());
+beforeEach(() => {
+  listMyStudents.mockReset();
+  listGroupStats.mockReset();
+  listGroupStats.mockResolvedValue([]);
+});
 afterEach(cleanup);
 
 describe('TeacherRoster', () => {
+  test('muestra las estadísticas de sus grupos, de todo el curso y sin elegir periodo', async () => {
+    listMyStudents.mockResolvedValue({ users: [ANA], total: 1 });
+    listGroupStats.mockResolvedValue([{
+      groupId: 'g1', groupName: 'Grupo A', generation: '2027', studentCount: 1,
+      quizAvgPercent: 80, quizCount: 1, examAvgScore: null, examCount: 0, examScoreLabel: 'Puntaje estimado',
+    }]);
+    render(<TeacherRoster />);
+    const seccion = await screen.findByRole('region', { name: 'Estadísticas de tus grupos' });
+    expect(await within(seccion).findByText(/Quizzes: 80 %/)).toBeInTheDocument();
+    expect(listGroupStats).toHaveBeenCalledWith(undefined);
+    expect(screen.queryByLabelText('Desde')).not.toBeInTheDocument();
+  });
+
   test('muestra a los alumnos con su grupo', async () => {
     listMyStudents.mockResolvedValue({ users: [ANA], total: 1 });
     render(<TeacherRoster />);

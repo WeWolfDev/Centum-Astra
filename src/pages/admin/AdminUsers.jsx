@@ -24,6 +24,7 @@ import Input from '../../components/rediseno/Input';
 import Modal from '../../components/rediseno/Modal';
 import Paginacion from '../../components/rediseno/Paginacion';
 import Pastilla from '../../components/rediseno/Pastilla';
+import EstadisticasAdmin from './EstadisticasAdmin';
 import StatCard from '../../components/rediseno/StatCard';
 
 const ROLES = [
@@ -546,6 +547,7 @@ export function AdminOverview({ onNavigate }) {
           </Tarjeta>
         </>
       )}
+      <EstadisticasAdmin />
     </Pagina>
   );
 }
