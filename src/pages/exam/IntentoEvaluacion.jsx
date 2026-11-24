@@ -3,7 +3,7 @@
 // hacia la hora de cierre que fijó el servidor; al llegar a cero se entrega y
 // el servidor lo cierra como vencido aunque el alumno ya no tenga conexión.
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Clock, ExternalLink, WifiOff } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Clock, ExternalLink, WifiOff } from 'lucide-react';
 import { formatoReloj, loadAnswers, loadQuestions, saveAnswer, submitAttempt } from '../../lib/evaluacionesService';
 import { enlaceSeguro } from '../../lib/materialService';
 import Boton from '../../components/rediseno/Boton';
@@ -109,11 +109,14 @@ function Navegador({ preguntas, actual, respuestas, pendientes, onIr }) {
             onClick={() => onIr(i)}
             aria-current={i === actual ? 'step' : undefined}
             aria-label={`Pregunta ${i + 1}${estado}`}
-            className={`h-10 w-10 rounded-lg border text-sm font-semibold ${
-              i === actual ? 'border-gold-bright text-gold-bright' : 'border-white/10 text-white/80'
+            className={`relative h-10 w-10 rounded-lg text-sm font-semibold ${
+              i === actual ? 'border-2 border-gold-bright text-gold-bright' : 'border border-white/10 text-white/80'
             } ${contestada ? 'bg-white/10' : 'bg-transparent'} ${pendientes.has(p.id) ? 'border-dashed' : ''}`}
           >
             {i + 1}
+            {contestada && (
+              <Check data-marca="contestada" size={12} strokeWidth={3} aria-hidden="true" className="absolute right-0.5 top-0.5" />
+            )}
           </button>
         );
       })}

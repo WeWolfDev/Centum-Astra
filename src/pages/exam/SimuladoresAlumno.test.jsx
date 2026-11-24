@@ -154,6 +154,20 @@ describe('iniciar y retomar', () => {
     expect(screen.getByRole('button', { name: 'Pregunta 1, contestada' })).toBeInTheDocument();
   });
 
+  test('el navegador marca la pregunta actual y las contestadas sin depender del color', async () => {
+    const user = userEvent.setup();
+    fake.listMyEvaluations.mockResolvedValue([{ ...SIMULADOR, enCurso: intento() }]);
+    fake.loadAnswers.mockResolvedValue({ q1: ['o2'] });
+    render(<SimuladoresAlumno />);
+
+    await user.click(await screen.findByRole('button', { name: 'Continuar: Simulador EXANI 1' }));
+
+    const contestada = await screen.findByRole('button', { name: 'Pregunta 1, contestada' });
+    expect(contestada).toHaveAttribute('aria-current', 'step');
+    expect(contestada).toHaveClass('border-2');
+    expect(contestada.querySelector('[data-marca="contestada"]')).not.toBeNull();
+  });
+
   test('si el servidor rechaza el inicio lo dice', async () => {
     const user = userEvent.setup();
     fake.startAttempt.mockRejectedValue(new Error('Esta evaluación ya no está disponible para ti.'));

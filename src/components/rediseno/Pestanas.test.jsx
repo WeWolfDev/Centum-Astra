@@ -112,6 +112,12 @@ describe('Pestanas', () => {
     expect(screen.getByRole('tab', { name: /alpha/i })).toHaveAttribute('aria-selected', 'true');
   });
 
+  test('el tab seleccionado se distingue con un subrayado, no solo con color', () => {
+    render(<Host />);
+    expect(screen.getByRole('tab', { name: 'Alpha' })).toHaveClass('pestana-activa');
+    expect(screen.getByRole('tab', { name: 'Beta' })).not.toHaveClass('pestana-activa');
+  });
+
   test('solo el tab seleccionado está en el orden de tabulación (tabindex 0 / -1)', () => {
     render(<Host valorInicial="b" />);
     expect(screen.getByRole('tab', { name: /alpha/i })).toHaveAttribute('tabindex', '-1');
