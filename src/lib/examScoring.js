@@ -1,7 +1,7 @@
-// Lógica pura de puntuación del simulador EXANI-II.
+// Lógica pura de puntuación del simulador (modo demo; con Supabase califica el servidor).
 // Sin React, sin estado, sin side effects: solo (questions, answers) -> número.
 
-import { aciertosACeneval } from '../config/rediseno';
+import { puntajeEstimado } from '../config/rediseno';
 
 // Cuenta cuántas respuestas del map `answers` coinciden con la opción correcta
 // de `questions[i]`. Comparación estricta (===), por lo que null/undefined no
@@ -13,17 +13,17 @@ export function contarAciertos(questions, answers) {
   );
 }
 
-// Devuelve { aciertos, puntaje } usando la escala Ceneval configurada.
+// Devuelve { aciertos, puntaje } con el puntaje estimado de 700 a 1300.
 // `total` es el denominador oficial del simulador (puede diferir de
 // questions.length si en el futuro se agregan preguntas extra que no cuentan).
 export function calcularResultadoSimulador(questions, answers, total) {
   const aciertos = contarAciertos(questions, answers);
-  const puntaje = aciertosACeneval(aciertos, total);
+  const puntaje = puntajeEstimado(aciertos, total);
   return { aciertos, puntaje };
 }
 
 // Punto único de entrada que despacha por `tipo` de la evaluación.
-// - simulador → delega en calcularResultadoSimulador (puntaje Ceneval).
+// - simulador → delega en calcularResultadoSimulador (puntaje estimado).
 // - quiz      → solo aciertos sobre total; nunca expone `puntaje`.
 export function calcularResultado(evaluacion, respuestas) {
   const { tipo, preguntas } = evaluacion || {};

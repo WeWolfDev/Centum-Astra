@@ -1,18 +1,17 @@
 // Mis alumnos (maestro). Implementa `mockups/Maestro-Alumnos.dc.html`.
 // HANDOFF:
-//  - Puntaje mostrado = Ceneval 700–1300 del simulador. Quizzes aparte (aciertos/total).
+//  - Puntaje mostrado = puntaje estimado 700–1300 del simulador. Quizzes aparte (aciertos/total).
 //  - Baja de puntaje en gris, nunca en rojo. "Requiere atención" sí puede usar rojo tenue.
 //  - Nunca "te faltan X puntos".
 import { useMemo, useState } from 'react';
 import { Search, ChevronRight, ArrowUp } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { mockStudents } from '../../data/mockData';
+import { mockSimuladorPreguntas, mockStudents } from '../../data/mockData';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import TeacherRoster from './TeacherRoster';
 import {
-  aciertosACeneval,
-  SIMULADOR_TOTAL_PREGUNTAS,
+  puntajeEstimado,
   ATENCION_POR_BAJA,
 } from '../../config/rediseno';
 
@@ -20,9 +19,10 @@ import {
 // TODO(rediseno): histórico real de simuladores por alumno (StudentSimulatorScore).
 // Mientras tanto, derivamos una serie corta a partir de avgScore con una pequeña
 // variación determinista por id del alumno.
-function serieCenevalDeAlumno(student) {
-  const puntajeActual = aciertosACeneval(
-    Math.round((student.avgScore / 100) * SIMULADOR_TOTAL_PREGUNTAS),
+function seriePuntajeDeAlumno(student) {
+  const puntajeActual = puntajeEstimado(
+    Math.round((student.avgScore / 100) * mockSimuladorPreguntas),
+    mockSimuladorPreguntas,
   );
   const n = 6;
   const bajo = puntajeActual - 120;
@@ -77,7 +77,7 @@ function initialsOf(name) {
 }
 
 function StudentRow({ student }) {
-  const serie = useMemo(() => serieCenevalDeAlumno(student), [student]);
+  const serie = useMemo(() => seriePuntajeDeAlumno(student), [student]);
   const puntajeActual = serie[serie.length - 1];
   const puntajePrevio = serie[serie.length - 2];
   const delta = puntajeActual - puntajePrevio;
@@ -224,7 +224,7 @@ function TeacherDashboardDemo() {
   const alumnos = useMemo(
     () =>
       mockStudents.map(s => {
-        const serie = serieCenevalDeAlumno(s);
+        const serie = seriePuntajeDeAlumno(s);
         const delta = serie[serie.length - 1] - serie[serie.length - 2];
         return { ...s, _serie: serie, _delta: delta, _atencion: ATENCION_POR_BAJA && delta < 0 };
       }),

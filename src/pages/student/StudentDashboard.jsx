@@ -11,13 +11,13 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { useAuth } from '../../context/AuthContext';
-import { mockModules } from '../../data/mockData';
+import { mockModules, mockSimuladorPreguntas } from '../../data/mockData';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import {
-  SIMULADOR_RANGO_CENEVAL,
+  ESCALA_PUNTAJE,
   META_OCULTA_POR_DEFECTO,
-  aciertosACeneval,
+  puntajeEstimado,
 } from '../../config/rediseno';
 import BotonSecundario from '../../components/rediseno/BotonSecundario';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
@@ -25,15 +25,15 @@ import InicioAlumno from './InicioAlumno';
 import TarjetasAreas from './TarjetasAreas';
 
 
-// Historial Ceneval del alumno. HANDOFF: lo primero que ve es cuánto subió desde
+// Historial del puntaje estimado del alumno (modo demo). HANDOFF: lo primero que ve es cuánto subió desde
 // su primer simulador. En el mock no existe una tabla de simuladores completados
 // por alumno; derivamos un historial razonable del único dato disponible
-// (`mockStudents.avgScore` → puntaje Ceneval actual) y un supuesto de que su
+// (`mockStudents.avgScore` → puntaje estimado actual) y un supuesto de que su
 // primer simulador fue 117 puntos abajo del actual.
 // TODO(rediseno): sustituir por tabla real StudentSimulatorScore (id, fecha,
 // aciertos, ceneval) cuando exista.
 function buildHistorialCeneval(currentCeneval) {
-  const { min, max } = SIMULADOR_RANGO_CENEVAL;
+  const { min, max } = ESCALA_PUNTAJE;
   const subida = 117; // TODO(rediseno): calcular con (ceneval actual - primer simulador real)
   const primero = Math.max(min, Math.min(max, currentCeneval - subida));
   const n = 6; // TODO(rediseno): usar el número real de simuladores completados
@@ -64,11 +64,11 @@ function InicioEjemplo({ setActiveSection }) {
   const [metaVisible, setMetaVisible] = useState(!META_OCULTA_POR_DEFECTO);
 
   // Datos del alumno. mockUsers tiene `progress` (0–100) pero no un puntaje
-  // Ceneval directo. Lo derivamos con la conversión supuesta del HANDOFF.
-  // TODO(rediseno): leer el puntaje Ceneval real del último simulador cuando
+  // estimado directo. Lo derivamos con la fórmula de la decisión 1.10 sobre el
+  // simulador de ejemplo. TODO(rediseno): leer el puntaje real del último simulador cuando
   // exista la tabla StudentSimulatorScore.
-  const aciertosActuales = Math.round(((user.progress ?? 0) / 100) * 138);
-  const puntajeActual = aciertosACeneval(aciertosActuales);
+  const aciertosActuales = Math.round(((user.progress ?? 0) / 100) * mockSimuladorPreguntas);
+  const puntajeActual = puntajeEstimado(aciertosActuales, mockSimuladorPreguntas);
 
   // Meta del alumno. HANDOFF: oculta por defecto. Hoy no hay fuente de la meta.
   // TODO(rediseno): tomar la meta del alumno de su carrera objetivo o de un
@@ -215,7 +215,7 @@ function PuntajeHero({
   onToggleMeta,
   metaCeneval,
 }) {
-  const { min, max } = SIMULADOR_RANGO_CENEVAL;
+  const { min, max } = ESCALA_PUNTAJE;
   const absDelta = Math.abs(delta);
   const faltante = metaCeneval - ultimo;
 
@@ -264,7 +264,7 @@ function PuntajeHero({
           }}
         >
           <span style={{ color: 'rgb(var(--c-ink) / 0.9)' }}>
-            <strong style={{ fontWeight: 600, color: 'rgb(var(--c-ink))' }}>{aciertos}</strong> / 138 aciertos
+            <strong style={{ fontWeight: 600, color: 'rgb(var(--c-ink))' }}>{aciertos}</strong> / {mockSimuladorPreguntas} aciertos
           </span>
           <span
             style={{
@@ -389,7 +389,7 @@ function BarraEscalaCeneval({
     <svg
       viewBox={`0 0 ${W} ${H}`}
       role="img"
-      aria-label={`Escala del índice Ceneval de ${min} a ${max}: empezaste en ${primero} y hoy vas en ${ultimo}`}
+      aria-label={`Escala del puntaje estimado de ${min} a ${max}: empezaste en ${primero} y hoy vas en ${ultimo}`}
       style={{ display: 'block', width: '100%', height: 'auto' }}
     >
       <text x={padL} y={34} fontSize={13} fill="rgb(var(--c-ink))" fillOpacity={0.6}>
@@ -564,7 +564,7 @@ function EvolucionBlock({
               Simulador EXANI-II
             </h2>
             <div style={{ fontSize: 14, color: 'rgb(var(--c-ink) / 0.8)' }}>
-              138 preguntas · da puntaje Ceneval
+              {mockSimuladorPreguntas} preguntas · da puntaje estimado
             </div>
           </div>
         </div>
@@ -613,7 +613,7 @@ function EvolucionBlock({
                   tickLine={false}
                 />
                 <YAxis
-                  domain={[SIMULADOR_RANGO_CENEVAL.min, SIMULADOR_RANGO_CENEVAL.max]}
+                  domain={[ESCALA_PUNTAJE.min, ESCALA_PUNTAJE.max]}
                   tick={{ fill: 'rgb(var(--c-ink) / 0.6)', fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
@@ -628,7 +628,7 @@ function EvolucionBlock({
                     fontSize: 13,
                   }}
                   cursor={{ stroke: 'rgb(var(--c-ink) / 0.15)' }}
-                  formatter={(v) => [`${Number(v).toLocaleString('es-MX')} pts`, 'Ceneval']}
+                  formatter={(v) => [`${Number(v).toLocaleString('es-MX')} pts`, 'Puntaje estimado']}
                 />
                 {metaVisible && (
                   <ReferenceLine

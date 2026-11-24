@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 
 // Bloque de contorno con acento azul claro (rgb(var(--c-info))) para quizzes por tema.
-// Quiz = aciertos / total. Nunca puntaje Ceneval.
+// Quiz = aciertos / total. Nunca puntaje estimado.
 export default function QuizBlock({ tema, aciertos, total, onEntrar, children }) {
   const hasScore = typeof aciertos === 'number' && typeof total === 'number';
 

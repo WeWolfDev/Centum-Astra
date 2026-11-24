@@ -6,6 +6,10 @@ export const mockUsers = [
   { id: 5, name: 'Luis Hernández', email: 'luis@centum.mx', password: 'alu123', role: 'student', progress: 42, avatar: 'LH' },
 ];
 
+// Preguntas del simulador de ejemplo del modo demo. Con Supabase, el total
+// sale de cada evaluación (#52).
+export const mockSimuladorPreguntas = 120;
+
 export const mockStudents = [
   { id: 1, name: 'Ana García López', email: 'ana@centum.mx', progress: 68, quizzes: 12, avgScore: 82, status: 'activo', paymentStatus: 'aprobado', subject: 'Pre-medicina' },
   { id: 2, name: 'Luis Hernández Vega', email: 'luis@centum.mx', progress: 42, quizzes: 7, avgScore: 71, status: 'activo', paymentStatus: 'aprobado', subject: 'Ciencias de la Salud' },

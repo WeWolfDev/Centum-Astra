@@ -103,14 +103,22 @@ describe('lista de evaluaciones', () => {
       ...SIMULADOR,
       terminados: [
         terminado({ id: 'a3', isBest: false, correctCount: 1, score: 1000 }),
-        terminado({ id: 'a2', correctCount: 2, score: 1300 }),
+        terminado({ id: 'a2', correctCount: 2, percent: 100, score: 1300 }),
       ],
     }]);
     render(<SimuladoresAlumno />);
 
-    expect(await screen.findByText('1 de 2 · 1,000 puntos')).toBeInTheDocument();
-    expect(screen.getByText('2 de 2 · 1,300 puntos')).toBeInTheDocument();
+    expect(await screen.findByText('1 de 2 aciertos · 50 % · 1,000 puntos')).toBeInTheDocument();
+    expect(screen.getByText('2 de 2 aciertos · 100 % · 1,300 puntos')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Volver a intentar: Simulador EXANI 1' })).toBeInTheDocument();
+  });
+
+  test('un quiz muestra aciertos y porcentaje, sin puntos', async () => {
+    fake.listMyEvaluations.mockResolvedValue([{ ...QUIZ, terminados: [terminado({ correctCount: 3, totalQuestions: 4, percent: 75, score: null })] }]);
+    render(<SimuladoresAlumno />);
+
+    expect(await screen.findByText('3 de 4 aciertos · 75 %')).toBeInTheDocument();
+    expect(screen.queryByText(/puntos/)).not.toBeInTheDocument();
   });
 });
 

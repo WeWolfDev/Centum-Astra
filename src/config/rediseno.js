@@ -1,14 +1,9 @@
 // Supuestos del HANDOFF — pendientes de confirmar con el cliente.
 // Mantener esta tabla como fuente única; no fijar los valores en los componentes.
 
-// Total de preguntas del simulador EXANI-II (supuesto).
-export const SIMULADOR_TOTAL_PREGUNTAS = 138;
-
-// Reparto de las 138 preguntas por área, en el orden del HANDOFF (supuesto).
-export const SIMULADOR_REPARTO = [30, 30, 30, 24, 24];
-
-// Rango del índice Ceneval (supuesto estándar EXANI-II).
-export const SIMULADOR_RANGO_CENEVAL = { min: 700, max: 1300 };
+// Escala del puntaje estimado de simuladores y cuestionarios (decisión 1.10).
+// No es un resultado oficial de Ceneval.
+export const ESCALA_PUNTAJE = { min: 700, max: 1300 };
 
 // Tiempo límite del simulador en minutos (supuesto).
 export const SIMULADOR_TIEMPO_LIMITE_MIN = 40;
@@ -16,11 +11,11 @@ export const SIMULADOR_TIEMPO_LIMITE_MIN = 40;
 // Si los simuladores con preguntas extra deben contar para el puntaje (supuesto).
 export const SIMULADOR_EXTRAS_CUENTAN = false;
 
-// Conversión aciertos → índice Ceneval (lineal, supuesto):
-// 0 aciertos ≈ 700, SIMULADOR_TOTAL_PREGUNTAS ≈ 1300.
-export function aciertosACeneval(aciertos, total = SIMULADOR_TOTAL_PREGUNTAS) {
-  const { min, max } = SIMULADOR_RANGO_CENEVAL;
-  if (total <= 0) return min;
+// Puntaje estimado: 700 + (aciertos / total de preguntas) × 600 (decisión 1.10).
+// El total es el de cada evaluación (#52): sin total no hay puntaje.
+export function puntajeEstimado(aciertos, total) {
+  const { min, max } = ESCALA_PUNTAJE;
+  if (!(total > 0)) return null;
   const ratio = Math.max(0, Math.min(1, aciertos / total));
   return Math.round(min + ratio * (max - min));
 }
