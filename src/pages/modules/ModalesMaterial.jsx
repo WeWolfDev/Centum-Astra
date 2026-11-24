@@ -75,25 +75,28 @@ export function ModalNombreClase({ clase = null, nombreModulo, temas = [], guard
   );
 }
 
-export function ModalEnlace({ clase, guardando, error, onGuardar, onCerrar }) {
-  const [titulo, setTitulo] = useState('');
-  const [url, setUrl] = useState('');
+/** Agrega un enlace a `clase` o corrige el título y la URL de `material`; el tipo no cambia. */
+export function ModalEnlace({ clase = null, material = null, guardando, error, onGuardar, onCerrar }) {
+  const [titulo, setTitulo] = useState(material?.title ?? '');
+  const [url, setUrl] = useState(material?.url ?? '');
   const [tipo, setTipo] = useState(TIPOS_ENLACE[0].valor);
 
   function enviar(e) {
     e.preventDefault();
-    onGuardar({ title: titulo, url, kind: tipo });
+    onGuardar(material ? { title: titulo, url } : { title: titulo, url, kind: tipo });
   }
 
   return (
-    <Modal abierto onCerrar={onCerrar} titulo={`Agregar enlace a ${clase.title}`}>
+    <Modal abierto onCerrar={onCerrar} titulo={material ? `Editar ${material.title}` : `Agregar enlace a ${clase.title}`}>
       <form onSubmit={enviar} className="flex flex-col gap-4">
-        <div>
-          <label htmlFor="enlace-tipo" className="block mb-1.5 text-xs font-medium text-white/70 tracking-wide">Tipo</label>
-          <select id="enlace-tipo" className={CLASE_SELECT} value={tipo} onChange={e => setTipo(e.target.value)}>
-            {TIPOS_ENLACE.map(t => <option key={t.valor} value={t.valor}>{t.etiqueta}</option>)}
-          </select>
-        </div>
+        {!material && (
+          <div>
+            <label htmlFor="enlace-tipo" className="block mb-1.5 text-xs font-medium text-white/70 tracking-wide">Tipo</label>
+            <select id="enlace-tipo" className={CLASE_SELECT} value={tipo} onChange={e => setTipo(e.target.value)}>
+              {TIPOS_ENLACE.map(t => <option key={t.valor} value={t.valor}>{t.etiqueta}</option>)}
+            </select>
+          </div>
+        )}
         <Input id="enlace-titulo" label="Título" value={titulo} onChange={e => setTitulo(e.target.value)} required />
         <Input
           id="enlace-url"
@@ -105,11 +108,12 @@ export function ModalEnlace({ clase, guardando, error, onGuardar, onCerrar }) {
           required
         />
         <p className="m-0 text-xs text-white/60">
-          Se publica de inmediato para los alumnos con acceso a esta área. Si es de Drive, compártelo
-          para que cualquiera con el enlace pueda verlo.
+          {material
+            ? 'El cambio se publica de inmediato. Se conservan las aperturas y los reportes del enlace.'
+            : 'Se publica de inmediato para los alumnos con acceso a esta área. Si es de Drive, compártelo para que cualquiera con el enlace pueda verlo.'}
         </p>
         <ErrorDialogo mensaje={error} />
-        <PieDialogo textoConfirmar="Publicar" guardando={guardando} onCancelar={onCerrar} />
+        <PieDialogo textoConfirmar={material ? 'Guardar' : 'Publicar'} guardando={guardando} onCancelar={onCerrar} />
       </form>
     </Modal>
   );

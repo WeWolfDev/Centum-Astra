@@ -12,6 +12,10 @@ profesor del curso o el administrador desde **Material** con "Agregar enlace" y
 tipo "Video". El alumno los ve en dos lugares: en la clase, dentro de
 **Módulos**, y todos juntos en la **Videoteca**, con búsqueda y filtro por materia.
 
+Con **Editar**, el administrador y quien agregó el enlace corrigen su título o
+su URL; el tipo no cambia. El video conserva sus aperturas y sus reportes. Solo
+el administrador lo retira.
+
 - Solo se aceptan enlaces `https://drive.google.com/…`. La pantalla y la base
   rechazan otros dominios, aunque se parezcan (`drive.google.com.otro.mx`).
 - Los enlaces de tipo "Página o documento en línea" aceptan cualquier `https`.
@@ -48,7 +52,7 @@ En la Videoteca, cada video tiene **Reportar problema**: "El video no carga",
 
 - Cada persona tiene a lo más un reporte abierto por video.
 - El administrador ve la etiqueta **Reportado (n)** junto al video en Material.
-  Revisa el enlace y los permisos en Drive, corrige o reemplaza el enlace, y
-  pulsa **Marcar resuelto**.
+  Revisa el enlace y los permisos en Drive, corrige el enlace con **Editar** si
+  hace falta, y pulsa **Marcar resuelto**.
 - El profesor no ve los reportes; el cliente decidió que el administrador
   mantiene los enlaces y resuelve los problemas de disponibilidad.
