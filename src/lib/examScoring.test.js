@@ -5,9 +5,9 @@ import {
   calcularResultado,
   resultadosParaGrafica,
 } from './examScoring';
-import { SIMULADOR_RANGO_CENEVAL } from '../config/rediseno';
+import { ESCALA_PUNTAJE } from '../config/rediseno';
 
-const { min: MIN, max: MAX } = SIMULADOR_RANGO_CENEVAL;
+const { min: MIN, max: MAX } = ESCALA_PUNTAJE;
 
 // Construye un banco mínimo donde la respuesta correcta de q[i] es (i % 4).
 function bank(n) {
@@ -132,7 +132,7 @@ describe('calcularResultado', () => {
     const qs = bank(5);
     const r = calcularResultado({ tipo: 'quiz', preguntas: qs }, allCorrect(qs));
     expect(r).toEqual({ tipo: 'quiz', aciertos: 5, total: 5 });
-    // Invariante: un quiz nunca produce puntaje Ceneval.
+    // Invariante: un quiz nunca produce puntaje estimado.
     expect(r).not.toHaveProperty('puntaje');
   });
 

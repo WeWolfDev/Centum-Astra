@@ -9,7 +9,7 @@ export const TIPO_COPY = {
     nombrePh: 'Simulador EXANI-II · set 1',
     aparecera: 'Este simulador aparecerá para los alumnos y su puntaje alimenta su gráfica.',
     vacioTitulo: 'Aún no has creado simuladores',
-    vacioDescripcion: 'Un simulador largo con puntaje Ceneval le sirve al alumno para medir su progreso.',
+    vacioDescripcion: 'Un simulador largo con puntaje estimado le sirve al alumno para medir su progreso.',
     vacioCta: 'Crear mi primer simulador',
     tono: 'tipo-simulador',
   },

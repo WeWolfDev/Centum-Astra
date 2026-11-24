@@ -20,7 +20,7 @@
 | `src/components/layout/` | 3 archivos: `Header`, `Sidebar`, `PublicNav` | `PublicNav.jsx` tiene 865 líneas — es un "mini-site" (CTA, menú, bloques de hero) más que una barra de navegación. |
 | `src/components/rediseno/` | 10 micro-componentes nacidos del rediseño: `BotonPrimario`, `BotonSecundario`, `Pastilla`, `StatCifra`, `PdfCard`, `VideoCard`, `QuizBlock`, `SimuladorBlock`, `IconSubject`, `ModalRecurso`, `ModalClase` | **Es el único intento de sistema de UI.** Convive con muchas versiones manuales del mismo botón/tarjeta en las páginas no-rediseño. |
 | `src/context/` | `AuthContext` (user + login mock), `MaterialContext` (archivos subidos por el maestro) | Estado global simple con `useState` — sin reducer, sin persistencia. |
-| `src/config/rediseno.js` | Constantes del rediseño (`SIMULADOR_TOTAL_PREGUNTAS`, `ATENCION_POR_BAJA`, `aciertosACeneval`) | 38 líneas. Único archivo "de dominio" fuera de `data/`. |
+| `src/config/rediseno.js` | Constantes del rediseño (`ESCALA_PUNTAJE`, `ATENCION_POR_BAJA`, `puntajeEstimado`; sin total fijo de preguntas desde #52) | 38 líneas. Único archivo "de dominio" fuera de `data/`. |
 | `src/data/mockData.js` | Usuarios, alumnos, módulos, quizzes, videos — todo el estado inicial | 198 líneas, hardcoded. Fuente única de la demo. |
 | `src/hooks/` | `useBreakpoint.js` (15 líneas) — detecta móvil por `window.innerWidth < 768` | Único hook propio. |
 | `src/lib/` | `utils.js` (`cn` con `clsx`+`tailwind-merge`), `examScoring.js` | Mínimo. |

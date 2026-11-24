@@ -1,6 +1,6 @@
 // Inicio del alumno con Supabase (#37): solo resultados reales de sus
 // evaluaciones (#31, docs/ESTADISTICAS.md). Sin intentos dice "Sin resultados",
-// nunca 0 %. El puntaje Ceneval y su evolución de ejemplo quedan para el modo demo.
+// nunca 0 %. La gráfica de evolución del puntaje queda para el modo demo.
 import { BarChart3, Target } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import useCarga from '../../hooks/useCarga';

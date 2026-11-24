@@ -4,7 +4,7 @@
 // Reglas del HANDOFF:
 //  - El alumno NO descarga PDFs: PdfCard con canDownload={false}.
 //  - No hay porcentaje de avance por módulo. Sí hay estado por clase.
-//  - Quizzes por tema con aciertos/total (nunca puntaje Ceneval).
+//  - Quizzes por tema con aciertos/total (nunca puntaje estimado).
 import { useMemo, useState } from 'react';
 import { Lock, ChevronDown } from 'lucide-react';
 import { mockModules, mockSessionsByModule, mockVideos } from '../../data/mockData';

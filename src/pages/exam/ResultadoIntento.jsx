@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CheckCircle2, Circle, XCircle } from 'lucide-react';
 import { formatoReloj, loadQuestions, reviewAttempt, tienePuntaje } from '../../lib/evaluacionesService';
-import { SIMULADOR_RANGO_CENEVAL } from '../../config/rediseno';
+import { ESCALA_PUNTAJE } from '../../config/rediseno';
 import Boton from '../../components/rediseno/Boton';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
 
@@ -103,7 +103,7 @@ export default function ResultadoIntento({ evaluacion, intento, motivo, onVolver
       </dl>
       {conPuntaje && (
         <p className="m-0 text-xs text-white/60">
-          {NOTA_ESTIMACION} Puntaje en escala {SIMULADOR_RANGO_CENEVAL.min}–{SIMULADOR_RANGO_CENEVAL.max}.
+          {NOTA_ESTIMACION} Puntaje en escala {ESCALA_PUNTAJE.min}–{ESCALA_PUNTAJE.max}.
         </p>
       )}
 

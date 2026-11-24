@@ -7,9 +7,9 @@ import Pastilla from '../../components/rediseno/Pastilla';
 import { useMaterial } from '../../context/MaterialContext';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import IconSubject from '../../components/rediseno/IconSubject';
-import { aciertosACeneval, SIMULADOR_TOTAL_PREGUNTAS, META_OCULTA_POR_DEFECTO, SIMULADOR_RANGO_CENEVAL } from '../../config/rediseno';
+import { puntajeEstimado, META_OCULTA_POR_DEFECTO, ESCALA_PUNTAJE } from '../../config/rediseno';
 import { resultadosParaGrafica } from '../../lib/examScoring';
-import { mockStudents, mockModules } from '../../data/mockData';
+import { mockSimuladorPreguntas, mockStudents, mockModules } from '../../data/mockData';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { AREA_POR_ID } from '../../config/areas';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
@@ -20,13 +20,13 @@ const NOTA_ESTIMACION = 'Estimación. No es resultado oficial del Ceneval.';
 
 // TODO(rediseno): tabla real de StudentSimulatorScore. Mientras tanto, derivamos
 // un histórico de simuladores a partir del alumno mock (Ana García López) con una
-// serie plausible de aciertos → puntaje Ceneval vía aciertosACeneval().
+// serie plausible de aciertos → puntaje estimado vía puntajeEstimado().
 // Los aciertos se eligen de modo que el último simulador coincida aproximadamente
-// con el avgScore del alumno proyectado sobre las 138 preguntas.
+// con el avgScore del alumno proyectado sobre el simulador de ejemplo.
 function buildSimuladoresHistoricos(student) {
-  const total = SIMULADOR_TOTAL_PREGUNTAS;
+  const total = mockSimuladorPreguntas;
   const avg = typeof student?.avgScore === 'number' ? student.avgScore : 60;
-  // El avgScore está en escala 0–100. Lo convertimos a aciertos sobre 138.
+  // El avgScore está en escala 0–100. Lo convertimos a aciertos del simulador de ejemplo.
   const ultimo = Math.round((avg / 100) * total);
   // Serie creciente que termina en `ultimo` (progreso del alumno).
   const serie = [
@@ -41,8 +41,8 @@ function buildSimuladoresHistoricos(student) {
   // Cuando conectemos resultados reales, el mismo filtro ignorará quizzes
   // y simuladores sin puntaje.
   const items = serie.map((s, i) => {
-    const puntaje = aciertosACeneval(s.aciertos, total);
-    const prev = i > 0 ? aciertosACeneval(serie[i - 1].aciertos, total) : null;
+    const puntaje = puntajeEstimado(s.aciertos, total);
+    const prev = i > 0 ? puntajeEstimado(serie[i - 1].aciertos, total) : null;
     const delta = prev == null ? null : puntaje - prev;
     return { tipo: 'simulador', ...s, total, puntaje, delta };
   });
@@ -159,7 +159,7 @@ function SimuladoresDemo() {
         <div style={{ flex: '1.55 1 460px', minWidth: 0 }}>
         <SimuladorBlock
           titulo="Simulador EXANI-II"
-          subtitulo={`${SIMULADOR_TOTAL_PREGUNTAS} preguntas · da puntaje Ceneval`}
+          subtitulo={`${mockSimuladorPreguntas} preguntas · da puntaje estimado`}
         >
           {/* CTA en el borde superior del cuerpo, como el mockup */}
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -273,7 +273,7 @@ function SimuladoresDemo() {
               color: 'rgb(var(--c-ink) / 0.6)',
             }}
           >
-            {NOTA_ESTIMACION} Puntaje en escala {SIMULADOR_RANGO_CENEVAL.min}–{SIMULADOR_RANGO_CENEVAL.max}.
+            {NOTA_ESTIMACION} Puntaje en escala {ESCALA_PUNTAJE.min}–{ESCALA_PUNTAJE.max}.
           </p>
 
           {/* Historial de simuladores */}

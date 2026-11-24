@@ -19,11 +19,12 @@ const ESTILO_CONTENEDOR = {
   overflowY: 'auto',
 };
 
+// Decisión 1.10: aciertos y porcentaje siempre; puntos solo en simuladores y cuestionarios.
 function resumenResultado(intento, kind) {
-  const aciertos = `${intento.correctCount} de ${intento.totalQuestions}`;
-  return tienePuntaje(kind) && intento.score != null
-    ? `${aciertos} · ${intento.score.toLocaleString('es-MX')} puntos`
-    : `${aciertos} aciertos`;
+  const partes = [`${intento.correctCount} de ${intento.totalQuestions} aciertos`];
+  if (intento.percent != null) partes.push(`${Math.round(intento.percent)} %`);
+  if (tienePuntaje(kind) && intento.score != null) partes.push(`${intento.score.toLocaleString('es-MX')} puntos`);
+  return partes.join(' · ');
 }
 
 function TarjetaEvaluacion({ evaluacion, ocupado, onIniciar, onVerResultado }) {

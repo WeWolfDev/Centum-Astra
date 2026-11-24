@@ -2,8 +2,8 @@
 // Cada pestaña tiene su propio listado, estado vacío y botón de crear.
 //
 // Reglas del HANDOFF que aplican:
-//  - Simulador = da puntaje Ceneval y alimenta la gráfica del alumno.
-//  - Quiz = aciertos sobre total. Nunca puntaje Ceneval.
+//  - Simulador = da puntaje estimado y alimenta la gráfica del alumno.
+//  - Quiz = aciertos sobre total. Nunca puntaje estimado.
 //  - Visualmente: cards con acento azul claro rgb(var(--c-info)), pastilla por tipo.
 //  - Sin degradado dorado, sin emojis.
 import { useMemo, useState } from 'react';
@@ -199,7 +199,7 @@ function MaestroQuizzesDemo({ conSimuladores }) {
   const hayItems = itemsActivos.length > 0;
   const titulo = conSimuladores ? 'Simuladores y quizzes' : 'Quizzes';
   const descripcion = conSimuladores
-    ? 'Arma simuladores con puntaje Ceneval y quizzes cortos por tema. Los verán tus alumnos.'
+    ? 'Arma simuladores con puntaje estimado y quizzes cortos por tema. Los verán tus alumnos.'
     : 'Arma quizzes cortos por tema para que tus alumnos repasen. Los verán tus alumnos.';
 
   function abrirModal() {
