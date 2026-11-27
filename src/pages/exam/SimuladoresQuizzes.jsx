@@ -16,6 +16,10 @@ import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { AREA_POR_ID } from '../../config/areas';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import SimuladoresAlumno from './SimuladoresAlumno';
+import QuizDemo from './QuizDemo';
+import ColeccionEstrellas from '../../components/rediseno/ColeccionEstrellas';
+import useEstrellasDemo from '../../hooks/useEstrellasDemo';
+import { quizzesEjemplo, simuladorMuestra } from '../../data/quizzesEjemplo';
 
 // Nota de la decisión 1.10: no es un resultado oficial del EXANI-II.
 const NOTA_ESTIMACION = 'Estimación. No es resultado oficial del EXANI-II.';
@@ -82,6 +86,10 @@ function SimuladoresDemo() {
   const quizzesRecientes = useMemo(() => buildQuizzesRecientes(), []);
   const materias = useMemo(() => buildMateriasConProgreso(), []);
 
+  // Quiz o simulador que el alumno está contestando en el demo, y sus estrellas (#57).
+  const [evaluacionActiva, setEvaluacionActiva] = useState(null);
+  const estrellas = useEstrellasDemo();
+
   const primero = simuladores[0];
   const ultimo = simuladores[simuladores.length - 1];
   const subida = ultimo && primero ? ultimo.puntaje - primero.puntaje : 0;
@@ -102,6 +110,16 @@ function SimuladoresDemo() {
   const areaD = `${lineD} L${xs[xs.length - 1]} 170 L${xs[0]} 170 Z`;
   const my = Y(metaCeneval);
   const myLabel = my < 22 ? my + 16 : my - 7;
+
+  if (evaluacionActiva) {
+    return (
+      <QuizDemo
+        evaluacion={evaluacionActiva}
+        onTerminar={estrellas.terminar}
+        onSalir={() => setEvaluacionActiva(null)}
+      />
+    );
+  }
 
   return (
     <div
@@ -134,6 +152,8 @@ function SimuladoresDemo() {
         Tus resultados e historial de esta sección son de muestra hasta que los simuladores guarden tus intentos.
       </AvisoDatosEjemplo>
 
+      <ColeccionEstrellas registros={estrellas.registros} />
+
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 24 }}>
         {/* ----- SIMULADOR EXANI-II (bloque azul sólido via SimuladorBlock) ----- */}
         <div style={{ flex: '1.55 1 460px', minWidth: 0 }}>
@@ -143,8 +163,8 @@ function SimuladoresDemo() {
         >
           {/* CTA en el borde superior del cuerpo, como el mockup */}
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <BotonPrimario disabled aria-label="Iniciar nuevo simulador (próximamente)">
-              Próximamente
+            <BotonPrimario onClick={() => setEvaluacionActiva(simuladorMuestra)}>
+              Probar simulador de muestra
             </BotonPrimario>
           </div>
 
@@ -537,6 +557,30 @@ function SimuladoresDemo() {
                     })}
                   </span>
                 </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Quizzes que se pueden contestar en el demo: dan estrella al terminar */}
+          <div>
+            <h3
+              style={{
+                margin: '0 0 10px',
+                fontSize: 14,
+                fontWeight: 600,
+                color: 'rgb(var(--c-ink) / 0.9)',
+              }}
+            >
+              Practica ahora
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {quizzesEjemplo.map(q => (
+                <QuizBlock key={q.id} tema={q.titulo} onEntrar={() => setEvaluacionActiva(q)}>
+                  <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px', fontSize: 13, color: 'rgb(var(--c-ink) / 0.7)' }}>
+                    <Pastilla tono="tipo-quiz">Quiz</Pastilla>
+                    <span>{q.materia} · {q.preguntas.length} preguntas · gana una estrella</span>
+                  </div>
+                </QuizBlock>
               ))}
             </div>
           </div>

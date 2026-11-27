@@ -86,7 +86,7 @@ describe('LandingPage', () => {
   test('el precio es el registrado con el cliente, sin promesas que no se acordaron', () => {
     renderizar();
     expect(screen.getByText('$4,500')).toBeInTheDocument();
-    expect(screen.getByText(/inscripción de \$500 incluida/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/inscripción de \$500 incluida/i).length).toBeGreaterThan(0);
     expect(screen.queryByText(/pago único|sin mensualidades/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/garantía|te devolvemos/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/6 meses/i)).not.toBeInTheDocument();

@@ -2,9 +2,11 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight, MapPin, Phone, Mail, User, CheckCircle,
-  ShieldCheck, Zap, BookOpen, MessageCircle,
+  ShieldCheck, BookOpen, MessageCircle,
 } from 'lucide-react';
 import PublicNav from '../../components/layout/PublicNav';
+import HeroMedicina from './secciones/HeroMedicina';
+import { SeccionAreas, SeccionCalcula, SeccionEstrellas, SeccionPadres, SeccionTestimonios } from './secciones/SeccionesHistoria';
 import { useModoOscuroForzado } from '../../context/ThemeContext';
 import { canalDeRegistro, enlaceRegistro } from '../../config/contacto';
 
@@ -27,115 +29,6 @@ const PLAN_FEATURES = [
   'Acceso desde celular, tablet y PC',
   'Soporte vía WhatsApp',
 ];
-
-/* ══════════════════════════════════════════════════════════
-   SECTION A — Hero (minimalista)
-══════════════════════════════════════════════════════════ */
-function Hero({ onRegisterClick }) {
-  const container = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.12, delayChildren: 0.2 } },
-  };
-  const item = {
-    hidden: { opacity: 0, y: 22 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
-  };
-
-  return (
-    <section className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* Fondo: una sola capa (degradado radial del rediseño) + halo dorado sutil */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          zIndex: 0,
-          background:
-            'radial-gradient(ellipse 90% 60% at 50% 0%, #0c1d45 0%, transparent 70%), #030a1a',
-        }}
-      />
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          zIndex: 1,
-          top: '12%', left: '50%', transform: 'translateX(-50%)',
-          width: 'min(640px, 90vw)', height: 'min(640px, 90vw)',
-          background:
-            'radial-gradient(circle at 50% 50%, rgba(245,200,66,0.08) 0%, transparent 60%)',
-          filter: 'blur(40px)',
-        }}
-      />
-
-      {/* Contenido centrado */}
-      <motion.div
-        className="relative flex flex-col flex-1 items-center justify-center text-center px-6 pt-28 pb-24"
-        style={{ zIndex: 5 }}
-        variants={container}
-        initial="hidden"
-        animate="show"
-      >
-        {/* Badge */}
-        <motion.div variants={item} className="mb-7">
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '5px 14px', borderRadius: 999,
-            background: 'rgba(245,200,66,0.1)',
-            border: '1px solid rgba(245,200,66,0.22)',
-            fontSize: 12, fontWeight: 600, color: '#f5c842',
-            letterSpacing: '0.05em',
-          }}>
-            <Zap size={11} />
-            PREPARACIÓN EXANI-II · CARRERAS DE SALUD
-          </span>
-        </motion.div>
-
-        {/* Headline */}
-        <motion.h1
-          variants={item}
-          className="mb-7"
-          style={{
-            fontFamily: '"Bricolage Grotesque", sans-serif',
-            fontWeight: 800,
-            fontSize: 'clamp(44px, 8vw, 80px)',
-            lineHeight: 1.02,
-            letterSpacing: '-0.03em',
-            maxWidth: 920,
-          }}
-        >
-          <span style={{ color: 'white' }}>Domina el EXANI-II.</span>
-          <br />
-          <span style={{ color: '#f5c842' }}>Vive tu vocación.</span>
-        </motion.h1>
-
-        {/* Sub */}
-        <motion.p
-          variants={item}
-          style={{
-            color: 'rgba(255,255,255,0.72)',
-            fontSize: 'clamp(15px, 1.6vw, 18px)',
-            lineHeight: 1.7,
-            maxWidth: 560,
-            marginBottom: 36,
-          }}
-        >
-          La plataforma diseñada para aspirantes a carreras de salud.
-          Simuladores reales, metodología probada y seguimiento personalizado
-          para que llegues donde quieres.
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div variants={item} className="flex flex-wrap gap-3 justify-center">
-          <button
-            className="btn-gold-flat"
-            onClick={onRegisterClick}
-            style={{ padding: '14px 28px', fontSize: 15 }}
-          >
-            Quiero acceder a la plataforma
-          </button>
-        </motion.div>
-
-      </motion.div>
-    </section>
-  );
-}
 
 /* ══════════════════════════════════════════════════════════
    SECTION C — Registration + Payment
@@ -505,7 +398,12 @@ export default function LandingPage({ onLoginClick }) {
   return (
     <div className="relative" style={{ background: '#030a1a' }}>
       <PublicNav onLoginClick={onLoginClick} />
-      <Hero onRegisterClick={scrollToRegister} />
+      <HeroMedicina onRegisterClick={scrollToRegister} />
+      <SeccionCalcula />
+      <SeccionEstrellas />
+      <SeccionAreas />
+      <SeccionTestimonios />
+      <SeccionPadres />
       <RegistrationPayment sectionRef={registroRef} />
       <LandingFooter onLoginClick={onLoginClick} />
     </div>

@@ -82,7 +82,8 @@ El **bloque de firma** (simulador EXANI-II y cifras principales) es navy en oscu
 - Un solo acento: dorado. Relleno `#f5c842` en botones; como texto, `{colors.<modo>.gold}`.
 - Tres superficies por modo: `canvas`, `surface` y `surface-subtle`, más el bloque navy.
 - Cifras grandes en Bricolage Grotesque con números tabulares.
-- Sin vidrio (`backdrop-filter`), sin estrellas y sin degradados dorados en texto ni en botones (ver `mockups/HANDOFF.md`).
+- Sin vidrio (`backdrop-filter`), sin estrellas de adorno y sin degradados dorados en texto ni en botones (ver `mockups/HANDOFF.md`).
+- La estrella significa una sola cosa: un quiz o simulador terminado (#57). Va en relleno `gold-fill` con contorno `gold-muted` (componente `Estrella`) y no se usa como decoración en ningún otro lugar.
 
 ## Colors
 
