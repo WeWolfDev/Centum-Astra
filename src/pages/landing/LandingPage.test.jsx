@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 const contacto = vi.hoisted(() => ({ canal: null }));
@@ -75,5 +75,26 @@ describe('LandingPage', () => {
     expect(screen.getByRole('heading', { name: 'Ya casi' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Si no se abrió, toca aquí' })).toHaveAttribute('href', url);
     expect(screen.queryByText(/solicitud recibida/i)).not.toBeInTheDocument();
+  });
+
+  test('el botón de iniciar sesión del menú tiene una versión corta para el celular', () => {
+    renderizar();
+    const boton = within(screen.getByRole('navigation')).getByRole('button', { name: 'Iniciar sesión' });
+    expect(boton).toHaveTextContent('Entrar');
+  });
+
+  test('el precio es el registrado con el cliente, sin promesas que no se acordaron', () => {
+    renderizar();
+    expect(screen.getByText('$4,500')).toBeInTheDocument();
+    expect(screen.getByText(/inscripción de \$500 incluida/i)).toBeInTheDocument();
+    expect(screen.queryByText(/pago único|sin mensualidades/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/garantía|te devolvemos/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/6 meses/i)).not.toBeInTheDocument();
+  });
+
+  test('el pie de página muestra el año actual', () => {
+    vi.spyOn(Date.prototype, 'getFullYear').mockReturnValue(2027);
+    renderizar();
+    expect(screen.getByText(/© 2027 Centum Astra/)).toBeInTheDocument();
   });
 });

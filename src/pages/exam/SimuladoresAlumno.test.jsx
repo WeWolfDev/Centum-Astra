@@ -238,7 +238,7 @@ describe('contestar y entregar', () => {
     expect(screen.getByText('1 / 2')).toBeInTheDocument();
     expect(screen.getByText('50 %')).toBeInTheDocument();
     expect(screen.getByText('1,000')).toBeInTheDocument();
-    expect(screen.getByText(/No es resultado oficial del Ceneval/)).toBeInTheDocument();
+    expect(screen.getByText(/No es resultado oficial del EXANI-II/)).toBeInTheDocument();
     expect(await screen.findByText('Suma básica.')).toBeInTheDocument();
     expect(screen.getByText('Tu respuesta, correcta')).toBeInTheDocument();
     expect(screen.getByText('Respuesta correcta')).toBeInTheDocument();

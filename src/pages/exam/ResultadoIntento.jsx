@@ -8,7 +8,7 @@ import { ESCALA_PUNTAJE } from '../../config/rediseno';
 import Boton from '../../components/rediseno/Boton';
 import EstadoVacio from '../../components/rediseno/EstadoVacio';
 
-const NOTA_ESTIMACION = 'Estimación. No es resultado oficial del Ceneval.';
+const NOTA_ESTIMACION = 'Estimación. No es resultado oficial del EXANI-II.';
 
 const MOTIVOS = {
   tiempo: 'Se terminó el tiempo. Se calificó con las respuestas que alcanzaron a guardarse.',

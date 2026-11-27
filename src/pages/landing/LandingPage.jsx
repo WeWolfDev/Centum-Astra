@@ -26,7 +26,6 @@ const PLAN_FEATURES = [
   'Estadísticas de progreso personalizadas',
   'Acceso desde celular, tablet y PC',
   'Soporte vía WhatsApp',
-  'Vigencia de 6 meses completos',
 ];
 
 /* ══════════════════════════════════════════════════════════
@@ -230,7 +229,7 @@ function RegistrationPayment({ sectionRef }) {
             ACCESO COMPLETO
           </span>
           <h2
-            className="font-syne font-bold text-white mb-4"
+            className="font-display font-bold text-white mb-4"
             style={{ fontSize: 36, letterSpacing: '-0.03em', lineHeight: 1.1 }}
           >
             Empieza hoy mismo.
@@ -267,7 +266,7 @@ function RegistrationPayment({ sectionRef }) {
                 }}>
                   <CheckCircle size={32} color="#f5c842" />
                 </div>
-                <h3 className="font-syne font-bold text-white text-2xl">Ya casi</h3>
+                <h3 className="font-display font-bold text-white text-2xl">Ya casi</h3>
                 <p className="text-white/60 text-[15px] leading-[1.7] max-w-sm">
                   Abrimos {nombreCanal} con tus datos. Envía el mensaje para que te respondamos
                   con los pasos para pagar y activar tu cuenta.
@@ -290,7 +289,7 @@ function RegistrationPayment({ sectionRef }) {
                 className="glass rounded-2xl p-8"
               >
                 <div className="mb-7">
-                  <h3 className="font-syne font-bold text-white text-xl mb-1">Tus datos</h3>
+                  <h3 className="font-display font-bold text-white text-xl mb-1">Tus datos</h3>
                   <p className="text-white/60 text-[13px]">Todos los campos son obligatorios.</p>
                 </div>
 
@@ -424,19 +423,20 @@ function RegistrationPayment({ sectionRef }) {
               <div className="flex items-center gap-2 mb-4">
                 <BookOpen size={15} color="#f5c842" />
                 <span style={{ fontSize: 11, fontWeight: 700, color: '#f5c842', letterSpacing: '0.1em' }}>
-                  ACCESO COMPLETO · 6 MESES
+                  CURSO COMPLETO
                 </span>
               </div>
               <div className="flex items-end gap-2 mb-1">
                 <span
-                  className="font-syne font-bold text-white"
+                  className="font-display font-bold text-white"
                   style={{ fontSize: 48, lineHeight: 1, letterSpacing: '-0.03em' }}
                 >
-                  $1,499
+                  $4,500
                 </span>
                 <span className="text-white/60 text-[14px] mb-2">MXN</span>
               </div>
-              <p className="text-white/60 text-[12.5px]">Pago único · Sin mensualidades</p>
+              {/* Precio registrado con el cliente (sección 1.8); las condiciones de cada descuento siguen pendientes. */}
+              <p className="text-white/60 text-[12.5px]">Inscripción de $500 incluida · También en mensualidades</p>
             </div>
 
             {/* Features */}
@@ -456,22 +456,6 @@ function RegistrationPayment({ sectionRef }) {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            {/* Guarantee */}
-            <div
-              className="mx-5 mb-5 rounded-xl px-5 py-4"
-              style={{ background: 'rgba(29,233,182,0.05)', border: '1px solid rgba(29,233,182,0.14)' }}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <ShieldCheck size={13} color="#1de9b6" />
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#1de9b6' }}>
-                  Garantía de satisfacción
-                </span>
-              </div>
-              <p className="text-white/60 text-[12px] leading-[1.55]">
-                Si en los primeros 7 días no estás satisfecho, te devolvemos tu inversión.
-              </p>
             </div>
           </motion.div>
 
@@ -494,7 +478,7 @@ function LandingFooter({ onLoginClick }) {
       }}
     >
       <p className="text-white/60 text-[12px]">
-        © 2025 Centum Astra · Todos los derechos reservados
+        © {new Date().getFullYear()} Centum Astra · Todos los derechos reservados
       </p>
       <button
         onClick={onLoginClick}

@@ -96,7 +96,7 @@ function Promedios({ promedios }) {
         />
       </div>
       <p className="m-0 text-xs text-white/60">
-        Cuenta tu mejor intento de cada evaluación. El {examScoreLabel.toLowerCase()} no es un resultado oficial de Ceneval.
+        Cuenta tu mejor intento de cada evaluación. El {examScoreLabel.toLowerCase()} no es un resultado oficial del EXANI-II.
       </p>
     </section>
   );

@@ -12,12 +12,12 @@ import {
 } from 'recharts';
 import { useAuth } from '../../context/AuthContext';
 import { mockModules, mockSimuladorPreguntas } from '../../data/mockData';
+import { historialSimuladorEjemplo } from '../../data/simuladorEjemplo';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import {
   ESCALA_PUNTAJE,
   META_OCULTA_POR_DEFECTO,
-  puntajeEstimado,
 } from '../../config/rediseno';
 import BotonSecundario from '../../components/rediseno/BotonSecundario';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
@@ -25,30 +25,15 @@ import InicioAlumno from './InicioAlumno';
 import TarjetasAreas from './TarjetasAreas';
 
 
-// Historial del puntaje estimado del alumno (modo demo). HANDOFF: lo primero que ve es cuánto subió desde
-// su primer simulador. En el mock no existe una tabla de simuladores completados
-// por alumno; derivamos un historial razonable del único dato disponible
-// (`mockStudents.avgScore` → puntaje estimado actual) y un supuesto de que su
-// primer simulador fue 117 puntos abajo del actual.
-// TODO(rediseno): sustituir por tabla real StudentSimulatorScore (id, fecha,
-// aciertos, ceneval) cuando exista.
-function buildHistorialCeneval(currentCeneval) {
-  const { min, max } = ESCALA_PUNTAJE;
-  const subida = 117; // TODO(rediseno): calcular con (ceneval actual - primer simulador real)
-  const primero = Math.max(min, Math.min(max, currentCeneval - subida));
-  const n = 6; // TODO(rediseno): usar el número real de simuladores completados
-  const puntos = [];
-  for (let i = 0; i < n; i++) {
-    const t = i / (n - 1);
-    const base = primero + subida * t;
-    const ruido = 18 * Math.sin(i * 2.1) * Math.sin(Math.PI * t);
-    const v = Math.round(Math.max(min, Math.min(max, base + ruido)));
-    puntos.push({ idx: i + 1, label: i === 0 ? 'Primero' : `#${i + 1}`, ceneval: v });
-  }
-  // Fuerza que el último coincida con el actual (sin ruido).
-  puntos[puntos.length - 1].ceneval = currentCeneval;
-  puntos[0].ceneval = primero;
-  return puntos;
+// Historial del puntaje estimado del alumno (modo demo). HANDOFF: lo primero que
+// ve es cuánto subió desde su primer simulador. Es el mismo historial que muestra
+// Simuladores, para que las dos pantallas no se contradigan.
+function historialInicio(email) {
+  return historialSimuladorEjemplo(email).map((s, i) => ({
+    idx: s.n,
+    label: i === 0 ? 'Primero' : `#${s.n}`,
+    ceneval: s.puntaje,
+  }));
 }
 
 // Con Supabase, Inicio muestra solo resultados reales (#37); sin Supabase, el
@@ -63,19 +48,16 @@ function InicioEjemplo({ setActiveSection }) {
   const { user } = useAuth();
   const [metaVisible, setMetaVisible] = useState(!META_OCULTA_POR_DEFECTO);
 
-  // Datos del alumno. mockUsers tiene `progress` (0–100) pero no un puntaje
-  // estimado directo. Lo derivamos con la fórmula de la decisión 1.10 sobre el
-  // simulador de ejemplo. TODO(rediseno): leer el puntaje real del último simulador cuando
-  // exista la tabla StudentSimulatorScore.
-  const aciertosActuales = Math.round(((user.progress ?? 0) / 100) * mockSimuladorPreguntas);
-  const puntajeActual = puntajeEstimado(aciertosActuales, mockSimuladorPreguntas);
+  // El último simulador del historial de ejemplo es el resultado actual.
+  const simuladores = useMemo(() => historialSimuladorEjemplo(user.email), [user.email]);
+  const { aciertos: aciertosActuales, puntaje: puntajeActual } = simuladores[simuladores.length - 1];
 
   // Meta del alumno. HANDOFF: oculta por defecto. Hoy no hay fuente de la meta.
   // TODO(rediseno): tomar la meta del alumno de su carrera objetivo o de un
   // input del propio alumno (ver pregunta pendiente en HANDOFF).
   const metaCeneval = 1240;
 
-  const historial = useMemo(() => buildHistorialCeneval(puntajeActual), [puntajeActual]);
+  const historial = useMemo(() => historialInicio(user.email), [user.email]);
   const primero = historial[0].ceneval;
   const ultimo = historial[historial.length - 1].ceneval;
   const delta = ultimo - primero;
@@ -346,7 +328,7 @@ function PuntajeHero({
             {metaVisible ? 'Ocultar mi meta' : 'Ver mi meta'}
           </BotonSecundario>
           <span style={{ fontSize: 13, color: 'rgb(var(--c-ink) / 0.6)' }}>
-            Estimación. No es resultado oficial del Ceneval.
+            Estimación. No es resultado oficial del EXANI-II.
           </span>
           {metaVisible && (
             <span style={{ fontSize: 13, color: 'rgb(var(--c-info))', fontWeight: 600 }}>

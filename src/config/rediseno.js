@@ -2,7 +2,7 @@
 // Mantener esta tabla como fuente única; no fijar los valores en los componentes.
 
 // Escala del puntaje estimado de simuladores y cuestionarios (decisión 1.10).
-// No es un resultado oficial de Ceneval.
+// No es un resultado oficial del EXANI-II.
 export const ESCALA_PUNTAJE = { min: 700, max: 1300 };
 
 // Tiempo límite del simulador en minutos (supuesto).

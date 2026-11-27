@@ -70,7 +70,7 @@ export default function TeacherRoster() {
       <section aria-labelledby="maestro-estadisticas" className="flex flex-col gap-3">
         <h2 id="maestro-estadisticas" className="m-0 font-display font-bold text-xl text-white tracking-tight">Estadísticas de tus grupos</h2>
         <p className="m-0 text-sm text-white/70">
-          Todo el curso. Cuenta el mejor intento de cada alumno en cada evaluación; el puntaje estimado no es un resultado oficial de Ceneval.
+          Todo el curso. Cuenta el mejor intento de cada alumno en cada evaluación; el puntaje estimado no es un resultado oficial del EXANI-II.
         </p>
         <EstadisticasGrupos vacio="Todavía no tienes grupos asignados." />
       </section>

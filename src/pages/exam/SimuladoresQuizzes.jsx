@@ -5,46 +5,29 @@ import SimuladorBlock from '../../components/rediseno/SimuladorBlock';
 import QuizBlock from '../../components/rediseno/QuizBlock';
 import Pastilla from '../../components/rediseno/Pastilla';
 import { useMaterial } from '../../context/MaterialContext';
+import { useAuth } from '../../context/AuthContext';
 import BotonPrimario from '../../components/rediseno/BotonPrimario';
 import IconSubject from '../../components/rediseno/IconSubject';
-import { puntajeEstimado, META_OCULTA_POR_DEFECTO, ESCALA_PUNTAJE } from '../../config/rediseno';
+import { META_OCULTA_POR_DEFECTO, ESCALA_PUNTAJE } from '../../config/rediseno';
 import { resultadosParaGrafica } from '../../lib/examScoring';
-import { mockSimuladorPreguntas, mockStudents, mockModules } from '../../data/mockData';
+import { mockSimuladorPreguntas, mockModules } from '../../data/mockData';
+import { historialSimuladorEjemplo } from '../../data/simuladorEjemplo';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
 import { AREA_POR_ID } from '../../config/areas';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import SimuladoresAlumno from './SimuladoresAlumno';
 
-// Nota del HANDOFF: "Estimación. No es resultado oficial del Ceneval."
-const NOTA_ESTIMACION = 'Estimación. No es resultado oficial del Ceneval.';
+// Nota de la decisión 1.10: no es un resultado oficial del EXANI-II.
+const NOTA_ESTIMACION = 'Estimación. No es resultado oficial del EXANI-II.';
 
-// TODO(rediseno): tabla real de StudentSimulatorScore. Mientras tanto, derivamos
-// un histórico de simuladores a partir del alumno mock (Ana García López) con una
-// serie plausible de aciertos → puntaje estimado vía puntajeEstimado().
-// Los aciertos se eligen de modo que el último simulador coincida aproximadamente
-// con el avgScore del alumno proyectado sobre el simulador de ejemplo.
-function buildSimuladoresHistoricos(student) {
-  const total = mockSimuladorPreguntas;
-  const avg = typeof student?.avgScore === 'number' ? student.avgScore : 60;
-  // El avgScore está en escala 0–100. Lo convertimos a aciertos del simulador de ejemplo.
-  const ultimo = Math.round((avg / 100) * total);
-  // Serie creciente que termina en `ultimo` (progreso del alumno).
-  const serie = [
-    { n: 1, fecha: '20 jul', aciertos: Math.max(0, ultimo - 27) },
-    { n: 2, fecha: '3 ago',  aciertos: Math.max(0, ultimo - 19) },
-    { n: 3, fecha: '17 ago', aciertos: Math.max(0, ultimo - 22) }, // baja intencional (gris, no rojo)
-    { n: 4, fecha: '31 ago', aciertos: Math.max(0, ultimo - 11) },
-    { n: 5, fecha: '14 sep', aciertos: Math.max(0, ultimo - 8)  },
-    { n: 6, fecha: '28 sep', aciertos: ultimo                    },
-  ];
-  // Marcamos `tipo: 'simulador'` para pasar por resultadosParaGrafica.
-  // Cuando conectemos resultados reales, el mismo filtro ignorará quizzes
-  // y simuladores sin puntaje.
+// Historial de ejemplo: el mismo que muestra Inicio (A3). Marcamos
+// `tipo: 'simulador'` para pasar por resultadosParaGrafica, que con resultados
+// reales ignorará quizzes y simuladores sin puntaje.
+function buildSimuladoresHistoricos(email) {
+  const serie = historialSimuladorEjemplo(email);
   const items = serie.map((s, i) => {
-    const puntaje = puntajeEstimado(s.aciertos, total);
-    const prev = i > 0 ? puntajeEstimado(serie[i - 1].aciertos, total) : null;
-    const delta = prev == null ? null : puntaje - prev;
-    return { tipo: 'simulador', ...s, total, puntaje, delta };
+    const delta = i > 0 ? s.puntaje - serie[i - 1].puntaje : null;
+    return { tipo: 'simulador', ...s, delta };
   });
   return resultadosParaGrafica(items);
 }
@@ -94,11 +77,8 @@ function SimuladoresDemo() {
   // TODO(rediseno): meta real del alumno (viene de su carrera objetivo o la elige él).
   const [metaCeneval] = useState(1240);
 
-  // TODO(rediseno): el alumno en sesión debe venir de AuthContext. Para el mock,
-  // tomamos el primero (Ana García López) como está en el mockup.
-  const student = mockStudents[0];
-
-  const simuladores = useMemo(() => buildSimuladoresHistoricos(student), [student]);
+  const { user } = useAuth();
+  const simuladores = useMemo(() => buildSimuladoresHistoricos(user?.email), [user?.email]);
   const quizzesRecientes = useMemo(() => buildQuizzesRecientes(), []);
   const materias = useMemo(() => buildMateriasConProgreso(), []);
 
