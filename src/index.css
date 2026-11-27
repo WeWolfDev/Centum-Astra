@@ -487,6 +487,10 @@
   }
   }
 
+  /* En claro el menú lleva más tinta: el 60 % se pierde sobre marfil */
+  :root[data-theme='light'] .nav-link { color: rgb(var(--c-ink) / 0.82); }
+  :root[data-theme='light'] .nav-link:hover { color: rgb(var(--c-ink)); }
+
   .nav-link-active {
     color: rgb(var(--c-ink) / 0.88);
     background: rgb(var(--c-ink) / 0.055);

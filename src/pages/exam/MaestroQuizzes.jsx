@@ -120,7 +120,6 @@ function EstadoVacioPanel({ tipo, onCrear }) {
       style={{
         padding: '48px 24px',
         borderRadius: 16,
-        border: '1px dashed rgb(var(--c-ink) / 0.13)',
         background: 'rgb(var(--c-ink) / 0.03)',
         textAlign: 'center',
       }}

@@ -37,10 +37,10 @@ export default function HeroMedicina({ onRegisterClick }) {
           style={{ maxWidth: 640 }}
         >
           <h1 className="m-0 font-display font-extrabold text-white" style={{ fontSize: 'clamp(42px, 7vw, 76px)', lineHeight: 1.02, letterSpacing: '-0.03em', textWrap: 'balance' }}>
-            ¿Quieres entrar a <span style={{ color: '#f5c842' }}>Medicina</span>?
+            Prepárate para entrar a <span style={{ color: '#f5c842' }}>Medicina</span>.
           </h1>
           <p className="mt-6 mb-0 text-white/80" style={{ fontSize: 'clamp(16px, 1.8vw, 19px)', lineHeight: 1.65, maxWidth: 540 }}>
-            Prepárate para el examen de admisión con simuladores, quizzes por tema y clases de cada área. Después de cada intento ves en qué mejoraste.
+            Clases en línea, simuladores y quizzes por tema para el examen de admisión. Después de cada intento ves en qué mejoraste.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <button type="button" onClick={onRegisterClick} className="btn-gold" style={{ minHeight: 52, padding: '0 28px', fontSize: 16, borderRadius: 12 }}>

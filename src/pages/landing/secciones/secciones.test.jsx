@@ -5,6 +5,7 @@ import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TarjetaAreaGiratoria from './TarjetaAreaGiratoria';
 import Testimonios from './Testimonios';
+import { SeccionPadres } from './SeccionesHistoria';
 
 afterEach(cleanup);
 
@@ -43,5 +44,16 @@ describe('Testimonios', () => {
     render(<Testimonios testimonios={[]} />);
     expect(screen.getByRole('button', { name: 'Testimonio anterior' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Testimonio siguiente' })).toBeInTheDocument();
+  });
+});
+
+describe('SeccionPadres', () => {
+  test('dice que es 100 % en línea, con sus horarios, y manda a pedir informes en vez de dar el precio', () => {
+    render(<SeccionPadres />);
+    expect(screen.getByText(/100 % en línea/)).toBeInTheDocument();
+    expect(screen.getByText(/martes y jueves, de 7:00 a 9:00 p\. m\./i)).toBeInTheDocument();
+    expect(screen.getByText(/sábados, de 8:00 a\. m\. a 12:00 p\. m\./i)).toBeInTheDocument();
+    expect(screen.queryByText(/\$4,500/)).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /pide informes/i })).toHaveAttribute('href', '#registro');
   });
 });

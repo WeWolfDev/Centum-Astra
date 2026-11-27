@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { canalDeRegistro, enlaceRegistro, mensajeRegistro } from './contacto';
+import { canalDeRegistro, enlaceInformes, enlaceRegistro, mensajeRegistro } from './contacto';
 
 const form = {
   nombres: ' María ',
@@ -40,5 +40,17 @@ describe('contacto del registro', () => {
     const contacto = { whatsapp: '', correo: '' };
     expect(canalDeRegistro(contacto)).toBeNull();
     expect(enlaceRegistro(form, contacto)).toBeNull();
+  });
+});
+
+describe('enlaceInformes', () => {
+  it('con WhatsApp abre el chat con un saludo para pedir informes', () => {
+    const url = enlaceInformes({ whatsapp: '5213312345678', correo: '' });
+    expect(url).toMatch(/^https:\/\/wa\.me\/5213312345678\?text=/);
+    expect(decodeURIComponent(url)).toContain('informes');
+  });
+
+  it('sin WhatsApp lleva al formulario de registro', () => {
+    expect(enlaceInformes({ whatsapp: '', correo: '' })).toBe('#registro');
   });
 });
