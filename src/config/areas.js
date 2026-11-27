@@ -1,4 +1,5 @@
-// Fuente única de presentación por área (imagen, icono, intensidad del tinte).
+// Fuente única de presentación por área (imagen, icono, intensidad del tinte y
+// la descripción breve que muestra la landing).
 // El `id` coincide con `mockModules`. El título oficial sigue viniendo del
 // dominio (mockModules); aquí vive solo la capa visual.
 //
@@ -13,11 +14,16 @@ import medicineSrc from '../assets/areas/medicine.jpg';
 // `clave` reconoce el área en el título de un módulo real de Supabase, cuyo id
 // es un uuid y no coincide con estos ids.
 export const AREAS = [
-  { id: 1, clave: 'matematic', icono: 'math',    imagen: mathSrc,      intensidadTinte: 'media'  },
-  { id: 2, clave: 'lector',    icono: 'reading', imagen: spanishSrc,   intensidadTinte: 'media'  },
-  { id: 3, clave: 'redaccion', icono: 'writing', imagen: redaccionSrc, intensidadTinte: 'media'  },
-  { id: 4, clave: 'medicina',  icono: 'premed',  imagen: doctorSrc,    intensidadTinte: 'media'  },
-  { id: 5, clave: 'salud',     icono: 'health',  imagen: medicineSrc,  intensidadTinte: 'fuerte' },
+  { id: 1, clave: 'matematic', icono: 'math',    imagen: mathSrc,      intensidadTinte: 'media',
+    descripcion: 'Aritmética, álgebra, geometría y probabilidad, con problemas para razonar, no para memorizar.' },
+  { id: 2, clave: 'lector',    icono: 'reading', imagen: spanishSrc,   intensidadTinte: 'media',
+    descripcion: 'Encontrar la idea principal de un texto, hacer inferencias y reconocer su propósito.' },
+  { id: 3, clave: 'redaccion', icono: 'writing', imagen: redaccionSrc, intensidadTinte: 'media',
+    descripcion: 'Ortografía, puntuación, concordancia y orden de las ideas al escribir.' },
+  { id: 4, clave: 'medicina',  icono: 'premed',  imagen: doctorSrc,    intensidadTinte: 'media',
+    descripcion: 'Para quien va a Medicina: biología, química y bases de las ciencias de la salud.' },
+  { id: 5, clave: 'salud',     icono: 'health',  imagen: medicineSrc,  intensidadTinte: 'fuerte',
+    descripcion: 'Para carreras de la salud: biología y química con preguntas tipo examen.' },
 ];
 
 export const AREA_POR_ID = Object.fromEntries(AREAS.map((a) => [a.id, a]));

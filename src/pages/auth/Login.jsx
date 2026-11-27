@@ -127,16 +127,12 @@ export default function Login({ onBack }) {
           {/* Hero headline */}
           <motion.div variants={item} className="relative">
             <h1 className="relative z-10 font-display font-bold tracking-tight leading-tight text-4xl md:text-5xl lg:text-6xl mb-6">
-              <span className="text-white">
-                Domina el EXANI-II.
-              </span>
-              <br />
-              <span className="text-gold-bright">
-                Vive tu vocación.
-              </span>
+              <span className="text-white">¿Quieres entrar a </span>
+              <span className="text-gold-bright">Medicina</span>
+              <span className="text-white">?</span>
             </h1>
-            <p className="relative z-10 text-white/70 text-base leading-relaxed max-w-sm">
-              La plataforma que prepara a los mejores aspirantes a carreras de salud — metodología probada, simuladores reales.
+            <p className="relative z-10 text-white/75 text-lg leading-relaxed max-w-md">
+              Entra para seguir con tus simuladores, tus quizzes y tus clases.
             </p>
           </motion.div>
 
@@ -238,8 +234,8 @@ export default function Login({ onBack }) {
               Se oculta automáticamente cuando Supabase está configurado. */}
           {showQuickLogin && (
             <div className="w-full max-w-sm">
-              <p className="text-white/70 text-xs tracking-widest uppercase mb-2 text-center">
-                Acceso rápido · Demo
+              <p className="text-white/75 text-sm mb-2 text-center">
+                Entrar al demo como:
               </p>
               <div className="grid grid-cols-3 gap-2">
                 {roles.map(role => (

@@ -1,26 +1,53 @@
 // La estrella significa una sola cosa: un quiz o simulador terminado (#57).
-// No se usa como adorno en ningún otro lugar. Rellena = ganada; vacía = día sin
-// estrella. El dorado de relleno es igual en ambos modos; el contorno le da
-// contraste sobre marfil.
-const PUNTAS =
-  'M12 1.8l3.05 6.5 7.1.85-5.25 4.85 1.4 7.02L12 17.5 5.7 21.02l1.4-7.02L1.85 9.15l7.1-.85z';
+// No se usa como adorno en ningún otro lugar. Es pixel art, como un premio de
+// videojuego: "o" es el contorno, "X" el dorado y "+" el brillo. `llena={false}`
+// la dibuja apagada.
+const DIBUJO = [
+  '......o......',
+  '.....oXo.....',
+  '.....oXo.....',
+  '....oX+Xo....',
+  'ooooX+XXXoooo',
+  'oXXX+XXXXXXXo',
+  '.oXXXXXXXXXo.',
+  '..oXXXXXXXo..',
+  '..oXXXXXXXo..',
+  '.oXXXXoXXXXo.',
+  '.oXXXo.oXXXo.',
+  'oXXo.....oXXo',
+  'ooo.......ooo',
+];
+
+const COLORES = {
+  o: 'rgb(122 86 10)',
+  X: 'rgb(var(--c-gold-fill))',
+  '+': 'rgb(255 247 214)',
+};
+
+const PIXELES = DIBUJO.flatMap((fila, y) =>
+  [...fila].map((celda, x) => ({ x, y, celda })).filter(p => p.celda !== '.'),
+);
 
 export default function Estrella({ size = 20, llena = true, style }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 24 24"
+      viewBox="0 0 13 13"
+      shapeRendering="crispEdges"
       aria-hidden="true"
       style={{ display: 'block', flexShrink: 0, ...style }}
     >
-      <path
-        d={PUNTAS}
-        fill={llena ? 'rgb(var(--c-gold-fill))' : 'none'}
-        stroke={llena ? 'rgb(var(--c-gold-muted))' : 'rgb(var(--c-ink) / 0.3)'}
-        strokeWidth={1.4}
-        strokeLinejoin="round"
-      />
+      {PIXELES.map(({ x, y, celda }) => (
+        <rect
+          key={`${x}-${y}`}
+          x={x}
+          y={y}
+          width={1}
+          height={1}
+          fill={llena ? COLORES[celda] : 'rgb(var(--c-ink) / 0.18)'}
+        />
+      ))}
     </svg>
   );
 }

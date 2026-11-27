@@ -3,8 +3,8 @@
 
 export const TEMA_STORAGE_KEY = 'centum-astra:tema';
 
-// El modo claro queda detrás de un flag mientras falten pantallas por migrar.
-export const modoClaroHabilitado = import.meta.env.VITE_LIGHT_MODE === 'true';
+// El modo claro está disponible salvo que se apague con VITE_LIGHT_MODE=false.
+export const modoClaroHabilitado = import.meta.env.VITE_LIGHT_MODE !== 'false';
 
 /** @returns {'light' | 'dark' | null} */
 function leerGuardado() {

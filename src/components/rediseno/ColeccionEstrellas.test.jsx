@@ -6,27 +6,23 @@ import ColeccionEstrellas from './ColeccionEstrellas';
 
 afterEach(cleanup);
 
-const hoy = new Date(2026, 10, 27);
+const registros = n => Array.from({ length: n }, (_, i) => ({ evaluacionId: `q${i}`, fecha: '2026-11-27' }));
 
 describe('ColeccionEstrellas', () => {
-  test('muestra cuántas lleva, su racha y la semana', () => {
-    const registros = [
-      { evaluacionId: 'a', fecha: '2026-11-26' },
-      { evaluacionId: 'b', fecha: '2026-11-27' },
-      { evaluacionId: 'c', fecha: '2026-11-27' },
-    ];
-    render(<ColeccionEstrellas registros={registros} hoy={hoy} />);
-
+  test('pone todas las estrellas en un renglón, sin días de la semana', () => {
+    render(<ColeccionEstrellas registros={registros(3)} />);
     expect(screen.getByRole('heading', { name: 'Tus estrellas' })).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText(/racha de/i)).toHaveTextContent('Racha de 2 días');
-    const dias = within(screen.getByRole('list', { name: 'Esta semana' })).getAllByRole('listitem');
-    expect(dias).toHaveLength(7);
-    expect(dias[4]).toHaveAccessibleName('2026-11-27: 2 estrellas, hoy');
+    expect(within(screen.getByRole('list', { name: '3 estrellas' })).getAllByRole('listitem')).toHaveLength(3);
+    expect(screen.queryByText('L')).not.toBeInTheDocument();
   });
 
-  test('sin estrellas invita a empezar la racha', () => {
-    render(<ColeccionEstrellas registros={[]} hoy={hoy} />);
-    expect(screen.getByText('Termina un quiz hoy para empezar tu racha.')).toBeInTheDocument();
+  test('con muchas, muestra las primeras y cuántas más hay', () => {
+    render(<ColeccionEstrellas registros={registros(20)} />);
+    expect(screen.getByText('+6')).toBeInTheDocument();
+  });
+
+  test('sin estrellas invita a ganar la primera', () => {
+    render(<ColeccionEstrellas registros={[]} />);
+    expect(screen.getByText('Termina un quiz para ganar tu primera estrella.')).toBeInTheDocument();
   });
 });

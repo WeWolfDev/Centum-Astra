@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronRight, ChevronLeft, X, Clock, CheckCircle, XCircle, Lightbulb } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { AREA_POR_ID } from '../../config/areas';
 
 /* ── Mock data ──────────────────────────────────────────── */
 const COURSES = [
   {
     id: 'mat',
+    areaId: 1,
     label: 'Pensamiento Matemático',
-    icon: '📐',
     type: 'transversal',
     desc: 'Álgebra, geometría y razonamiento numérico',
     color: 'rgb(var(--c-info))',
@@ -17,8 +18,8 @@ const COURSES = [
   },
   {
     id: 'red',
+    areaId: 3,
     label: 'Redacción Indirecta',
-    icon: '✍️',
     type: 'transversal',
     desc: 'Coherencia textual y sintaxis avanzada',
     color: 'rgb(var(--c-violeta))',
@@ -27,8 +28,8 @@ const COURSES = [
   },
   {
     id: 'lec',
+    areaId: 2,
     label: 'Comprensión Lectora',
-    icon: '📖',
     type: 'transversal',
     desc: 'Inferencia, análisis y síntesis de textos',
     color: 'rgb(var(--c-exito))',
@@ -37,8 +38,8 @@ const COURSES = [
   },
   {
     id: 'med',
+    areaId: 4,
     label: 'Pre-medicina',
-    icon: '🩺',
     type: 'specific',
     desc: 'Biología, química y ciencias de la salud',
     color: 'rgb(var(--c-clinico))',
@@ -548,7 +549,7 @@ function CourseSelector({ onClose }) {
         style={{
           pointerEvents: 'auto',
           width: '100%',
-          maxWidth: selected ? 600 : 700,
+          maxWidth: selected ? 600 : 860,
           maxHeight: '88vh',
           background: 'rgb(var(--c-deep))',
           border: '1px solid rgb(var(--c-ink) / calc(0.08 * var(--borde-k)))',
@@ -605,13 +606,7 @@ function CourseSelector({ onClose }) {
               >
                 {/* Transversal */}
                 <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-[14px]">
-                    <div className="h-px flex-1 bg-white/[0.06]" />
-                    <span className="text-[10px] font-bold tracking-[0.12em] text-white/60 uppercase">
-                      Módulos Transversales
-                    </span>
-                    <div className="h-px flex-1 bg-white/[0.06]" />
-                  </div>
+                  <h3 className="m-0 mb-3 text-white text-[16px] font-semibold">Áreas que vienen en todo el examen</h3>
                   <div className="grid gap-[10px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))' }}>
                     {transversal.map((c, i) => (
                       <CourseCard key={c.id} course={c} index={i} onSelect={() => setSelected(c.id)} />
@@ -621,13 +616,7 @@ function CourseSelector({ onClose }) {
 
                 {/* Specific */}
                 <div>
-                  <div className="flex items-center gap-2 mb-[14px]">
-                    <div className="h-px flex-1 bg-teal-400/[0.12]" />
-                    <span className="text-[10px] font-bold tracking-[0.12em] text-teal-400/45 uppercase">
-                      Módulos Específicos
-                    </span>
-                    <div className="h-px flex-1 bg-teal-400/[0.12]" />
-                  </div>
+                  <h3 className="m-0 mb-3 text-white text-[16px] font-semibold">Para carreras de la salud</h3>
                   <div className="grid gap-[10px]" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(190px, 1fr))' }}>
                     {specific.map((c, i) => (
                       <CourseCard key={c.id} course={c} index={transversal.length + i} onSelect={() => setSelected(c.id)} />
@@ -635,8 +624,8 @@ function CourseSelector({ onClose }) {
                   </div>
                 </div>
 
-                <p className="text-center text-white/60 text-[11.5px] mt-5 tracking-[0.01em]">
-                  3 preguntas · sin registro · experiencia real del simulador EXANI-II
+                <p className="text-center text-white/70 text-[14px] mt-6 mb-0">
+                  Cada área tiene 3 preguntas de práctica. No necesitas registrarte.
                 </p>
               </motion.div>
             ) : (
@@ -660,15 +649,19 @@ function CourseSelector({ onClose }) {
             border-t border-white/[0.07]
             bg-[radial-gradient(ellipse_at_left,rgb(var(--c-gold-bright)_/_0.04)_0%,transparent_70%)]">
             <div>
-              <p className="text-white text-[13px] font-semibold mb-[2px] tracking-[-0.01em]">
-                ¿Listo para el EXANI-II?
+              <p className="text-white text-[15px] font-semibold m-0">
+                ¿Quieres todas las áreas?
               </p>
-              <p className="text-white/60 text-[12px]">
-                Accede a todos los módulos y seguimiento personalizado.
+              <p className="text-white/70 text-[14px] m-0">
+                Con el curso completo tienes simuladores, clases y quizzes de cada una.
               </p>
             </div>
-            <button onClick={onClose} className="btn-gold shrink-0" style={{ padding: '10px 20px', fontSize: 13 }}>
-              Crear cuenta gratis
+            <button
+              onClick={() => { onClose(); window.location.hash = 'registro'; }}
+              className="btn-gold shrink-0"
+              style={{ minHeight: 44, padding: '0 20px', fontSize: 14 }}
+            >
+              Quiero inscribirme
             </button>
           </div>
         )}
@@ -694,7 +687,7 @@ function CourseCard({ course, index, onSelect }) {
         /* base */
         'group relative flex flex-col items-start gap-3 p-[18px_16px_16px] rounded-2xl cursor-pointer text-left w-full overflow-hidden',
         /* glassmorphism */
-        'bg-white/5 backdrop-blur-xl',
+        'bg-white/5',
         /* border — Tailwind hover handles color, FM handles transform */
         'border transition-colors duration-300 ease-out',
         isMed
@@ -718,25 +711,22 @@ function CourseCard({ course, index, onSelect }) {
           : 'bg-gradient-to-r from-transparent via-yellow-500/45 to-transparent',
       )} />
 
-      {/* ── Icon badge ── */}
-      <div className={cn(
-        'text-[20px] p-[9px] rounded-xl shrink-0',
-        isMed ? 'bg-teal-400/10' : 'bg-white/[0.06]',
-      )}>
-        {course.icon}
+      {/* ── Foto del área ── */}
+      <div className="relative w-full overflow-hidden rounded-xl shrink-0" style={{ aspectRatio: '16 / 9' }}>
+        <img src={AREA_POR_ID[course.areaId]?.imagen} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
       </div>
 
       {/* ── Label + description ── */}
       <div className="flex-1 space-y-[5px]">
         <p className={cn(
-          'text-[13.5px] font-semibold leading-snug tracking-[-0.01em]',
+          'text-[15px] font-semibold leading-snug tracking-[-0.01em]',
           isMed ? 'text-teal-50/90' : 'text-white/88',
         )}>
           {course.label}
         </p>
         <p className={cn(
-          'text-[12px] leading-relaxed',
-          isMed ? 'text-teal-300/45' : 'text-white/60',
+          'text-[14px] leading-relaxed',
+          isMed ? 'text-teal-50/75' : 'text-white/70',
         )}>
           {course.desc}
         </p>
@@ -745,10 +735,10 @@ function CourseCard({ course, index, onSelect }) {
       {/* ── Probar ahora CTA ── */}
       <div className="flex items-center gap-[5px]">
         <span className={cn(
-          'text-[11.5px] font-medium transition-colors duration-200',
+          'text-[14px] font-semibold transition-colors duration-200',
           isMed
-            ? 'text-teal-400/55 group-hover:text-teal-400/80'
-            : 'text-yellow-500/60 group-hover:text-yellow-400/85',
+            ? 'text-teal-300 group-hover:text-teal-200'
+            : 'text-yellow-400 group-hover:text-yellow-300',
         )}>
           Probar ahora
         </span>

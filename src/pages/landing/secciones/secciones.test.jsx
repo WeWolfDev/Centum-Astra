@@ -1,21 +1,25 @@
 // @vitest-environment jsdom
 import '@testing-library/jest-dom/vitest';
 import { afterEach, describe, expect, test } from 'vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import CalculadoraPuntaje from './CalculadoraPuntaje';
+import { cleanup, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import TarjetaAreaGiratoria from './TarjetaAreaGiratoria';
 import Testimonios from './Testimonios';
 
 afterEach(cleanup);
 
-describe('CalculadoraPuntaje', () => {
-  test('con 60 de 100 aciertos da 1,060, y cambia al mover el control', () => {
-    render(<CalculadoraPuntaje />);
-    expect(screen.getByText('1,060')).toBeInTheDocument();
+describe('TarjetaAreaGiratoria', () => {
+  test('al tocarla se voltea y muestra qué se ve en el área; al tocarla otra vez regresa', async () => {
+    render(<TarjetaAreaGiratoria titulo="Pensamiento Matemático" imagen="/x.jpg" descripcion="Aritmética y álgebra." />);
+    const tarjeta = screen.getByRole('button', { name: /Pensamiento Matemático/ });
+    expect(tarjeta).toHaveAttribute('aria-pressed', 'false');
 
-    fireEvent.change(screen.getByRole('slider', { name: 'Aciertos de 100' }), { target: { value: '85' } });
+    await userEvent.click(tarjeta);
+    expect(tarjeta).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Aritmética y álgebra.')).toBeVisible();
 
-    expect(screen.getByText('1,210')).toBeInTheDocument();
-    expect(screen.getByText(/no es resultado oficial del EXANI-II/i)).toBeInTheDocument();
+    await userEvent.click(tarjeta);
+    expect(tarjeta).toHaveAttribute('aria-pressed', 'false');
   });
 });
 
