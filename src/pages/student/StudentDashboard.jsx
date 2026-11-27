@@ -15,6 +15,8 @@ import { mockModules, mockSimuladorPreguntas } from '../../data/mockData';
 import { historialSimuladorEjemplo } from '../../data/simuladorEjemplo';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import AvisoDatosEjemplo from '../../components/rediseno/AvisoDatosEjemplo';
+import ColeccionEstrellas from '../../components/rediseno/ColeccionEstrellas';
+import useEstrellasDemo from '../../hooks/useEstrellasDemo';
 import {
   ESCALA_PUNTAJE,
   META_OCULTA_POR_DEFECTO,
@@ -58,6 +60,7 @@ function InicioEjemplo({ setActiveSection }) {
   const metaCeneval = 1240;
 
   const historial = useMemo(() => historialInicio(user.email), [user.email]);
+  const { registros: estrellas } = useEstrellasDemo();
   const primero = historial[0].ceneval;
   const ultimo = historial[historial.length - 1].ceneval;
   const delta = ultimo - primero;
@@ -82,6 +85,8 @@ function InicioEjemplo({ setActiveSection }) {
       <AvisoDatosEjemplo>
         Tu puntaje y su evolución todavía no salen de tus simuladores; se calcularán con tus resultados reales.
       </AvisoDatosEjemplo>
+
+      <ColeccionEstrellas registros={estrellas} />
 
       <PuntajeHero
         puntaje={puntajeActual}
