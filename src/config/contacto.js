@@ -35,3 +35,13 @@ export function enlaceRegistro(form, contacto = contactoConfigurado) {
   }
   return null;
 }
+
+/**
+ * Enlace para pedir informes (precio, formas de pago): el chat de WhatsApp con
+ * un saludo o, sin WhatsApp configurado, el formulario de registro.
+ */
+export function enlaceInformes(contacto = contactoConfigurado) {
+  if (!contacto.whatsapp) return '#registro';
+  const texto = 'Hola, quiero informes de Centum Astra: precio, formas de pago y horarios.';
+  return `https://wa.me/${contacto.whatsapp}?text=${encodeURIComponent(texto)}`;
+}

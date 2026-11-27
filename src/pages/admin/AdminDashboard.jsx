@@ -73,7 +73,7 @@ function BarraProgreso({ valor, ancho = 'full' }) {
   return (
     <div className={cn('h-1 rounded-full bg-white/10 overflow-hidden', ancho === 'full' ? 'flex-1' : 'w-20')}>
       <div
-        className="h-full rounded-full bg-gradient-to-r from-gold-muted to-gold-bright"
+        className="h-full rounded-full bg-gold-bright"
         style={{ width: `${valor}%` }}
       />
     </div>

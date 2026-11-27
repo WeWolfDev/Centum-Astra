@@ -1,4 +1,5 @@
-import { ArrowDown, CreditCard, Eye, Receipt, Smartphone } from 'lucide-react';
+import { ArrowDown, CalendarDays, Eye, MessageCircle, Wifi } from 'lucide-react';
+import { enlaceInformes } from '../../../config/contacto';
 import { AREAS } from '../../../config/areas';
 import { mockModules } from '../../../data/mockData';
 import TarjetaAreaGiratoria from './TarjetaAreaGiratoria';
@@ -62,11 +63,13 @@ export function SeccionTestimonios() {
   );
 }
 
+// Horarios registrados con el cliente (docs/RESPUESTAS_Y_PREGUNTAS_PENDIENTES_CLIENTE.md, 1.8):
+// cada grupo tiene uno solo. El precio y las formas de pago se piden por WhatsApp.
 const DATOS_PADRES = [
-  { Icono: CreditCard, titulo: 'Cuánto cuesta', texto: '$4,500 MXN el curso completo, con la inscripción de $500 incluida. También se puede pagar en mensualidades.' },
-  { Icono: Receipt, titulo: 'Cómo se paga', texto: 'Fuera de la plataforma. Después envían el comprobante y un administrador lo revisa.' },
+  { Icono: Wifi, titulo: '100 % en línea', texto: 'Las clases son en vivo y se toman desde casa, sin trasladarse.' },
+  { Icono: CalendarDays, titulo: 'Grupo entre semana', texto: 'Martes y jueves, de 7:00 a 9:00 p. m.' },
+  { Icono: CalendarDays, titulo: 'Grupo sabatino', texto: 'Sábados, de 8:00 a. m. a 12:00 p. m.' },
   { Icono: Eye, titulo: 'Qué ve su hijo o hija', texto: 'Sus resultados de cada simulador y quiz, y su avance en cada área.' },
-  { Icono: Smartphone, titulo: 'Desde dónde estudia', texto: 'Desde el celular, la tablet o la computadora, a la hora que le acomode.' },
 ];
 
 export function SeccionPadres() {
@@ -84,7 +87,18 @@ export function SeccionPadres() {
           </li>
         ))}
       </ul>
-      <Siguiente href="#registro">¿Listo para empezar?</Siguiente>
+      <a
+        href={enlaceInformes()}
+        target={enlaceInformes().startsWith('http') ? '_blank' : undefined}
+        rel="noopener noreferrer"
+        className="btn-gold inline-flex items-center gap-2 mt-10"
+        style={{ minHeight: 48, padding: '0 24px', fontSize: 16, borderRadius: 12 }}
+      >
+        <MessageCircle size={18} aria-hidden="true" /> Pide informes de precio y pagos
+      </a>
+      <div>
+        <Siguiente href="#registro">¿Listo para empezar?</Siguiente>
+      </div>
     </Seccion>
   );
 }

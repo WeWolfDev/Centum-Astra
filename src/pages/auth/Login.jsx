@@ -127,12 +127,11 @@ export default function Login({ onBack }) {
           {/* Hero headline */}
           <motion.div variants={item} className="relative">
             <h1 className="relative z-10 font-display font-bold tracking-tight leading-tight text-4xl md:text-5xl lg:text-6xl mb-6">
-              <span className="text-white">¿Quieres entrar a </span>
-              <span className="text-gold-bright">Medicina</span>
-              <span className="text-white">?</span>
+              <span className="text-white">Tu preparación </span>
+              <span className="text-gold-bright">sigue aquí.</span>
             </h1>
             <p className="relative z-10 text-white/75 text-lg leading-relaxed max-w-md">
-              Entra para seguir con tus simuladores, tus quizzes y tus clases.
+              Retoma tus simuladores, quizzes y clases donde los dejaste.
             </p>
           </motion.div>
 
