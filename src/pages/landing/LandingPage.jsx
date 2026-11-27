@@ -2,11 +2,11 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronRight, MapPin, Phone, Mail, User, CheckCircle,
-  ShieldCheck, BookOpen, MessageCircle,
+  BookOpen, MessageCircle,
 } from 'lucide-react';
 import PublicNav from '../../components/layout/PublicNav';
 import HeroMedicina from './secciones/HeroMedicina';
-import { SeccionAreas, SeccionCalcula, SeccionEstrellas, SeccionPadres, SeccionTestimonios } from './secciones/SeccionesHistoria';
+import { SeccionAreas, SeccionPadres, SeccionTestimonios } from './secciones/SeccionesHistoria';
 import { useModoOscuroForzado } from '../../context/ThemeContext';
 import { canalDeRegistro, enlaceRegistro } from '../../config/contacto';
 
@@ -110,17 +110,6 @@ function RegistrationPayment({ sectionRef }) {
       <div className="relative max-w-6xl mx-auto px-6 md:px-12">
         {/* Header */}
         <div className="text-center mb-14">
-          <span style={{
-            display: 'inline-flex', alignItems: 'center', gap: 6,
-            padding: '4px 14px', borderRadius: 999, marginBottom: 16,
-            background: 'rgba(245,200,66,0.08)',
-            border: '1px solid rgba(245,200,66,0.2)',
-            fontSize: 11.5, fontWeight: 600, color: '#f5c842',
-            letterSpacing: '0.06em',
-          }}>
-            <ShieldCheck size={11} />
-            ACCESO COMPLETO
-          </span>
           <h2
             className="font-display font-bold text-white mb-4"
             style={{ fontSize: 36, letterSpacing: '-0.03em', lineHeight: 1.1 }}
@@ -315,8 +304,8 @@ function RegistrationPayment({ sectionRef }) {
             >
               <div className="flex items-center gap-2 mb-4">
                 <BookOpen size={15} color="#f5c842" />
-                <span style={{ fontSize: 11, fontWeight: 700, color: '#f5c842', letterSpacing: '0.1em' }}>
-                  CURSO COMPLETO
+                <span style={{ fontSize: 15, fontWeight: 600, color: '#f5c842' }}>
+                  Curso completo
                 </span>
               </div>
               <div className="flex items-end gap-2 mb-1">
@@ -334,7 +323,7 @@ function RegistrationPayment({ sectionRef }) {
 
             {/* Features */}
             <div className="px-7 py-6">
-              <p className="text-white/60 text-[12px] font-semibold tracking-[0.06em] uppercase mb-4">
+              <p className="text-white/80 text-[15px] font-semibold mb-4">
                 Incluye
               </p>
               <ul className="flex flex-col gap-3">
@@ -399,8 +388,6 @@ export default function LandingPage({ onLoginClick }) {
     <div className="relative" style={{ background: '#030a1a' }}>
       <PublicNav onLoginClick={onLoginClick} />
       <HeroMedicina onRegisterClick={scrollToRegister} />
-      <SeccionCalcula />
-      <SeccionEstrellas />
       <SeccionAreas />
       <SeccionTestimonios />
       <SeccionPadres />

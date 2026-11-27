@@ -1,9 +1,10 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import Estrella from './Estrella';
 
-// Animación al terminar un quiz o simulador: la estrella aparece, destella y
-// se suma a la colección. Enseña causa y efecto (terminaste → ganaste una), no
-// adorna. Con "reducir movimiento" se muestra quieta.
+// Al terminar un quiz o simulador, la estrella sale de abajo, salta, gira y cae
+// en su lugar, como un premio de videojuego, con destellos cuadrados. Enseña
+// causa y efecto: terminaste → ganaste una. Con "reducir movimiento" se queda
+// quieta.
 const DESTELLOS = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4);
 
 export default function EstrellaGanada({ gano, total, tipo = 'quiz' }) {
@@ -11,45 +12,52 @@ export default function EstrellaGanada({ gano, total, tipo = 'quiz' }) {
 
   if (!gano) {
     return (
-      <div role="status" style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'rgb(var(--c-ink) / 0.8)', fontSize: 14 }}>
-        <Estrella size={28} />
+      <div role="status" style={{ display: 'flex', alignItems: 'center', gap: 14, color: 'rgb(var(--c-ink) / 0.85)', fontSize: 16, maxWidth: 360 }}>
+        <Estrella size={40} />
         <span>Ya ganaste la estrella de este {tipo} hoy. Mañana puedes ganar otra. Llevas {total}.</span>
       </div>
     );
   }
 
   return (
-    <div role="status" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, textAlign: 'center' }}>
-      <div style={{ position: 'relative', width: 120, height: 120, display: 'grid', placeItems: 'center' }}>
+    <div role="status" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, textAlign: 'center' }}>
+      <div style={{ position: 'relative', width: 140, height: 140, display: 'grid', placeItems: 'center' }}>
         {!reducir && DESTELLOS.map(angulo => (
           <motion.span
             key={angulo}
             aria-hidden="true"
-            initial={{ x: 0, y: 0, opacity: 0, scale: 0.4 }}
-            animate={{ x: Math.cos(angulo) * 58, y: Math.sin(angulo) * 58, opacity: [0, 1, 0], scale: 1 }}
-            transition={{ duration: 0.9, delay: 0.35, ease: 'easeOut' }}
-            style={{ position: 'absolute', width: 8, height: 8, borderRadius: 999, background: 'rgb(var(--c-gold-fill))' }}
+            initial={{ x: 0, y: 0, opacity: 0 }}
+            animate={{ x: Math.cos(angulo) * 64, y: Math.sin(angulo) * 64, opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 0.8, delay: 0.75, ease: 'easeOut' }}
+            style={{ position: 'absolute', width: 8, height: 8, background: 'rgb(var(--c-gold-fill))' }}
           />
         ))}
         <motion.div
-          initial={reducir ? false : { scale: 0, rotate: -40 }}
-          animate={{ scale: [0, 1.25, 1], rotate: 0 }}
-          transition={{ duration: 0.7, times: [0, 0.6, 1], ease: 'easeOut' }}
+          initial={reducir ? false : { y: 70, scale: 0.3, rotate: 0, opacity: 0 }}
+          animate={{ y: [70, -46, 0, -14, 0], scale: [0.3, 1.2, 1, 1.06, 1], rotate: [0, 360, 360, 360, 360], opacity: 1 }}
+          transition={{ duration: 1.3, times: [0, 0.45, 0.7, 0.85, 1], ease: 'easeOut' }}
         >
-          <Estrella size={84} />
+          <Estrella size={96} />
         </motion.div>
+        {!reducir && (
+          <motion.span
+            aria-hidden="true"
+            className="font-display tabular-nums"
+            initial={{ y: 0, opacity: 0 }}
+            animate={{ y: -70, opacity: [0, 1, 1, 0] }}
+            transition={{ duration: 1.2, delay: 0.6 }}
+            style={{ position: 'absolute', top: 10, right: 0, fontWeight: 800, fontSize: 22, color: 'rgb(var(--c-gold-fill))' }}
+          >
+            +1
+          </motion.span>
+        )}
       </div>
-      <p style={{ margin: 0, fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 800, fontSize: 24, color: 'rgb(var(--c-ink))' }}>
+      <p style={{ margin: 0, fontFamily: '"Bricolage Grotesque", sans-serif', fontWeight: 800, fontSize: 26, color: 'rgb(var(--c-ink))' }}>
         ¡Ganaste una estrella!
       </p>
-      <motion.p
-        initial={reducir ? false : { opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        style={{ margin: 0, fontSize: 15, color: 'rgb(var(--c-ink) / 0.8)' }}
-      >
+      <p style={{ margin: 0, fontSize: 16, color: 'rgb(var(--c-ink) / 0.85)' }}>
         Llevas <strong className="tabular-nums" style={{ color: 'rgb(var(--c-ink))' }}>{total}</strong> estrellas.
-      </motion.p>
+      </p>
     </div>
   );
 }

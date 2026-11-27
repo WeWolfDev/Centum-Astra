@@ -661,3 +661,28 @@
   /* VideoLibrary padding */
   .p-8 { padding: 16px !important; }
 }
+
+/* Quiz y simulador del demo: pregunta a la izquierda, panel de preguntas a la derecha */
+.quiz-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 24px;
+  align-items: start;
+}
+.quiz-panel {
+  position: sticky;
+  top: 96px;
+  border: 1px solid rgb(var(--c-ink) / calc(0.12 * var(--borde-k)));
+  border-radius: 18px;
+  padding: 20px;
+}
+@media (max-width: 900px) {
+  .quiz-layout { grid-template-columns: 1fr; }
+  .quiz-panel { position: static; order: -1; }
+}
+
+/* Tarjeta de área de la landing: vertical en escritorio, apaisada en celular */
+.tarjeta-giratoria { aspect-ratio: 3 / 4; }
+@media (max-width: 640px) {
+  .tarjeta-giratoria { aspect-ratio: 16 / 10; }
+}

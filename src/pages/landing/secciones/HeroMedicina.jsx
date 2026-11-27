@@ -2,8 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 
 // Hero de la landing: foto de estudio de medicina y un latido dorado que se
-// convierte en una línea de puntaje que sube. Dice lo que hace la plataforma
-// (practicar para el EXANI-II y ver tu puntaje subir) sin adjetivos.
+// convierte en una línea que sube, como el avance del alumno.
 const FOTO = '/fernandozhiminaicela-face-mask-5042631_1920.jpg';
 
 // Tres latidos y, al final, la subida del puntaje.
@@ -37,21 +36,18 @@ export default function HeroMedicina({ onRegisterClick }) {
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           style={{ maxWidth: 640 }}
         >
-          <p className="m-0 mb-5 text-[15px] font-semibold" style={{ color: '#1de9b6' }}>
-            Preparación para el EXANI-II · Medicina y carreras de la salud
-          </p>
           <h1 className="m-0 font-display font-extrabold text-white" style={{ fontSize: 'clamp(42px, 7vw, 76px)', lineHeight: 1.02, letterSpacing: '-0.03em', textWrap: 'balance' }}>
             ¿Quieres entrar a <span style={{ color: '#f5c842' }}>Medicina</span>?
           </h1>
           <p className="mt-6 mb-0 text-white/80" style={{ fontSize: 'clamp(16px, 1.8vw, 19px)', lineHeight: 1.65, maxWidth: 540 }}>
-            Practica con simuladores tipo EXANI-II y quizzes por tema. Después de cada simulador ves tu puntaje estimado de 700 a 1300 y cuánto subiste.
+            Prepárate para el examen de admisión con simuladores, quizzes por tema y clases de cada área. Después de cada intento ves en qué mejoraste.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-4">
             <button type="button" onClick={onRegisterClick} className="btn-gold" style={{ minHeight: 52, padding: '0 28px', fontSize: 16, borderRadius: 12 }}>
               Quiero empezar
             </button>
-            <a href="#calcula" className="inline-flex items-center gap-2 text-white font-semibold text-[16px] hover:underline" style={{ minHeight: 44 }}>
-              ¿Cuánto sacarías hoy? <ArrowDown size={18} aria-hidden="true" />
+            <a href="#estudias" className="inline-flex items-center gap-2 text-white font-semibold text-[16px] hover:underline" style={{ minHeight: 44 }}>
+              ¿Qué vas a estudiar? <ArrowDown size={18} aria-hidden="true" />
             </a>
           </div>
         </motion.div>
@@ -60,10 +56,9 @@ export default function HeroMedicina({ onRegisterClick }) {
       {/* Latido → puntaje */}
       <svg
         viewBox="0 0 1200 190"
-        preserveAspectRatio="none"
         aria-hidden="true"
         className="absolute left-0 right-0 bottom-6 w-full"
-        style={{ height: 'clamp(110px, 16vw, 190px)' }}
+        style={{ height: 'auto', overflow: 'visible' }}
       >
         <motion.path
           d={LATIDO}
@@ -72,7 +67,6 @@ export default function HeroMedicina({ onRegisterClick }) {
           strokeWidth={3}
           strokeLinecap="round"
           strokeLinejoin="round"
-          vectorEffect="non-scaling-stroke"
           initial={reducir ? false : { pathLength: 0 }}
           animate={{ pathLength: 1 }}
           transition={{ duration: 2.6, ease: 'easeInOut', delay: 0.3 }}
