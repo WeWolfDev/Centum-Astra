@@ -105,7 +105,7 @@ function Resumen({ rango }) {
           tono="dorado"
         />
       </div>
-      <p className="m-0 text-xs text-white/60">El {examScoreLabel.toLowerCase()} no es un resultado oficial de Ceneval.</p>
+      <p className="m-0 text-xs text-white/60">El {examScoreLabel.toLowerCase()} no es un resultado oficial del EXANI-II.</p>
     </div>
   );
 }

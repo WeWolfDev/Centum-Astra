@@ -577,7 +577,7 @@ function CourseSelector({ onClose }) {
               </motion.button>
             )}
             {selected && <div style={{ width: 1, height: 16, background: 'rgb(var(--c-ink) / 0.1)' }} />}
-            <h2 style={{ fontFamily: 'Syne, sans-serif', fontSize: 16, fontWeight: 700, color: 'rgb(var(--c-ink))', margin: 0 }}>
+            <h2 style={{ fontFamily: '"Bricolage Grotesque", sans-serif', fontSize: 16, fontWeight: 700, color: 'rgb(var(--c-ink))', margin: 0 }}>
               {selected ? COURSES.find(c => c.id === selected)?.label : 'Elige tu área de práctica'}
             </h2>
           </div>
@@ -848,10 +848,13 @@ export default function PublicNav({ onLoginClick }) {
           {onLoginClick && (
             <button
               onClick={onLoginClick}
-              className="btn-gold nav-cta-label"
+              className="btn-gold nav-cta"
+              aria-label="Iniciar sesión"
               style={{ padding: '7px 18px', fontSize: 13.5, borderRadius: 8 }}
             >
-              Iniciar sesión
+              {/* En el celular cabe solo la versión corta; el botón sigue visible (A1). */}
+              <span className="nav-cta-largo">Iniciar sesión</span>
+              <span className="nav-cta-corto">Entrar</span>
             </button>
           )}
         </div>

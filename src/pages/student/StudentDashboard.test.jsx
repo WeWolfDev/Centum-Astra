@@ -81,7 +81,7 @@ describe('Inicio con datos reales', () => {
     expect(resultados.getByText('Promedio de quizzes · 2 quizzes')).toBeInTheDocument();
     expect(resultados.getByText('1,080')).toBeInTheDocument();
     expect(resultados.getByText('Puntaje estimado promedio · 1 simulador o cuestionario')).toBeInTheDocument();
-    expect(resultados.getByText(/no es un resultado oficial de Ceneval/)).toBeInTheDocument();
+    expect(resultados.getByText(/no es un resultado oficial del EXANI-II/)).toBeInTheDocument();
     expect(screen.queryByText(/todavía no salen de tus simuladores/)).not.toBeInTheDocument();
     expect(screen.queryByText('Geometría analítica')).not.toBeInTheDocument();
   });

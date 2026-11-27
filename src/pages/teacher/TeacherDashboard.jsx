@@ -392,22 +392,31 @@ function TeacherDashboardDemo() {
           >
             {nAtencion}
           </div>
-          <div style={{ marginTop: 8, fontSize: 14, color: 'rgb(var(--c-ink) / 0.9)' }}>
-            {nAtencion === 1 ? 'requiere atención' : 'requieren atención'}
-          </div>
-          <div
-            style={{
-              marginTop: 4,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: 14,
-              color: 'rgb(var(--c-peligro))',
-            }}
-          >
-            <span style={{ width: 8, height: 8, borderRadius: 999, background: 'rgb(var(--c-peligro))' }} />
-            bajan o llevan semanas sin entrar
-          </div>
+          {/* Con cero, sin alerta roja: una alarma sin motivo enseña a ignorarla (M6). */}
+          {nAtencion === 0 ? (
+            <div style={{ marginTop: 8, fontSize: 14, color: 'rgb(var(--c-ink) / 0.9)' }}>
+              Nadie requiere atención
+            </div>
+          ) : (
+            <>
+              <div style={{ marginTop: 8, fontSize: 14, color: 'rgb(var(--c-ink) / 0.9)' }}>
+                {nAtencion === 1 ? 'requiere atención' : 'requieren atención'}
+              </div>
+              <div
+                style={{
+                  marginTop: 4,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 14,
+                  color: 'rgb(var(--c-peligro))',
+                }}
+              >
+                <span style={{ width: 8, height: 8, borderRadius: 999, background: 'rgb(var(--c-peligro))' }} />
+                bajan o llevan semanas sin entrar
+              </div>
+            </>
+          )}
         </div>
       </section>
 
