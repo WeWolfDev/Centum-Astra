@@ -5,7 +5,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions;
 
-select plan(23);
+select plan(24);
 
 create function pg_temp.como(usuario text) returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', usuario)::text, true)
@@ -215,6 +215,12 @@ select is(
 );
 
 -- ── Una evaluación publicada no se queda sin preguntas ───────────────────────
+select throws_ok(
+  $$ update public.questions set evaluation_id = 'b4500000-0000-0000-0000-000000000003', position = 9
+     where id = 'b4600000-0000-0000-0000-000000000021' $$,
+  'CA025', null,
+  'mover la única pregunta de una evaluación publicada a otra falla'
+);
 select throws_ok(
   $$ delete from public.questions where id = 'b4600000-0000-0000-0000-000000000021' $$,
   'CA025', null,

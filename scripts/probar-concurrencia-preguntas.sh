@@ -8,10 +8,19 @@
 set -euo pipefail
 
 DB_URL="${DB_URL:-postgresql://postgres:postgres@127.0.0.1:54322/postgres}"
-case "$DB_URL" in
-  *127.0.0.1*|*localhost*) ;;
-  *) echo "Solo corre contra la base local (DB_URL=$DB_URL)." >&2; exit 1 ;;
+# Solo el host cuenta: lo que va después de la última @ y antes de :, / o ?.
+# Los parámetros (?host=...) y las variables PGHOST* podrían cambiar el
+# destino, así que se rechazan o se quitan.
+no_local() { echo "Solo corre contra la base local: el host de DB_URL debe ser 127.0.0.1 o localhost." >&2; exit 1; }
+case "$DB_URL" in *\?*) no_local ;; esac
+resto="${DB_URL#*://}"
+resto="${resto##*@}"
+host="${resto%%[:/]*}"
+case "$host" in
+  127.0.0.1|localhost) ;;
+  *) no_local ;;
 esac
+unset PGHOST PGHOSTADDR PGSERVICE PGSERVICEFILE
 
 sql() { psql "$DB_URL" -X -q -v ON_ERROR_STOP=1 -At "$@"; }
 

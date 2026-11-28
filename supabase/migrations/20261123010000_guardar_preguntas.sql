@@ -47,11 +47,12 @@ begin
 end;
 $$;
 
--- Una evaluación publicada no se queda sin preguntas. El trigger se llama
--- questions_publicada_* para correr después de questions_lock_with_attempts
--- (orden alfabético): con el candado ya tomado, dos borrados al mismo tiempo
--- no pueden dejarla vacía. Al borrar una evaluación completa, su fila ya no
--- existe y la cascada pasa.
+-- Una evaluación publicada no se queda sin preguntas, ni al borrar su última
+-- pregunta ni al moverla a otra evaluación (cambio de evaluation_id). El
+-- trigger se llama questions_publicada_* para correr después de
+-- questions_lock_with_attempts (orden alfabético): con el candado ya tomado,
+-- dos cambios al mismo tiempo no pueden dejarla vacía. Al borrar una
+-- evaluación completa, su fila ya no existe y la cascada pasa.
 create function app_private.keep_published_questions()
 returns trigger
 language plpgsql
@@ -59,6 +60,9 @@ security definer
 set search_path = ''
 as $$
 begin
+  if tg_op = 'UPDATE' and new.evaluation_id = old.evaluation_id then
+    return new;
+  end if;
   if exists (
     select 1 from public.evaluations e
     where e.id = old.evaluation_id and e.status = 'published'
@@ -69,14 +73,14 @@ begin
     raise exception 'Una evaluación publicada necesita al menos una pregunta.'
       using errcode = 'CA025';
   end if;
-  return old;
+  return coalesce(new, old);
 end;
 $$;
 
 revoke all on function app_private.keep_published_questions() from public, authenticated;
 
 create trigger questions_publicada_con_preguntas
-before delete on public.questions
+before delete or update of evaluation_id on public.questions
 for each row
 execute function app_private.keep_published_questions();
 
