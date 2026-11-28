@@ -3,6 +3,7 @@
 // Los archivos viven en el bucket privado `materiales` (#28): primero se
 // registra el borrador, luego se sube el objeto y al final se confirma.
 import { supabase } from './supabaseClient';
+import { imagenModuloUrl } from './catalogoService';
 
 const LOAD_ERROR = 'No pudimos cargar el material. Intenta de nuevo.';
 const ACTION_ERROR = 'No se pudo guardar. Intenta de nuevo.';
@@ -67,7 +68,7 @@ export function enlaceSeguro(url) {
 export async function listMaterialCourses() {
   const { data, error } = await supabase
     .from('courses')
-    .select('id, name, status, modules(id, title, position, status)')
+    .select('id, name, status, modules(id, title, position, status, image_path)')
     .eq('status', 'active')
     .order('name');
   if (error) throw new Error(LOAD_ERROR);
@@ -77,7 +78,7 @@ export async function listMaterialCourses() {
     modules: (curso.modules ?? [])
       .filter(m => m.status === 'active')
       .sort((a, b) => a.position - b.position)
-      .map(m => ({ id: m.id, title: m.title })),
+      .map(m => ({ id: m.id, title: m.title, imageUrl: imagenModuloUrl(m.image_path) })),
   }));
 }
 

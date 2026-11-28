@@ -57,7 +57,10 @@ function toCatalogCourse(curso) {
       .map(g => ({ id: g.id, name: g.name, code: g.code, schedule: g.schedule ?? '', generation: g.generation ?? '', status: g.status })),
     modules: [...(curso.modules ?? [])]
       .sort((a, b) => a.position - b.position)
-      .map(m => ({ id: m.id, title: m.title, description: m.description ?? '', position: m.position, status: m.status })),
+      .map(m => ({
+        id: m.id, title: m.title, description: m.description ?? '', position: m.position, status: m.status,
+        imagePath: m.image_path ?? null, imageUrl: imagenModuloUrl(m.image_path),
+      })),
   };
 }
 
@@ -67,7 +70,7 @@ export async function listCatalog({ includeArchived = false } = {}) {
     .from('courses')
     .select(
       'id, name, description, status, starts_on, ends_on, ' +
-      'groups(id, name, code, schedule, generation, status), modules(id, title, description, position, status)',
+      'groups(id, name, code, schedule, generation, status), modules(id, title, description, position, status, image_path)',
     )
     .order('name');
   if (error) throw new Error(LOAD_ERROR);
@@ -156,14 +159,57 @@ async function siguientePosicion(courseId) {
   return data.length > 0 ? data[0].position + 1 : 0;
 }
 
+// ── Imagen del módulo ────────────────────────────────────────────────────────
+// Sin imagen propia, la pantalla usa la del área (src/config/areas.js).
+
+const BUCKET_MODULOS = 'modulos';
+export const TIPOS_IMAGEN_MODULO = ['image/jpeg', 'image/png', 'image/webp'];
+export const MAX_IMAGEN_MODULO_BYTES = 5 * 1024 * 1024;
+
+/** URL pública de la imagen del módulo, o null si no tiene. */
+export function imagenModuloUrl(path) {
+  if (!path) return null;
+  return supabase.storage.from(BUCKET_MODULOS).getPublicUrl(path).data.publicUrl;
+}
+
+export function validarImagenModulo(archivo) {
+  if (!TIPOS_IMAGEN_MODULO.includes(archivo.type)) throw new Error('La imagen debe ser JPG, PNG o WebP.');
+  if (archivo.size > MAX_IMAGEN_MODULO_BYTES) throw new Error('La imagen pesa más de 5 MB.');
+}
+
+/**
+ * Sube una imagen nueva (`archivo`) o quita la actual (`quitar`). Cada imagen
+ * va con un nombre nuevo para que el navegador no muestre la anterior en caché;
+ * la anterior se borra al final y, si falla el borrado, solo queda ocupando espacio.
+ */
+export async function cambiarImagenModulo(moduleId, { archivo = null, quitar = false, anterior = null } = {}) {
+  if (!archivo && !quitar) return;
+  let nueva = null;
+  if (archivo) {
+    validarImagenModulo(archivo);
+    const extension = archivo.type.split('/')[1].replace('jpeg', 'jpg');
+    nueva = `${moduleId}/${Date.now()}.${extension}`;
+    const { error } = await supabase.storage
+      .from(BUCKET_MODULOS)
+      .upload(nueva, archivo, { contentType: archivo.type, upsert: false });
+    if (error) throw new Error('No se pudo subir la imagen. Intenta de nuevo.');
+  }
+  const { error } = await supabase.from('modules').update({ image_path: nueva, updated_at: ahora() }).eq('id', moduleId);
+  if (error) {
+    if (nueva) await supabase.storage.from(BUCKET_MODULOS).remove([nueva]);
+    throw new Error(mensajeDeError(error));
+  }
+  if (anterior) await supabase.storage.from(BUCKET_MODULOS).remove([anterior]);
+}
+
 // El módulo nuevo va al final. Si otra persona tomó esa posición al mismo
 // tiempo, (course_id, position) es único y se reintenta una vez.
 export async function createModule({ courseId, ...modulo }) {
   const fila = { course_id: courseId, ...datosModulo(modulo) };
   for (let intento = 0; intento < 2; intento += 1) {
     const position = await siguientePosicion(courseId);
-    const { error } = await supabase.from('modules').insert({ ...fila, position });
-    if (!error) return;
+    const { data, error } = await supabase.from('modules').insert({ ...fila, position }).select('id').single();
+    if (!error) return data?.id;
     if (error.code !== UNIQUE_VIOLATION || intento === 1) throw new Error(mensajeDeError(error));
   }
 }

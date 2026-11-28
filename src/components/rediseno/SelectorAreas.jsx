@@ -29,6 +29,7 @@ export default function SelectorAreas({ modulos }) {
     >
       {modulos.map((mod) => {
         const area = areaDeModulo(mod);
+        const imagen = mod.imageUrl ?? area?.imagen;
         return (
           <Pestanas.Tab
             key={mod.id}
@@ -42,9 +43,9 @@ export default function SelectorAreas({ modulos }) {
               'transition-[box-shadow] duration-200'
             }
           >
-            {area?.imagen ? (
+            {imagen ? (
               <img
-                src={area.imagen}
+                src={imagen}
                 alt=""
                 loading="lazy"
                 decoding="async"

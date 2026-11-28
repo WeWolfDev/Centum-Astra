@@ -80,7 +80,7 @@ describe('listMaterialCourses', () => {
       ],
     }, { id: 'c2', name: 'Sin módulos', status: 'active', modules: null }];
     await expect(listMaterialCourses()).resolves.toEqual([
-      { id: 'c1', name: 'Curso', modules: [{ id: 'm1', title: 'Matemático' }, { id: 'm2', title: 'Lectora' }] },
+      { id: 'c1', name: 'Curso', modules: [{ id: 'm1', title: 'Matemático', imageUrl: null }, { id: 'm2', title: 'Lectora', imageUrl: null }] },
       { id: 'c2', name: 'Sin módulos', modules: [] },
     ]);
     expect(fake.calls.filtros).toEqual([['status', 'active']]);

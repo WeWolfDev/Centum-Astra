@@ -1,6 +1,6 @@
 // Diálogos para crear, editar y archivar cursos, grupos y módulos (#50).
-import { useState } from 'react';
-import { HORARIOS_SUGERIDOS } from '../../lib/catalogoService';
+import { useEffect, useMemo, useState } from 'react';
+import { HORARIOS_SUGERIDOS, TIPOS_IMAGEN_MODULO, validarImagenModulo } from '../../lib/catalogoService';
 import Boton from '../../components/rediseno/Boton';
 import Input from '../../components/rediseno/Input';
 import Modal from '../../components/rediseno/Modal';
@@ -112,18 +112,71 @@ export function ModalGrupo({ grupo, guardando, error, onGuardar, onCerrar }) {
   );
 }
 
+// Imagen opcional del módulo; sin ella, la tarjeta usa la del área.
+function ImagenModulo({ actual, archivo, quitar, onElegir, onQuitar }) {
+  const [aviso, setAviso] = useState(null);
+  const vistaPrevia = useMemo(() => (archivo ? URL.createObjectURL(archivo) : null), [archivo]);
+  useEffect(() => () => { if (vistaPrevia) URL.revokeObjectURL(vistaPrevia); }, [vistaPrevia]);
+
+  const imagen = vistaPrevia ?? (quitar ? null : actual);
+
+  function elegir(e) {
+    const elegido = e.target.files?.[0];
+    e.target.value = '';
+    if (!elegido) return;
+    try {
+      validarImagenModulo(elegido);
+      setAviso(null);
+      onElegir(elegido);
+    } catch (err) {
+      setAviso(err.message);
+    }
+  }
+
+  return (
+    <div>
+      <span className="block mb-1.5 text-xs font-medium text-white/70 tracking-wide">
+        Imagen <span className="text-white/60">(opcional)</span>
+      </span>
+      {imagen ? (
+        <img src={imagen} alt="Vista previa de la imagen del módulo" className="mb-2 h-28 w-full rounded-[10px] object-cover" />
+      ) : (
+        <p className="m-0 mb-2 text-xs text-white/60">Sin imagen propia: se usa la del área.</p>
+      )}
+      <div className="flex gap-2.5 flex-wrap">
+        <label className="btn-ghost inline-flex cursor-pointer items-center rounded-[10px] px-3 py-2 text-xs focus-within:ring-2 focus-within:ring-gold-bright">
+          {imagen ? 'Cambiar imagen' : 'Elegir imagen'}
+          <input type="file" accept={TIPOS_IMAGEN_MODULO.join(',')} onChange={elegir} className="sr-only" />
+        </label>
+        {imagen && <Boton variant="secundario" size="sm" type="button" onClick={onQuitar}>Quitar imagen</Boton>}
+      </div>
+      <p className="m-0 mt-1.5 text-xs text-white/60">JPG, PNG o WebP, hasta 5 MB.</p>
+      {aviso && <p role="alert" className="m-0 mt-1.5 text-xs text-peligro">{aviso}</p>}
+    </div>
+  );
+}
+
 export function ModalModulo({ modulo, guardando, error, onGuardar, onCerrar }) {
   const [title, setTitle] = useState(modulo?.title ?? '');
   const [description, setDescription] = useState(modulo?.description ?? '');
+  const [imagen, setImagen] = useState(null);
+  const [quitarImagen, setQuitarImagen] = useState(false);
 
   return (
     <Formulario
       titulo={modulo ? 'Editar módulo' : 'Nuevo módulo'}
       onCerrar={onCerrar}
-      onEnviar={() => onGuardar({ title, description })}
+      onEnviar={() => onGuardar({ title, description, imagen, quitarImagen: quitarImagen && !imagen })}
     >
       <Input id="modulo-titulo" label="Título del módulo" value={title} onChange={e => setTitle(e.target.value)} required />
       <Descripcion id="modulo-descripcion" value={description} onChange={setDescription} />
+      <ImagenModulo
+        actual={modulo?.imageUrl ?? null}
+        archivo={imagen}
+        quitar={quitarImagen}
+        onElegir={archivo => { setImagen(archivo); setQuitarImagen(false); }}
+        onQuitar={() => { setImagen(null); setQuitarImagen(true); }}
+      />
       {!modulo && <p className="m-0 text-xs text-white/60">Se agrega al final de los módulos del curso.</p>}
       <ErrorDialogo mensaje={error} />
       <PieDialogo textoConfirmar={modulo ? 'Guardar' : 'Crear módulo'} guardando={guardando} onCancelar={onCerrar} />
