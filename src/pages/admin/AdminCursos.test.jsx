@@ -3,6 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { StrictMode } from 'react';
 
 const fake = vi.hoisted(() => ({
   listCatalog: vi.fn(),
@@ -33,7 +34,7 @@ const CURSO = {
   startsOn: '2027-01-11', endsOn: '2027-06-26',
   groups: [{ id: 'g1', name: 'Grupo A', code: 'A', schedule: 'Sabatino: sábados, 8:00 a. m. a 12:00 p. m.', generation: '2027', status: 'active' }],
   modules: [
-    { id: 'm1', title: 'Pensamiento Matemático', description: '', position: 0, status: 'active' },
+    { id: 'm1', title: 'Pensamiento Matemático', description: '', position: 0, status: 'active', imagePath: 'm1/1.png', imageUrl: 'https://publica/modulos/m1/1.png' },
     { id: 'm2', title: 'Comprensión Lectora', description: '', position: 1, status: 'active' },
   ],
 };
@@ -189,6 +190,50 @@ describe('AdminCursos', () => {
 
     expect(await screen.findByText(/Módulo creado, pero la imagen no se guardó/)).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  test('al editar, cambia la imagen y manda la anterior para borrarla', async () => {
+    render(<AdminCursos />);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    await userEvent.click(curso.getByRole('button', { name: 'Editar módulo Pensamiento Matemático' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    expect(dialogo.getByAltText('Vista previa de la imagen del módulo')).toHaveAttribute('src', 'https://publica/modulos/m1/1.png');
+    const nueva = new File(['x'], 'nueva.webp', { type: 'image/webp' });
+    await userEvent.upload(dialogo.getByLabelText('Cambiar imagen'), nueva);
+    await userEvent.click(dialogo.getByRole('button', { name: 'Guardar' }));
+
+    expect(fake.updateModule).toHaveBeenCalledWith('m1', expect.objectContaining({ title: 'Pensamiento Matemático' }));
+    expect(fake.cambiarImagenModulo).toHaveBeenCalledWith('m1', { archivo: nueva, quitar: false, anterior: 'm1/1.png' });
+    expect(await screen.findByText('Módulo actualizado.')).toBeInTheDocument();
+  });
+
+  test('al editar, quitar la imagen la borra y vuelve a la del área', async () => {
+    render(<AdminCursos />);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    await userEvent.click(curso.getByRole('button', { name: 'Editar módulo Pensamiento Matemático' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    await userEvent.click(dialogo.getByRole('button', { name: 'Quitar imagen' }));
+    expect(dialogo.getByText('Sin imagen propia: se usa la del área.')).toBeInTheDocument();
+    await userEvent.click(dialogo.getByRole('button', { name: 'Guardar' }));
+
+    expect(fake.cambiarImagenModulo).toHaveBeenCalledWith('m1', { archivo: null, quitar: true, anterior: 'm1/1.png' });
+  });
+
+  test('en StrictMode libera todas las vistas previas que crea', async () => {
+    let n = 0;
+    URL.createObjectURL.mockImplementation(() => `blob:${(n += 1)}`);
+    render(<StrictMode><AdminCursos /></StrictMode>);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    await userEvent.click(curso.getByRole('button', { name: 'Agregar módulo a EXANI-II 2027' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    await userEvent.upload(dialogo.getByLabelText('Elegir imagen'), new File(['x'], 'a.png', { type: 'image/png' }));
+    await userEvent.upload(dialogo.getByLabelText('Cambiar imagen'), new File(['y'], 'b.png', { type: 'image/png' }));
+    await userEvent.click(dialogo.getByRole('button', { name: 'Cancelar' }));
+
+    const creadas = URL.createObjectURL.mock.results.map(r => r.value);
+    const liberadas = URL.revokeObjectURL.mock.calls.map(([url]) => url);
+    expect(creadas.length).toBeGreaterThan(0);
+    expect(liberadas).toEqual(expect.arrayContaining(creadas));
   });
 
   test('rechaza un archivo que no es imagen antes de guardar', async () => {

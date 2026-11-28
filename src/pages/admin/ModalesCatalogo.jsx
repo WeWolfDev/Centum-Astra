@@ -1,5 +1,5 @@
 // Diálogos para crear, editar y archivar cursos, grupos y módulos (#50).
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HORARIOS_SUGERIDOS, TIPOS_IMAGEN_MODULO, validarImagenModulo } from '../../lib/catalogoService';
 import Boton from '../../components/rediseno/Boton';
 import Input from '../../components/rediseno/Input';
@@ -113,10 +113,19 @@ export function ModalGrupo({ grupo, guardando, error, onGuardar, onCerrar }) {
 }
 
 // Imagen opcional del módulo; sin ella, la tarjeta usa la del área.
-function ImagenModulo({ actual, archivo, quitar, onElegir, onQuitar }) {
+// La URL de la vista previa se crea al elegir el archivo, no al renderizar: así
+// StrictMode no crea URLs de más. Se libera al cambiarla y al cerrar el diálogo.
+function ImagenModulo({ actual, quitar, onElegir, onQuitar }) {
   const [aviso, setAviso] = useState(null);
-  const vistaPrevia = useMemo(() => (archivo ? URL.createObjectURL(archivo) : null), [archivo]);
-  useEffect(() => () => { if (vistaPrevia) URL.revokeObjectURL(vistaPrevia); }, [vistaPrevia]);
+  const [vistaPrevia, setVistaPrevia] = useState(null);
+  const ultima = useRef(null);
+  useEffect(() => () => { if (ultima.current) URL.revokeObjectURL(ultima.current); }, []);
+
+  function mostrar(url) {
+    if (ultima.current) URL.revokeObjectURL(ultima.current);
+    ultima.current = url;
+    setVistaPrevia(url);
+  }
 
   const imagen = vistaPrevia ?? (quitar ? null : actual);
 
@@ -127,6 +136,7 @@ function ImagenModulo({ actual, archivo, quitar, onElegir, onQuitar }) {
     try {
       validarImagenModulo(elegido);
       setAviso(null);
+      mostrar(URL.createObjectURL(elegido));
       onElegir(elegido);
     } catch (err) {
       setAviso(err.message);
@@ -148,7 +158,7 @@ function ImagenModulo({ actual, archivo, quitar, onElegir, onQuitar }) {
           {imagen ? 'Cambiar imagen' : 'Elegir imagen'}
           <input type="file" accept={TIPOS_IMAGEN_MODULO.join(',')} onChange={elegir} className="sr-only" />
         </label>
-        {imagen && <Boton variant="secundario" size="sm" type="button" onClick={onQuitar}>Quitar imagen</Boton>}
+        {imagen && <Boton variant="secundario" size="sm" type="button" onClick={() => { mostrar(null); onQuitar(); }}>Quitar imagen</Boton>}
       </div>
       <p className="m-0 mt-1.5 text-xs text-white/60">JPG, PNG o WebP, hasta 5 MB.</p>
       {aviso && <p role="alert" className="m-0 mt-1.5 text-xs text-peligro">{aviso}</p>}
@@ -172,7 +182,6 @@ export function ModalModulo({ modulo, guardando, error, onGuardar, onCerrar }) {
       <Descripcion id="modulo-descripcion" value={description} onChange={setDescription} />
       <ImagenModulo
         actual={modulo?.imageUrl ?? null}
-        archivo={imagen}
         quitar={quitarImagen}
         onElegir={archivo => { setImagen(archivo); setQuitarImagen(false); }}
         onQuitar={() => { setImagen(null); setQuitarImagen(true); }}

@@ -31,6 +31,7 @@ const fake = vi.hoisted(() => {
       upload: (ruta, file, opciones) => { calls.storage.push(['upload', bucket, ruta, opciones]); return Promise.resolve(respuestas.storage.upload); },
       remove: rutas => { calls.storage.push(['remove', bucket, rutas]); return Promise.resolve(respuestas.storage.remove); },
       createSignedUrl: (ruta, segundos) => { calls.storage.push(['createSignedUrl', bucket, ruta, segundos]); return Promise.resolve(respuestas.storage.createSignedUrl); },
+      getPublicUrl: ruta => ({ data: { publicUrl: `https://publica/${bucket}/${ruta}` } }),
     }),
   };
   return { calls, respuestas, supabase: { from, rpc, storage } };
@@ -84,6 +85,21 @@ describe('listMaterialCourses', () => {
       { id: 'c2', name: 'Sin módulos', modules: [] },
     ]);
     expect(fake.calls.filtros).toEqual([['status', 'active']]);
+  });
+
+  test('devuelve la URL pública de la imagen propia del módulo', async () => {
+    fake.respuestas.lectura.data = [{
+      id: 'c1', name: 'Curso', status: 'active',
+      modules: [
+        { id: 'm1', title: 'Química', position: 0, status: 'active', image_path: 'm1/1.png' },
+        { id: 'm2', title: 'Física', position: 1, status: 'active', image_path: null },
+      ],
+    }];
+    const [curso] = await listMaterialCourses();
+    expect(curso.modules).toEqual([
+      { id: 'm1', title: 'Química', imageUrl: 'https://publica/modulos/m1/1.png' },
+      { id: 'm2', title: 'Física', imageUrl: null },
+    ]);
   });
 
   test('informa un error de carga', async () => {
