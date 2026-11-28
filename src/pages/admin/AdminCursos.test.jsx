@@ -3,6 +3,7 @@ import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { StrictMode } from 'react';
 
 const fake = vi.hoisted(() => ({
   listCatalog: vi.fn(),
@@ -12,6 +13,7 @@ const fake = vi.hoisted(() => ({
   updateGroup: vi.fn(),
   createModule: vi.fn(),
   updateModule: vi.fn(),
+  cambiarImagenModulo: vi.fn(),
   setStatus: vi.fn(),
 }));
 const config = vi.hoisted(() => ({ supabase: true }));
@@ -32,7 +34,7 @@ const CURSO = {
   startsOn: '2027-01-11', endsOn: '2027-06-26',
   groups: [{ id: 'g1', name: 'Grupo A', code: 'A', schedule: 'Sabatino: sábados, 8:00 a. m. a 12:00 p. m.', generation: '2027', status: 'active' }],
   modules: [
-    { id: 'm1', title: 'Pensamiento Matemático', description: '', position: 0, status: 'active' },
+    { id: 'm1', title: 'Pensamiento Matemático', description: '', position: 0, status: 'active', imagePath: 'm1/1.png', imageUrl: 'https://publica/modulos/m1/1.png' },
     { id: 'm2', title: 'Comprensión Lectora', description: '', position: 1, status: 'active' },
   ],
 };
@@ -41,8 +43,11 @@ beforeEach(() => {
   config.supabase = true;
   Object.values(fake).forEach(fn => fn.mockReset());
   fake.listCatalog.mockResolvedValue([CURSO]);
-  ['createCourse', 'updateCourse', 'createGroup', 'updateGroup', 'createModule', 'updateModule', 'setStatus']
+  ['createCourse', 'updateCourse', 'createGroup', 'updateGroup', 'createModule', 'updateModule', 'cambiarImagenModulo', 'setStatus']
     .forEach(nombre => fake[nombre].mockResolvedValue());
+  // jsdom no crea URLs de archivos para la vista previa.
+  URL.createObjectURL = vi.fn(() => 'blob:vista-previa');
+  URL.revokeObjectURL = vi.fn();
 });
 afterEach(cleanup);
 
@@ -153,8 +158,91 @@ describe('AdminCursos', () => {
     await userEvent.type(dialogo.getByLabelText('Título del módulo'), 'Química');
     await userEvent.click(dialogo.getByRole('button', { name: 'Crear módulo' }));
 
-    expect(fake.createModule).toHaveBeenCalledWith({ courseId: 'c1', title: 'Química', description: '' });
+    expect(fake.createModule).toHaveBeenCalledWith(expect.objectContaining({ courseId: 'c1', title: 'Química', description: '' }));
     expect(await screen.findByText('Módulo creado.')).toBeInTheDocument();
+  });
+
+  test('sube la imagen elegida al crear un módulo', async () => {
+    fake.createModule.mockResolvedValue('m9');
+    render(<AdminCursos />);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    await userEvent.click(curso.getByRole('button', { name: 'Agregar módulo a EXANI-II 2027' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    await userEvent.type(dialogo.getByLabelText('Título del módulo'), 'Química');
+    const imagen = new File(['x'], 'quimica.png', { type: 'image/png' });
+    await userEvent.upload(dialogo.getByLabelText('Elegir imagen'), imagen);
+    await userEvent.click(dialogo.getByRole('button', { name: 'Crear módulo' }));
+
+    expect(fake.cambiarImagenModulo).toHaveBeenCalledWith('m9', { archivo: imagen, quitar: false, anterior: undefined });
+    expect(await screen.findByText('Módulo creado.')).toBeInTheDocument();
+  });
+
+  test('si la imagen falla, el módulo queda creado y lo avisa', async () => {
+    fake.createModule.mockResolvedValue('m9');
+    fake.cambiarImagenModulo.mockRejectedValueOnce(new Error('No se pudo subir la imagen. Intenta de nuevo.'));
+    render(<AdminCursos />);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    await userEvent.click(curso.getByRole('button', { name: 'Agregar módulo a EXANI-II 2027' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    await userEvent.type(dialogo.getByLabelText('Título del módulo'), 'Química');
+    await userEvent.upload(dialogo.getByLabelText('Elegir imagen'), new File(['x'], 'q.png', { type: 'image/png' }));
+    await userEvent.click(dialogo.getByRole('button', { name: 'Crear módulo' }));
+
+    expect(await screen.findByText(/Módulo creado, pero la imagen no se guardó/)).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  test('al editar, cambia la imagen y manda la anterior para borrarla', async () => {
+    render(<AdminCursos />);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    await userEvent.click(curso.getByRole('button', { name: 'Editar módulo Pensamiento Matemático' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    expect(dialogo.getByAltText('Vista previa de la imagen del módulo')).toHaveAttribute('src', 'https://publica/modulos/m1/1.png');
+    const nueva = new File(['x'], 'nueva.webp', { type: 'image/webp' });
+    await userEvent.upload(dialogo.getByLabelText('Cambiar imagen'), nueva);
+    await userEvent.click(dialogo.getByRole('button', { name: 'Guardar' }));
+
+    expect(fake.updateModule).toHaveBeenCalledWith('m1', expect.objectContaining({ title: 'Pensamiento Matemático' }));
+    expect(fake.cambiarImagenModulo).toHaveBeenCalledWith('m1', { archivo: nueva, quitar: false, anterior: 'm1/1.png' });
+    expect(await screen.findByText('Módulo actualizado.')).toBeInTheDocument();
+  });
+
+  test('al editar, quitar la imagen la borra y vuelve a la del área', async () => {
+    render(<AdminCursos />);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    await userEvent.click(curso.getByRole('button', { name: 'Editar módulo Pensamiento Matemático' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    await userEvent.click(dialogo.getByRole('button', { name: 'Quitar imagen' }));
+    expect(dialogo.getByText('Sin imagen propia: se usa la del área.')).toBeInTheDocument();
+    await userEvent.click(dialogo.getByRole('button', { name: 'Guardar' }));
+
+    expect(fake.cambiarImagenModulo).toHaveBeenCalledWith('m1', { archivo: null, quitar: true, anterior: 'm1/1.png' });
+  });
+
+  test('en StrictMode libera todas las vistas previas que crea', async () => {
+    let n = 0;
+    URL.createObjectURL.mockImplementation(() => `blob:${(n += 1)}`);
+    render(<StrictMode><AdminCursos /></StrictMode>);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    await userEvent.click(curso.getByRole('button', { name: 'Agregar módulo a EXANI-II 2027' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    await userEvent.upload(dialogo.getByLabelText('Elegir imagen'), new File(['x'], 'a.png', { type: 'image/png' }));
+    await userEvent.upload(dialogo.getByLabelText('Cambiar imagen'), new File(['y'], 'b.png', { type: 'image/png' }));
+    await userEvent.click(dialogo.getByRole('button', { name: 'Cancelar' }));
+
+    const creadas = URL.createObjectURL.mock.results.map(r => r.value);
+    const liberadas = URL.revokeObjectURL.mock.calls.map(([url]) => url);
+    expect(creadas.length).toBeGreaterThan(0);
+    expect(liberadas).toEqual(expect.arrayContaining(creadas));
+  });
+
+  test('rechaza un archivo que no es imagen antes de guardar', async () => {
+    render(<AdminCursos />);
+    const curso = within(await waitFor(() => tarjetaDe('EXANI-II 2027')));
+    await userEvent.click(curso.getByRole('button', { name: 'Agregar módulo a EXANI-II 2027' }));
+    const dialogo = within(screen.getByRole('dialog'));
+    await userEvent.upload(dialogo.getByLabelText('Elegir imagen'), new File(['x'], 'virus.exe', { type: 'application/x-msdownload' }), { applyAccept: false });
+    expect(dialogo.getByRole('alert')).toHaveTextContent('JPG, PNG o WebP');
   });
 
   test('archiva un curso después de confirmar', async () => {

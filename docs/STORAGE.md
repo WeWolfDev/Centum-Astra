@@ -7,13 +7,14 @@ pruebas por rol están en `supabase/tests/database/storage.test.sql`.
 
 ## Buckets
 
-Los tres son privados: ningún archivo se lee sin sesión y sin permiso.
+`materiales`, `reactivos` y `terminos` son privados: ningún archivo se lee sin sesión y sin permiso. `modulos` es de lectura pública porque solo guarda portadas.
 
 | Bucket | Ruta del objeto | Formatos | Quién sube y reemplaza | Quién lee | Quién borra |
 | --- | --- | --- | --- | --- | --- |
 | `materiales` | `{material_id}/{nombre}` | Todos salvo ejecutables | Administrador; profesor del curso, sobre el material que creó | Quien ve la fila en `materials` (el alumno, solo lo publicado de sus módulos) | Administrador; el profesor solo en sus borradores |
 | `reactivos` | `{pregunta_id}/{nombre}` | Imágenes y audio | Quien puede editar la evaluación de la pregunta (administrador; profesor del curso en sus quizzes y cuestionarios), mientras no tenga intentos | Quien administra la evaluación ve toda la carpeta; los demás, solo el archivo que usa la pregunta (`media_path`) si pueden ver la evaluación | Como al subir; los huérfanos (su pregunta ya no existe), solo el administrador |
 | `terminos` | `{alumno_id}/{nombre}` | Imágenes y PDF | Administrador | Administrador | Administrador |
+| `modulos` | `{modulo_id}/{fecha}.{ext}` | JPG, PNG y WebP, hasta 5 MB | Administrador | Cualquiera, con la URL pública | Administrador |
 
 - **Tamaño:** 50 MB por archivo, sin límite total por curso.
 - **Ejecutables:** se rechazan por extensión al subir (`.exe`, `.msi`, `.bat`,
@@ -32,6 +33,7 @@ Los tres son privados: ningún archivo se lee sin sesión y sin permiso.
   Al borrar una pregunta, su archivo queda huérfano: solo el administrador lo ve
   y lo borra.
 - La tabla de términos (#62) debe ligar sus filas a las rutas de `terminos`.
+- **Imagen del módulo:** `modules.image_path` apunta a la imagen en `modulos`. Sin imagen, las tarjetas usan la del área (`src/config/areas.js`). Cada imagen nueva lleva otro nombre para que el navegador no muestre la anterior desde su caché; la anterior se borra al guardar.
 
 ## Flujo de un archivo de material
 

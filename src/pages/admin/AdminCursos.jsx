@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { BookOpen, CalendarDays, Clock, GraduationCap, Plus } from 'lucide-react';
 import {
-  createCourse, createGroup, createModule, listCatalog, setStatus, updateCourse, updateGroup, updateModule,
+  cambiarImagenModulo, createCourse, createGroup, createModule, listCatalog, setStatus, updateCourse, updateGroup, updateModule,
 } from '../../lib/catalogoService';
 import { isSupabaseConfigured } from '../../lib/supabaseClient';
 import { Aviso } from '../../components/rediseno/Aviso';
@@ -230,9 +230,10 @@ export function CatalogoConectado() {
     setErrorDialogo('');
     setGuardando(true);
     try {
-      await accion();
+      // La acción puede devolver otro aviso, por ejemplo si algo quedó a medias.
+      const aviso = await accion();
       setDialogo(null);
-      setAviso(mensajeExito);
+      setAviso(aviso ?? mensajeExito);
       await recargar();
     } catch (e) {
       setErrorDialogo(e.message);
@@ -315,7 +316,22 @@ export function CatalogoConectado() {
         <ModalModulo
           modulo={item}
           onGuardar={datos => void ejecutar(
-            () => (item ? updateModule(item.id, datos) : createModule({ courseId: dialogo.curso.id, ...datos })),
+            async () => {
+              const imagen = { archivo: datos.imagen, quitar: datos.quitarImagen, anterior: item?.imagePath };
+              if (item) {
+                await updateModule(item.id, datos);
+                await cambiarImagenModulo(item.id, imagen);
+                return undefined;
+              }
+              const id = await createModule({ courseId: dialogo.curso.id, ...datos });
+              // Ya existe: reintentar con el mismo diálogo crearía otro módulo.
+              try {
+                await cambiarImagenModulo(id, imagen);
+              } catch (e) {
+                return `Módulo creado, pero la imagen no se guardó (${e.message}) Edítalo para intentarlo de nuevo.`;
+              }
+              return undefined;
+            },
             item ? 'Módulo actualizado.' : 'Módulo creado.',
           )}
           {...propsDialogo}

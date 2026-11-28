@@ -12,7 +12,7 @@ export default function TarjetasAreas({ modulos, onAbrirModulo }) {
             key={mod.id}
             titulo={mod.title}
             icono={area?.icono ?? 'math'}
-            imagen={area?.imagen}
+            imagen={mod.imageUrl ?? area?.imagen}
             intensidadTinte={area?.intensidadTinte ?? 'media'}
             onClick={() => onAbrirModulo(mod.id)}
             ariaLabel={`Abrir módulo ${mod.title}`}

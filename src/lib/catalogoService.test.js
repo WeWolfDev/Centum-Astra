@@ -15,13 +15,21 @@ const fake = vi.hoisted(() => {
     });
     return chain;
   }
-  return { consultas, respuestas, supabase: { from: vi.fn(from) } };
+  const storage = { subidas: [], borrados: [], errorSubida: null };
+  const bucket = {
+    upload: vi.fn(async (ruta, archivo, opciones) => { storage.subidas.push([ruta, archivo, opciones]); return { error: storage.errorSubida }; }),
+    remove: vi.fn(async rutas => { storage.borrados.push(...rutas); return { error: null }; }),
+    getPublicUrl: ruta => ({ data: { publicUrl: `https://x.supabase.co/storage/v1/object/public/modulos/${ruta}` } }),
+  };
+  return { consultas, respuestas, storage, supabase: { from: vi.fn(from), storage: { from: vi.fn(() => bucket) } } };
 });
 
 vi.mock('./supabaseClient', () => ({ supabase: fake.supabase }));
 
 const {
   HORARIOS_SUGERIDOS,
+  cambiarImagenModulo,
+  imagenModuloUrl,
   createCourse,
   createGroup,
   createModule,
@@ -37,6 +45,9 @@ const llamada = (q, metodo) => q.llamadas.find(([m]) => m === metodo)?.slice(1);
 beforeEach(() => {
   fake.consultas.length = 0;
   fake.respuestas.length = 0;
+  fake.storage.subidas.length = 0;
+  fake.storage.borrados.length = 0;
+  fake.storage.errorSubida = null;
 });
 
 describe('listCatalog', () => {
@@ -196,5 +207,62 @@ describe('setStatus', () => {
     await expect(setStatus('profiles', 'x', 'archived')).rejects.toThrow();
     await expect(setStatus('courses', 'x', 'deleted')).rejects.toThrow();
     expect(fake.consultas).toHaveLength(0);
+  });
+});
+
+describe('imagen del módulo', () => {
+  const png = new File(['x'], 'portada.png', { type: 'image/png' });
+
+  test('crear un módulo devuelve su id para subir la imagen', async () => {
+    fake.respuestas.push({ data: [], error: null }, { data: { id: 'm7' }, error: null });
+    await expect(createModule({ courseId: 'c1', title: 'Química' })).resolves.toBe('m7');
+  });
+
+  test('sube la imagen en la carpeta del módulo, la guarda y borra la anterior', async () => {
+    await cambiarImagenModulo('m1', { archivo: png, anterior: 'm1/viejo.jpg' });
+    const [ruta, archivo, opciones] = fake.storage.subidas[0];
+    expect(ruta).toMatch(/^m1\/\d+\.png$/);
+    expect(archivo).toBe(png);
+    expect(opciones).toEqual({ contentType: 'image/png', upsert: false });
+    expect(llamada(fake.consultas[0], 'update')[0]).toMatchObject({ image_path: ruta });
+    expect(fake.storage.borrados).toEqual(['m1/viejo.jpg']);
+  });
+
+  test('quitar la imagen deja el módulo con la del área', async () => {
+    await cambiarImagenModulo('m1', { quitar: true, anterior: 'm1/viejo.jpg' });
+    expect(fake.storage.subidas).toEqual([]);
+    expect(llamada(fake.consultas[0], 'update')[0]).toMatchObject({ image_path: null });
+    expect(fake.storage.borrados).toEqual(['m1/viejo.jpg']);
+  });
+
+  test('sin cambios no llama a la base', async () => {
+    await cambiarImagenModulo('m1', {});
+    expect(fake.consultas).toEqual([]);
+  });
+
+  test('rechaza otros tipos y archivos de más de 5 MB', async () => {
+    await expect(cambiarImagenModulo('m1', { archivo: new File(['x'], 'a.gif', { type: 'image/gif' }) }))
+      .rejects.toThrow('JPG, PNG o WebP');
+    const grande = new File(['x'], 'a.png', { type: 'image/png' });
+    Object.defineProperty(grande, 'size', { value: 6 * 1024 * 1024 });
+    await expect(cambiarImagenModulo('m1', { archivo: grande })).rejects.toThrow('5 MB');
+    expect(fake.storage.subidas).toEqual([]);
+  });
+
+  test('si la subida falla no cambia el módulo', async () => {
+    fake.storage.errorSubida = { message: 'x' };
+    await expect(cambiarImagenModulo('m1', { archivo: png })).rejects.toThrow('No se pudo subir la imagen');
+    expect(fake.consultas).toEqual([]);
+  });
+
+  test('si guardar la ruta falla, borra la imagen recién subida y conserva la anterior', async () => {
+    fake.respuestas.push({ error: { code: '42501' } });
+    await expect(cambiarImagenModulo('m1', { archivo: png, anterior: 'm1/viejo.jpg' })).rejects.toThrow('permiso');
+    expect(fake.storage.borrados).toEqual([fake.storage.subidas[0][0]]);
+  });
+
+  test('la URL pública sale de la ruta; sin ruta no hay URL', () => {
+    expect(imagenModuloUrl('m1/a.png')).toBe('https://x.supabase.co/storage/v1/object/public/modulos/m1/a.png');
+    expect(imagenModuloUrl(null)).toBeNull();
   });
 });
