@@ -15,6 +15,7 @@ const ERRORES = {
   CA020: 'Para publicar, la evaluación necesita al menos una pregunta, y cada pregunta dos opciones y su respuesta correcta.',
   CA021: 'Revisa la respuesta correcta: debe ser una opción de la pregunta y, en un simulador, solo una.',
   CA024: 'Esta evaluación ya tiene intentos; sus preguntas no se pueden cambiar. Crea otra para corregirla.',
+  CA025: 'Una evaluación publicada necesita al menos una pregunta. Agrega otra antes de borrar esta.',
 };
 
 export const TIPOS = ['simulador', 'cuestionario', 'quiz'];
@@ -115,7 +116,6 @@ export async function loadEvaluation(evaluationId) {
   const preguntas = [...(data.questions ?? [])].sort((a, b) => a.position - b.position);
   return {
     ...toEvaluacion({ ...data, questions: [{ count: preguntas.length }] }),
-    nextPosition: preguntas.reduce((max, q) => Math.max(max, q.position + 1), 0),
     questions: preguntas.map(q => {
       const clave = claveDe(q);
       return {
@@ -199,50 +199,30 @@ export function datosPregunta({ prompt, options = [], correctas = [], explanatio
   return { prompt: enunciado, explanation: texto(explanation), opciones };
 }
 
-// Opciones en orden y clave con los ids que devolvió la base.
-async function guardarOpcionesYClave(questionId, { opciones, explanation }) {
-  const insertadas = await ejecutar(
-    supabase
-      .from('question_options')
-      .insert(opciones.map((o, position) => ({ question_id: questionId, position, body: o.body })))
-      .select('id, position'),
-  );
-  const idPorPosicion = new Map(insertadas.map(o => [o.position, o.id]));
-  const correctas = opciones.flatMap((o, position) => (o.correcta ? [idPorPosicion.get(position)] : []));
-  await ejecutar(
-    supabase
-      .from('question_keys')
-      .upsert({ question_id: questionId, correct_option_ids: correctas, explanation }, { onConflict: 'question_id' }),
+// Enunciado, opciones y clave en una sola transacción (#104): si algo falla,
+// la pregunta queda como estaba.
+async function guardarPregunta(evaluacion, questionId, pregunta) {
+  const { prompt, explanation, opciones } = datosPregunta(pregunta, evaluacion.kind);
+  return ejecutar(
+    supabase.rpc('save_question', {
+      p_evaluation_id: evaluacion.id,
+      p_question_id: questionId,
+      p_prompt: prompt,
+      p_options: opciones.map(o => o.body),
+      p_correct: opciones.flatMap((o, indice) => (o.correcta ? [indice] : [])),
+      p_explanation: explanation,
+    }),
   );
 }
 
-/**
- * Agrega la pregunta al final. Si las opciones o la clave fallan, se borra la
- * pregunta para no dejarla a medias.
- */
+/** Agrega la pregunta al final; la posición la calcula la base. */
 export async function addQuestion(evaluacion, pregunta) {
-  const datos = datosPregunta(pregunta, evaluacion.kind);
-  const fila = await ejecutar(
-    supabase
-      .from('questions')
-      .insert({ evaluation_id: evaluacion.id, position: evaluacion.nextPosition, prompt: datos.prompt })
-      .select('id')
-      .single(),
-  );
-  try {
-    await guardarOpcionesYClave(fila.id, datos);
-  } catch (e) {
-    await supabase.from('questions').delete().eq('id', fila.id);
-    throw e;
-  }
+  await guardarPregunta(evaluacion, null, pregunta);
 }
 
 /** Reemplaza enunciado, opciones y clave. Con intentos, la base lo rechaza (CA024). */
 export async function updateQuestion(evaluacion, questionId, pregunta) {
-  const datos = datosPregunta(pregunta, evaluacion.kind);
-  await cambiarUna(supabase.from('questions').update({ prompt: datos.prompt }).eq('id', questionId));
-  await ejecutar(supabase.from('question_options').delete().eq('question_id', questionId));
-  await guardarOpcionesYClave(questionId, datos);
+  await guardarPregunta(evaluacion, questionId, pregunta);
 }
 
 export async function deleteQuestion(questionId) {

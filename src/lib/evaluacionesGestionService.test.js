@@ -24,7 +24,8 @@ const fake = vi.hoisted(() => {
     };
     return chain;
   });
-  return { calls, respuestas, supabase: { from } };
+  const rpc = vi.fn(() => Promise.resolve(respuestas.rpc ?? { data: 'q1', error: null }));
+  return { calls, respuestas, rpc, supabase: { from, rpc } };
 });
 
 vi.mock('./supabaseClient', () => ({ supabase: fake.supabase }));
@@ -36,6 +37,7 @@ const {
 
 beforeEach(() => {
   fake.calls.length = 0;
+  fake.rpc.mockClear();
   for (const clave of Object.keys(fake.respuestas)) delete fake.respuestas[clave];
 });
 
@@ -100,7 +102,6 @@ describe('loadEvaluation', () => {
     const e = await loadEvaluation('e1');
     expect(e.questionCount).toBe(2);
     expect(e.attemptCount).toBe(2);
-    expect(e.nextPosition).toBe(5);
     expect(e.questions.map(q => q.id)).toEqual(['q1', 'q2']);
     expect(e.questions[0]).toEqual({
       id: 'q1', position: 0, prompt: 'Uno', explanation: 'Porque sí', correctOptionIds: ['o1'],
@@ -200,49 +201,37 @@ describe('datosPregunta', () => {
 });
 
 describe('preguntas', () => {
-  const evaluacion = { id: 'e1', kind: 'simulador', nextPosition: 3 };
+  const evaluacion = { id: 'e1', kind: 'simulador' };
   const pregunta = { prompt: '¿2+2?', options: ['4', '5', ''], correctas: [0], explanation: 'Suma' };
 
-  test('agrega la pregunta al final con opciones en orden y la clave con sus ids', async () => {
-    fake.respuestas['questions.insert'] = { data: { id: 'q1' }, error: null };
-    fake.respuestas['question_options.insert'] = { data: [{ id: 'o2', position: 1 }, { id: 'o1', position: 0 }], error: null };
-    fake.respuestas['question_keys.upsert'] = { data: null, error: null };
-
+  test('agrega la pregunta completa en una sola llamada, sin opciones vacías', async () => {
     await addQuestion(evaluacion, pregunta);
-
-    expect(pasos('questions')[0][0]).toEqual(['insert', { evaluation_id: 'e1', position: 3, prompt: '¿2+2?' }]);
-    expect(pasos('question_options')[0][0]).toEqual(['insert', [
-      { question_id: 'q1', position: 0, body: '4' },
-      { question_id: 'q1', position: 1, body: '5' },
-    ]]);
-    expect(pasos('question_keys')[0][0]).toEqual([
-      'upsert', { question_id: 'q1', correct_option_ids: ['o1'], explanation: 'Suma' }, { onConflict: 'question_id' },
-    ]);
+    expect(fake.rpc).toHaveBeenCalledWith('save_question', {
+      p_evaluation_id: 'e1',
+      p_question_id: null,
+      p_prompt: '¿2+2?',
+      p_options: ['4', '5'],
+      p_correct: [0],
+      p_explanation: 'Suma',
+    });
+    expect(fake.calls).toEqual([]);
   });
 
-  test('si la clave falla borra la pregunta a medias y explica el error', async () => {
-    fake.respuestas['questions.insert'] = { data: { id: 'q1' }, error: null };
-    fake.respuestas['question_options.insert'] = { data: [{ id: 'o1', position: 0 }, { id: 'o2', position: 1 }], error: null };
-    fake.respuestas['question_keys.upsert'] = error('CA021');
-
-    await expect(addQuestion(evaluacion, pregunta)).rejects.toThrow(/respuesta correcta/);
-    expect(pasos('questions')[1]).toEqual([['delete'], ['eq', 'id', 'q1']]);
-  });
-
-  test('con intentos no deja agregar ni editar', async () => {
-    fake.respuestas['questions.insert'] = error('CA024');
-    await expect(addQuestion(evaluacion, pregunta)).rejects.toThrow(/ya tiene intentos/);
-    fake.respuestas['questions.update'] = error('CA024');
-    await expect(updateQuestion(evaluacion, 'q1', pregunta)).rejects.toThrow(/ya tiene intentos/);
-    expect(pasos('question_options')).toEqual([]);
-  });
-
-  test('editar reemplaza enunciado, opciones y clave', async () => {
-    fake.respuestas['question_options.insert'] = { data: [{ id: 'n1', position: 0 }, { id: 'n2', position: 1 }], error: null };
+  test('editar reemplaza enunciado, opciones y clave en una sola llamada', async () => {
     await updateQuestion({ ...evaluacion, kind: 'quiz' }, 'q1', { ...pregunta, correctas: [0, 1] });
-    expect(pasos('questions')[0][0]).toEqual(['update', { prompt: '¿2+2?' }]);
-    expect(pasos('question_options')[0]).toEqual([['delete'], ['eq', 'question_id', 'q1']]);
-    expect(pasos('question_keys')[0][0][1].correct_option_ids).toEqual(['n1', 'n2']);
+    expect(fake.rpc).toHaveBeenCalledWith('save_question', expect.objectContaining({ p_question_id: 'q1', p_correct: [0, 1] }));
+  });
+
+  test('explica los errores de la base', async () => {
+    fake.respuestas.rpc = error('CA024');
+    await expect(updateQuestion(evaluacion, 'q1', pregunta)).rejects.toThrow(/ya tiene intentos/);
+    fake.respuestas.rpc = error('CA021');
+    await expect(addQuestion(evaluacion, pregunta)).rejects.toThrow(/respuesta correcta/);
+  });
+
+  test('no deja borrar la última pregunta de una evaluación publicada', async () => {
+    fake.respuestas['questions.delete'] = error('CA025');
+    await expect(deleteQuestion('q1')).rejects.toThrow(/al menos una pregunta/);
   });
 
   test('borra una pregunta', async () => {
@@ -252,6 +241,6 @@ describe('preguntas', () => {
 
   test('valida antes de llamar a la base', async () => {
     await expect(addQuestion(evaluacion, { ...pregunta, correctas: [0, 1] })).rejects.toThrow(/solo una/);
-    expect(fake.calls).toEqual([]);
+    expect(fake.rpc).not.toHaveBeenCalled();
   });
 });
